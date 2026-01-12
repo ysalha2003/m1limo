@@ -192,56 +192,61 @@
     }
 
     /* Column width distribution - adjust based on content importance and size */
+    /* For all views: Passenger column */
     table th:nth-child(1),
     table td:nth-child(1) {
         width: 18%; /* Passenger - needs space for ID, badges, name, contact */
         min-width: 180px;
     }
 
-    /* Customer column (admin only) - adjust selectors when visible */
-    .table-wrapper table th:nth-child(2),
-    .table-wrapper table td:nth-child(2) {
-        width: 14%; /* Customer info */
-        min-width: 140px;
+    /* For admin view: Customer column is 2nd */
+    /* For non-admin view: Pickup column is 2nd */
+    table th:nth-child(2),
+    table td:nth-child(2) {
+        width: 16%; /* Customer (admin) or Pickup (non-admin) */
+        min-width: 160px;
     }
 
-    /* Pickup column shifts position based on admin view */
-    table th:nth-child(2):not(.hide-mobile),
-    table td:nth-child(2):not(.hide-mobile) {
-        width: 22%; /* Pickup - addresses need more space */
-        min-width: 200px;
-    }
-
+    /* For admin view: Pickup column is 3rd */
+    /* For non-admin view: Date & Time column is 3rd */
     table th:nth-child(3),
     table td:nth-child(3) {
-        width: 22%; /* Pickup or Date depending on context */
-        min-width: 200px;
+        width: 20%; /* Pickup (admin) or Date & Time (non-admin) */
+        min-width: 180px;
     }
 
+    /* For admin view: Date & Time column is 4th */
+    /* For non-admin view: Vehicle column is 4th */
     table th:nth-child(4),
     table td:nth-child(4) {
-        width: 13%; /* Date & Time */
+        width: 13%; /* Date & Time (admin) or Vehicle (non-admin) */
         min-width: 120px;
     }
 
+    /* For admin view: Vehicle column is 5th */
+    /* For non-admin view: Status column is 5th */
     table th:nth-child(5),
     table td:nth-child(5) {
-        width: 12%; /* Vehicle or Status */
+        width: 12%; /* Vehicle (admin) or Status (non-admin) */
         min-width: 110px;
     }
 
+    /* For admin view: Status column is 6th */
+    /* For non-admin view: Actions column is 6th (last) */
     table th:nth-child(6),
     table td:nth-child(6) {
-        width: 11%; /* Status or Driver */
+        width: 11%; /* Status (admin) or Actions (non-admin) */
         min-width: 100px;
     }
 
+    /* For admin view only: Driver column is 7th */
     table th:nth-child(7),
     table td:nth-child(7) {
-        width: 13%; /* Driver or Actions */
+        width: 13%; /* Driver (admin only) */
         min-width: 110px;
     }
 
+    /* For admin view: Actions column is 8th (last) */
     table th:last-child,
     table td:last-child {
         width: 13%; /* Actions - needs space for multiple links */
