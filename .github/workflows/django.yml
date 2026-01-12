@@ -13,7 +13,8 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.10, 3.11, 3.12]
+        # Quotes are required so 3.10 is not read as 3.1
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
@@ -24,13 +25,11 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        # Only install if requirements.txt exists
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Run Tests
       run: |
-        # Only run tests if Django is installed
         if python -c "import django" 2>/dev/null; then
             python manage.py test
         else
-            echo "Django not installed (missing requirements.txt). Skipping tests."
+            echo "Django not installed. Skipping tests."
         fi
