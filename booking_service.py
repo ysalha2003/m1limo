@@ -275,8 +275,15 @@ class BookingService:
                 return_booking_updates['number_of_passengers'] = booking_data['number_of_passengers']
             if 'vehicle_type' in booking_data:
                 return_booking_updates['vehicle_type'] = booking_data['vehicle_type']
+
+            # FIX: Only update linked booking status if it's not cancelled
+            # After partial cancellation, the remaining trip should be editable independently
             if 'status' in booking_data:
-                return_booking_updates['status'] = booking_data['status']
+                linked_booking_obj = booking.linked_booking
+                if linked_booking_obj and linked_booking_obj.status not in ['Cancelled', 'Cancelled_Full_Charge']:
+                    return_booking_updates['status'] = booking_data['status']
+                else:
+                    logger.info(f"Skipping status update for linked booking {linked_booking_obj.id if linked_booking_obj else 'None'} - it's cancelled")
 
         # CRITICAL FIX #3: Validate status transition BEFORE setting field
         if 'status' in booking_data and booking_data['status'] != original_status:
@@ -330,37 +337,42 @@ class BookingService:
 
         if is_outbound_with_return and return_booking_updates:
             linked_booking = booking.linked_booking
-            logger.info(f"Updating linked return booking {linked_booking.id}")
 
-            if 'status' in return_booking_updates:
-                linked_original_status = linked_booking.status
-                if return_booking_updates['status'] != linked_original_status:
-                    linked_booking.validate_status_transition(linked_original_status, return_booking_updates['status'])
-                    logger.info(f"Validated linked booking status transition: {linked_original_status} → {return_booking_updates['status']}")
+            # FIX: Skip updating cancelled linked bookings (partial cancellation independence)
+            if linked_booking.status in ['Cancelled', 'Cancelled_Full_Charge']:
+                logger.info(f"Skipping update for linked booking {linked_booking.id} - it's cancelled")
+            else:
+                logger.info(f"Updating linked return booking {linked_booking.id}")
 
-            for field, value in return_booking_updates.items():
-                setattr(linked_booking, field, value)
+                if 'status' in return_booking_updates:
+                    linked_original_status = linked_booking.status
+                    if return_booking_updates['status'] != linked_original_status:
+                        linked_booking.validate_status_transition(linked_original_status, return_booking_updates['status'])
+                        logger.info(f"Validated linked booking status transition: {linked_original_status} → {return_booking_updates['status']}")
 
-            linked_booking.save()
-            logger.info(f"Updated linked return booking {linked_booking.id}")
+                for field, value in return_booking_updates.items():
+                    setattr(linked_booking, field, value)
 
-            if return_stops_data is not None:
-                linked_booking.stops.all().delete()
-                for stop_info in return_stops_data:
-                    BookingStop.objects.create(
-                        booking=linked_booking,
-                        address=stop_info['address'],
-                        stop_number=stop_info['stop_number'],
-                        is_return_stop=False
-                    )
+                linked_booking.save()
+                logger.info(f"Updated linked return booking {linked_booking.id}")
 
-            if notification_recipients is not None:
-                BookingNotification.objects.filter(booking=linked_booking).delete()
-                for recipient in notification_recipients:
-                    BookingNotification.objects.create(
-                        booking=linked_booking,
-                        recipient=recipient
-                    )
+                if return_stops_data is not None:
+                    linked_booking.stops.all().delete()
+                    for stop_info in return_stops_data:
+                        BookingStop.objects.create(
+                            booking=linked_booking,
+                            address=stop_info['address'],
+                            stop_number=stop_info['stop_number'],
+                            is_return_stop=False
+                        )
+
+                if notification_recipients is not None:
+                    BookingNotification.objects.filter(booking=linked_booking).delete()
+                    for recipient in notification_recipients:
+                        BookingNotification.objects.create(
+                            booking=linked_booking,
+                            recipient=recipient
+                        )
 
         if notification_recipients is not None:
             BookingNotification.objects.filter(booking=booking).delete()
