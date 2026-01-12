@@ -332,7 +332,7 @@
         }
 
         /* Make search form stack on mobile */
-        .search-form > div[style*="grid-template-columns"] {
+        .search-form-grid {
             grid-template-columns: 1fr !important;
         }
 
@@ -340,13 +340,13 @@
             width: 100%;
         }
 
-        .search-form > div > div:last-child {
+        .search-form-actions {
             flex-direction: row;
             gap: 8px;
             width: 100%;
         }
 
-        .search-form > div > div:last-child .btn {
+        .search-form-actions .btn {
             flex: 1;
         }
 
@@ -534,7 +534,7 @@
 
     <!-- Search & Filter -->
     <form method="get" class="search-form">
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end;">
+        <div class="search-form-grid" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end;">
             <div class="form-group" style="margin: 0;">
                 <label class="form-label">Search</label>
                 <input type="text" name="search" class="form-input" placeholder="Booking ID, Name, Phone, or Reference Number" value="{{ request.GET.search }}" style="margin: 0;">
@@ -556,7 +556,7 @@
                 </select>
             </div>
 
-            <div style="display: flex; gap: 8px;">
+            <div class="search-form-actions" style="display: flex; gap: 8px;">
                 <button type="submit" class="btn btn-primary" style="margin: 0;">Search</button>
                 <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="margin: 0;">Clear</a>
             </div>
