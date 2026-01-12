@@ -358,6 +358,10 @@
         background: #f8fafc;
     }
 
+    .return-row td {
+        padding: 20px 16px !important; /* Override default td padding for better spacing */
+    }
+
     .return-trip-content {
         border-left: 3px solid var(--primary);
         padding-left: 16px;
@@ -942,7 +946,7 @@
 
                     {% if booking.trip_type == 'Round' and booking.linked_booking %}
                     <tr class="return-row return-row-{{ booking.id }}" style="display: table-row;">
-                        <td colspan="{% if is_admin %}7{% else %}6{% endif %}" style="padding: 16px 24px;">
+                        <td colspan="{% if is_admin %}8{% else %}6{% endif %}" style="padding: 16px 24px;">
                             <div class="return-trip-content">
                                 <div style="font-weight: 600; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
