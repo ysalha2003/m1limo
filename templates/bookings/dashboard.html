@@ -181,16 +181,75 @@
     .table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        margin: 0 -2px; /* Compensate for potential overflow */
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
         font-size: 14px;
+        table-layout: fixed; /* Fixed layout for consistent column widths */
+    }
+
+    /* Column width distribution - adjust based on content importance and size */
+    table th:nth-child(1),
+    table td:nth-child(1) {
+        width: 18%; /* Passenger - needs space for ID, badges, name, contact */
+        min-width: 180px;
+    }
+
+    /* Customer column (admin only) - adjust selectors when visible */
+    .table-wrapper table th:nth-child(2),
+    .table-wrapper table td:nth-child(2) {
+        width: 14%; /* Customer info */
+        min-width: 140px;
+    }
+
+    /* Pickup column shifts position based on admin view */
+    table th:nth-child(2):not(.hide-mobile),
+    table td:nth-child(2):not(.hide-mobile) {
+        width: 22%; /* Pickup - addresses need more space */
+        min-width: 200px;
+    }
+
+    table th:nth-child(3),
+    table td:nth-child(3) {
+        width: 22%; /* Pickup or Date depending on context */
+        min-width: 200px;
+    }
+
+    table th:nth-child(4),
+    table td:nth-child(4) {
+        width: 13%; /* Date & Time */
+        min-width: 120px;
+    }
+
+    table th:nth-child(5),
+    table td:nth-child(5) {
+        width: 12%; /* Vehicle or Status */
+        min-width: 110px;
+    }
+
+    table th:nth-child(6),
+    table td:nth-child(6) {
+        width: 11%; /* Status or Driver */
+        min-width: 100px;
+    }
+
+    table th:nth-child(7),
+    table td:nth-child(7) {
+        width: 13%; /* Driver or Actions */
+        min-width: 110px;
+    }
+
+    table th:last-child,
+    table td:last-child {
+        width: 13%; /* Actions - needs space for multiple links */
+        min-width: 120px;
     }
 
     th {
-        padding: 12px 8px;
+        padding: 14px 12px;
         color: var(--text-secondary);
         font-weight: 600;
         font-size: 12px;
@@ -199,15 +258,49 @@
         border-bottom: 2px solid var(--border);
         text-align: left;
         white-space: nowrap;
+        background: var(--light);
     }
 
     td {
-        padding: 16px 8px;
+        padding: 18px 12px;
         border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Text overflow handling for addresses and long content */
+    td > div {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Allow multi-line for address fields specifically */
+    td > div[style*="font-size: 14px"],
+    td > div[style*="font-size: 13px"] {
+        white-space: normal;
+        line-height: 1.5;
+        overflow: visible;
+        text-overflow: clip;
     }
 
     tr:hover {
         background: var(--light);
+        transition: background-color var(--transition-fast);
+    }
+
+    /* Better hover for non-cancelled/past trips */
+    tr:not(.trip-cancelled):not(.trip-past):hover {
+        background: var(--light-hover);
+    }
+
+    /* Ensure action column content stays compact */
+    td:last-child > div {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
     }
 
     .action-link {
@@ -295,12 +388,29 @@
             font-size: 24px;
         }
 
+        /* Adjust table for tablet screens */
         table {
             font-size: 13px;
+            table-layout: auto; /* Allow flexible sizing on tablets */
         }
 
         th, td {
-            padding: 10px 6px;
+            padding: 12px 10px;
+        }
+
+        /* Reduce min-widths for tablet */
+        table th, table td {
+            min-width: 100px;
+        }
+
+        table th:nth-child(1),
+        table td:nth-child(1) {
+            min-width: 150px;
+        }
+
+        table th:last-child,
+        table td:last-child {
+            min-width: 110px;
         }
     }
 
@@ -362,17 +472,19 @@
             flex: 1;
         }
 
+        /* Mobile table optimizations */
         table {
             font-size: 12px;
+            table-layout: auto; /* Allow content to determine width on mobile */
         }
 
         th {
-            padding: 10px 6px;
+            padding: 10px 8px;
             font-size: 11px;
         }
 
         td {
-            padding: 12px 6px;
+            padding: 14px 8px;
         }
 
         .action-link {
@@ -381,7 +493,45 @@
 
         /* Hide less important columns on mobile */
         .hide-mobile {
-            display: none;
+            display: none !important;
+        }
+
+        /* Remaining columns take up available space */
+        table th:not(.hide-mobile),
+        table td:not(.hide-mobile) {
+            min-width: 0;
+        }
+
+        /* Key columns for mobile: Passenger, Pickup/Date, Status, Actions */
+        table th:nth-child(1),
+        table td:nth-child(1) {
+            width: 30%; /* Passenger gets more space */
+            min-width: 140px;
+        }
+
+        table th:nth-child(2):not(.hide-mobile),
+        table td:nth-child(2):not(.hide-mobile) {
+            width: 30%; /* Pickup or Date */
+            min-width: 140px;
+        }
+
+        table th:nth-child(3):not(.hide-mobile),
+        table td:nth-child(3):not(.hide-mobile) {
+            width: 20%; /* Status or Date */
+            min-width: 100px;
+        }
+
+        table th:last-child,
+        table td:last-child {
+            width: 20%; /* Actions */
+            min-width: 100px;
+        }
+
+        /* Improve readability of long text on mobile */
+        td > div[style*="font-size: 14px"],
+        td > div[style*="font-size: 13px"] {
+            font-size: 12px !important;
+            line-height: 1.4;
         }
     }
 
@@ -392,6 +542,34 @@
 
         .pickup-item {
             padding: 12px;
+        }
+
+        /* Further optimize table for very small screens */
+        th {
+            padding: 8px 6px;
+            font-size: 10px;
+        }
+
+        td {
+            padding: 12px 6px;
+            font-size: 11px;
+        }
+
+        /* Compact action links */
+        .action-link {
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        /* Tighter column widths for smallest screens */
+        table th:nth-child(1),
+        table td:nth-child(1) {
+            min-width: 120px;
+        }
+
+        table th:nth-child(2):not(.hide-mobile),
+        table td:nth-child(2):not(.hide-mobile) {
+            min-width: 120px;
         }
     }
 
