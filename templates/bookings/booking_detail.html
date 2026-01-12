@@ -1,0 +1,451 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Details - M1 Limousine Service{% endblock %}
+
+{% block content %}
+
+<style>
+    .booking-detail-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+        .booking-detail-layout {
+            grid-template-columns: 1fr !important;
+        }
+
+        .booking-header-actions {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+
+        .booking-header-actions > div:last-child {
+            width: 100%;
+        }
+
+        .booking-header-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="booking-header-actions" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <a href="{% url 'dashboard' %}" style="color: var(--primary); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Dashboard
+        </a>
+        <h1 style="font-size: 24px; font-weight: 700; color: var(--dark); margin: 0;">Booking Details</h1>
+        {% if booking.trip_label %}
+        <p style="color: #64748b; margin-top: 4px;">{{ booking.trip_label }} Trip</p>
+        {% endif %}
+    </div>
+    <div style="display: flex; gap: 12px;">
+        {% if booking.status != 'Cancelled' and booking.status != 'Cancelled_Full_Charge' %}
+            {% if is_admin or booking.status == 'Pending' or booking.status == 'Confirmed' and booking.hours_until_pickup > 2 %}
+                {% if booking.trip_type == 'Round' and not booking.is_return_trip %}
+                    {# Round trip - show both edit options #}
+                    <div style="position: relative;">
+                        <button onclick="toggleEditMenu()" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px;">
+                            Edit Trip
+                            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div id="editMenu" style="display: none; position: absolute; top: 100%; left: 0; margin-top: 8px; background: white; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); min-width: 250px; z-index: 1000;">
+                            <a href="{% url 'update_round_trip' booking.id %}" style="display: block; padding: 12px 16px; text-decoration: none; color: var(--dark); border-bottom: 1px solid var(--border-light); transition: var(--transition);" onmouseover="this.style.backgroundColor='var(--light)'" onmouseout="this.style.backgroundColor='white'">
+                                <div style="font-weight: 600; margin-bottom: 4px;">Edit Entire Round Trip</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Edit both outbound and return legs together</div>
+                            </a>
+                            <a href="{% url 'update_booking' booking.id %}" style="display: block; padding: 12px 16px; text-decoration: none; color: var(--dark); transition: var(--transition);" onmouseover="this.style.backgroundColor='var(--light)'" onmouseout="this.style.backgroundColor='white'">
+                                <div style="font-weight: 600; margin-bottom: 4px;">Edit This Leg Only</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">Edit just the {% if booking.is_return_trip %}return{% else %}outbound{% endif %} trip</div>
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    {# Single trip or return leg - regular edit #}
+                    <a href="{% url 'update_booking' booking.id %}" class="btn btn-primary">Edit Trip</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if can_cancel and not booking.is_terminal_status %}
+        <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-secondary">Cancel Trip</a>
+        {% endif %}
+        {% if booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}
+        <a href="{% url 'rebook_booking' booking.id %}" class="btn btn-primary">
+            <svg style="width: 16px; height: 16px; margin-right: 6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Rebook Trip
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Status Banner -->
+<div class="card" style="margin-bottom: 24px; {% if booking.status == 'Confirmed' %}background: linear-gradient(135deg, #d1fae5, #ecfdf5);{% elif booking.status == 'Pending' %}background: linear-gradient(135deg, #fef3c7, #fff7ed);{% elif booking.status == 'Trip_Completed' %}background: linear-gradient(135deg, #dbeafe, #eff6ff);{% else %}background: linear-gradient(135deg, #fee2e2, #fef2f2);{% endif %}">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <span class="badge badge-{{ booking.status|lower }}" style="font-size: 12px; padding: 6px 14px;">
+                {{ booking.get_status_display }}
+            </span>
+            {% if booking.status == 'Pending' %}
+            <p style="margin-top: 8px; color: #92400e; font-size: 13px;">Awaiting admin confirmation</p>
+            {% elif booking.status == 'Confirmed' %}
+            <p style="margin-top: 8px; color: #065f46; font-size: 13px;">Your booking is confirmed!</p>
+            {% endif %}
+        </div>
+        {% if hours_until_pickup > 0 %}
+        <div style="text-align: right;">
+            <p style="font-size: 12px; color: #64748b;">Time until pickup</p>
+            <p style="font-size: 20px; font-weight: 700; color: var(--dark);">{{ time_until_pickup_formatted }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="booking-detail-layout">
+    <!-- Main Info -->
+    <div>
+        <!-- Trip Information -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h2 class="card-title">Trip Information</h2>
+
+            <div style="display: grid; gap: 20px;">
+                <!-- Passenger Info -->
+                <div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 4px; font-weight: 600;">PASSENGER</p>
+                    <p style="font-weight: 600; font-size: 15px; color: var(--dark);">{{ booking.passenger_name }}</p>
+                    {% if booking.phone_number %}
+                    <p style="color: #64748b; font-size: 13px;">{{ booking.phone_number }}</p>
+                    {% endif %}
+                    {% if booking.passenger_email %}
+                    <p style="color: #64748b; font-size: 13px;">{{ booking.passenger_email }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Trip Details -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 4px; font-weight: 600;">PICKUP DATE & TIME</p>
+                        <p style="font-weight: 600; color: var(--dark);">{{ booking.pick_up_date|date:"M d, Y" }}</p>
+                        <p style="color: #64748b;">{{ booking.pick_up_time|time:"g:i A" }}</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 4px; font-weight: 600;">VEHICLE & TRIP TYPE</p>
+                        <p style="font-weight: 600; color: var(--dark);">{{ booking.vehicle_type }}</p>
+                        <p style="color: #64748b;">{{ booking.get_trip_type_display }} • {{ booking.number_of_passengers }} passenger{{ booking.number_of_passengers|pluralize }}</p>
+                    </div>
+                </div>
+
+                <!-- Addresses -->
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 8px; font-weight: 600;">ROUTE</p>
+                    <div style="background: var(--light); padding: 16px; border-radius: 8px; border-left: 4px solid var(--primary);">
+                        <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 24px; height: 24px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg style="width: 14px; height: 14px; color: white;" fill="currentColor" viewBox="0 0 20 20">
+                                    <circle cx="10" cy="10" r="3"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #64748b;">Pickup</p>
+                                <p style="font-weight: 600; color: var(--dark);">{{ booking.pick_up_address }}</p>
+                            </div>
+                        </div>
+
+                        {% for stop in outbound_stops %}
+                        <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 12px; margin-left: 12px;">
+                            <div style="width: 2px; height: 20px; background: #cbd5e1; margin-left: 11px;"></div>
+                        </div>
+                        <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 12px;">
+                            <div style="width: 24px; height: 24px; background: #e0e7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span style="font-size: 12px; font-weight: 700; color: #3730a3;">{{ stop.stop_number }}</span>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #64748b;">Stop {{ stop.stop_number }}</p>
+                                <p style="font-weight: 500; color: var(--dark);">{{ stop.address }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% if booking.drop_off_address %}
+                        {% if outbound_stops %}
+                        <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 12px; margin-left: 12px;">
+                            <div style="width: 2px; height: 20px; background: #cbd5e1; margin-left: 11px;"></div>
+                        </div>
+                        {% endif %}
+                        <div style="display: flex; align-items: start; gap: 12px;">
+                            <div style="width: 24px; height: 24px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg style="width: 14px; height: 14px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #64748b;">Drop-off</p>
+                                <p style="font-weight: 600; color: var(--dark);">{{ booking.drop_off_address }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Additional Details -->
+                {% if booking.flight_number or booking.hours_booked or booking.notes %}
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 8px; font-weight: 600;">ADDITIONAL DETAILS</p>
+                    {% if booking.flight_number %}
+                    <p style="margin-bottom: 8px;"><strong>Flight Number:</strong> {{ booking.flight_number }}</p>
+                    {% endif %}
+                    {% if booking.hours_booked %}
+                    <p style="margin-bottom: 8px;"><strong>Hours Booked:</strong> {{ booking.hours_booked }} hours</p>
+                    {% endif %}
+                    {% if booking.notes %}
+                    <p style="margin-bottom: 8px;"><strong>Special Requests:</strong></p>
+                    <div style="background: var(--light); padding: 12px; border-radius: 6px;">
+                        {{ booking.notes|linebreaksbr }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Driver Assignment -->
+        {% if booking.assigned_driver %}
+        <div class="card" style="margin-bottom: 24px; {% if booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}opacity: 0.5; background-color: rgba(0,0,0,0.02);{% endif %}">
+            <h2 class="card-title">Driver {% if request.user.is_staff %}Assignment{% else %}Information{% endif %}{% if booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %} <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);">(Trip Cancelled)</span>{% endif %}</h2>
+
+            <div style="display: grid; gap: 16px;">
+                <!-- Driver Info - Show basic info to customers if share_driver_info is True -->
+                {% if request.user.is_staff or booking.share_driver_info %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Driver Name</p>
+                        <p style="font-weight: 600; color: var(--dark);">{{ booking.assigned_driver.full_name }}</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Vehicle</p>
+                        <p style="font-weight: 600; color: var(--dark);">{{ booking.assigned_driver.car_type }} ({{ booking.assigned_driver.car_number }})</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Phone</p>
+                        <p style="font-weight: 600; color: var(--dark);">{{ booking.assigned_driver.phone_number }}</p>
+                    </div>
+                    {% if request.user.is_staff %}
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Response Status</p>
+                        <p style="font-weight: 600;">
+                            {% if booking.driver_response_status == 'accepted' %}
+                                <span style="color: #059669;">✓ Accepted</span>
+                            {% elif booking.driver_response_status == 'rejected' %}
+                                <span style="color: #dc2626;">✗ Rejected</span>
+                            {% elif booking.driver_response_status == 'completed' %}
+                                <span style="color: #0c5460;">✓ Completed</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div style="padding: 16px; background: var(--color-gray-50); border-radius: 8px; text-align: center;">
+                    <p style="color: var(--text-secondary); font-size: 14px;">Driver information will be shared once confirmed by admin.</p>
+                </div>
+                {% endif %}
+
+                <!-- Payment Info (Admin Only) -->
+                {% if request.user.is_staff and booking.driver_payment_amount %}
+                <div style="background: #fff8e1; padding: 16px; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <p style="font-weight: 600; margin-bottom: 8px;">Payment Information</p>
+                    <p><strong>Amount:</strong> ${{ booking.driver_payment_amount }}</p>
+                    {% if booking.driver_paid %}
+                        <p style="color: #2e7d32;"><strong>Status:</strong> ✓ Paid on {{ booking.driver_paid_at|date:"M d, Y" }}</p>
+                        <p style="font-size: 13px; color: #666;">Marked by: {{ booking.driver_paid_by.username }}</p>
+                    {% else %}
+                        <p style="color: #f57c00;"><strong>Status:</strong> ⏳ Payment Pending</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Admin Note (Admin Only) -->
+                {% if request.user.is_staff and booking.driver_admin_note %}
+                <div style="background: #fff3cd; padding: 16px; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <p style="font-weight: 600; margin-bottom: 8px;">Note to Driver</p>
+                    <p style="white-space: pre-line;">{{ booking.driver_admin_note }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Admin Actions -->
+                {% if request.user.is_staff %}
+                <div style="display: flex; gap: 12px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                    <a href="{% url 'resend_driver_notification' booking.id %}" class="btn btn-secondary">
+                        Resend Driver Email
+                    </a>
+                    {% if booking.driver_response_status == 'completed' and not booking.driver_paid %}
+                    <a href="{% url 'mark_driver_paid' booking.id %}" class="btn btn-primary">
+                        Mark as Paid
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'driver_list_by_driver' booking.assigned_driver.id %}" class="btn btn-secondary">
+                        View All Driver's Trips
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+            {% if request.user.is_staff and booking.status not in 'Cancelled,Cancelled_Full_Charge,Trip_Completed' %}
+            <div class="card" style="margin-bottom: 24px;">
+                <h2 class="card-title">Driver Assignment</h2>
+                <p style="color: #64748b; margin-bottom: 16px;">No driver assigned to this trip.</p>
+                <a href="{% url 'assign_driver' booking.id %}" class="btn btn-primary">Assign Driver</a>
+            </div>
+            {% endif %}
+        {% endif %}
+
+        <!-- Linked Booking (Round Trip) -->
+        {% if linked_booking %}
+        <div class="card" style="margin-bottom: 24px; border: 2px solid #e0e7ff;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 32px; height: 32px; background: #e0e7ff; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <svg style="width: 18px; height: 18px; color: #3730a3;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                    </div>
+                    <h2 class="card-title" style="margin: 0;">Linked {{ linked_booking.trip_label }} Trip</h2>
+                </div>
+            </div>
+
+            <div style="background: var(--light); padding: 16px; border-radius: 8px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Date & Time</p>
+                        <p style="font-weight: 600;">{{ linked_booking.pick_up_date|date:"M d, Y" }} at {{ linked_booking.pick_up_time|time:"g:i A" }}</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Status</p>
+                        <span class="badge badge-{{ linked_booking.status|lower }}">{{ linked_booking.get_status_display }}</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Route</p>
+                    <p style="font-weight: 500;">{{ linked_booking.pick_up_address }} → {{ linked_booking.drop_off_address }}</p>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <a href="{% url 'booking_detail' linked_booking.id %}" style="color: var(--primary); text-decoration: none; font-weight: 500; font-size: 14px;">View Full Details →</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+        <!-- Booking Info -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--dark);">Booking Information</h3>
+            <div style="display: grid; gap: 12px;">
+                {% if booking.booking_reference %}
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Reference Number</p>
+                    <p style="font-weight: 700; color: var(--primary); font-size: 16px;">{{ booking.booking_reference }}</p>
+                </div>
+                {% endif %}
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Trip ID</p>
+                    <p style="font-weight: 600; color: var(--dark);">#{{ booking.id }}</p>
+                </div>
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Created</p>
+                    <p style="font-weight: 500; color: var(--dark);">{{ booking.created_at|date:"M d, Y g:i A" }}</p>
+                </div>
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Last Updated</p>
+                    <p style="font-weight: 500; color: var(--dark);">{{ booking.updated_at|date:"M d, Y g:i A" }}</p>
+                </div>
+                {% if is_admin %}
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Customer</p>
+                    <p style="font-weight: 500; color: var(--dark);">{{ booking.user.username }}</p>
+                    <p style="font-size: 13px; color: #64748b;">{{ booking.user.email }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        {% if is_admin %}
+        <div class="card" style="margin-bottom: 24px;">
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--dark);">Quick Actions</h3>
+            <div style="display: grid; gap: 8px;">
+                {% if booking.status == 'Pending' %}
+                <a href="{% url 'booking_actions' booking.id 'confirm' %}" class="btn btn-primary" style="width: 100%; justify-content: center;">✓ Confirm Booking</a>
+                <a href="{% url 'booking_actions' booking.id 'assign_driver' %}" class="btn btn-secondary" style="width: 100%; justify-content: center;">🚗 Assign Driver</a>
+                {% elif booking.status == 'Confirmed' %}
+                    {% if booking.hours_until_pickup <= 0 %}
+                        <a href="{% url 'booking_actions' booking.id 'complete' %}" class="btn btn-primary" style="width: 100%; justify-content: center;">✓ Mark as Completed</a>
+                    {% else %}
+                        <button class="btn btn-primary" style="width: 100%; justify-content: center; opacity: 0.5; cursor: not-allowed;" disabled title="Cannot complete until after pickup time ({{ booking.time_until_pickup_formatted }} remaining)">✓ Mark as Completed</button>
+                    {% endif %}
+                <a href="{% url 'booking_actions' booking.id 'assign_driver' %}" class="btn btn-secondary" style="width: 100%; justify-content: center;">🚗 Assign Driver</a>
+                {% endif %}
+                {% if booking.status not in 'Cancelled,Cancelled_Full_Charge' %}
+                <a href="{% url 'update_booking' booking.id %}" class="btn btn-secondary" style="width: 100%; justify-content: center;">Edit Booking</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Notifications Sent -->
+        {% if is_admin and notifications %}
+        <div class="card">
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--dark);">Recent Notifications</h3>
+            <div style="display: grid; gap: 12px;">
+                {% for notif in notifications %}
+                <div style="padding: 12px; background: var(--light); border-radius: 6px;">
+                    <div style="display: flex; justify-content: between; align-items: start; gap: 8px;">
+                        <div style="flex: 1;">
+                            <p style="font-weight: 600; font-size: 13px; color: var(--dark);">{{ notif.get_notification_type_display }}</p>
+                            <p style="font-size: 12px; color: #64748b;">{{ notif.recipient }}</p>
+                        </div>
+                        {% if notif.success %}
+                        <span style="color: #10b981; font-size: 12px;">✓</span>
+                        {% else %}
+                        <span style="color: #ef4444; font-size: 12px;">✗</span>
+                        {% endif %}
+                    </div>
+                    <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">{{ notif.sent_at|date:"M d, g:i A" }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleEditMenu() {
+    const menu = document.getElementById('editMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('editMenu');
+    const button = event.target.closest('button[onclick="toggleEditMenu()"]');
+
+    if (!button && menu && !menu.contains(event.target)) {
+        menu.style.display = 'none';
+    }
+});
+</script>
+
+{% endblock %}

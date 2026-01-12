@@ -1,0 +1,24 @@
+# Python / Django
+*.pyc
+__pycache__/
+venv/
+env/
+db.sqlite3
+*.log
+logs/
+.DS_Store
+
+# Static collection folder (keep source 'static', ignore collected 'staticfiles')
+staticfiles/
+
+# Sensitive media (if any)
+media/
+__pycache__/
+*.pyc
+venv/
+db.sqlite3
+logs/
+*.log
+staticfiles/
+.DS_Store
+.env

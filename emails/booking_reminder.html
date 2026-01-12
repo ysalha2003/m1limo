@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1 Limousine - Pickup Reminder</title>
+    <style>
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 32px 24px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .header p {
+            margin: 0;
+            font-size: 13px;
+            color: #dbeafe;
+            font-weight: 500;
+        }
+        .reminder-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-weight: 600;
+            margin-top: 16px;
+            font-size: 13px;
+            letter-spacing: -0.01em;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .content {
+            padding: 32px 24px;
+            text-align: center;
+        }
+        .time-display {
+            font-size: 28px;
+            font-weight: 700;
+            color: #3b82f6;
+            margin: 16px 0;
+            letter-spacing: -0.02em;
+        }
+        .date-display {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        .message {
+            font-size: 15px;
+            color: #475569;
+            margin: 24px 0;
+            line-height: 1.6;
+        }
+        .booking-ref {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+        .booking-ref strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 14px 28px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14.5px;
+            margin-top: 8px;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.15);
+        }
+        .footer {
+            padding: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            border-top: 1px solid #f1f5f9;
+        }
+        .footer p {
+            margin: 6px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- Logo -->
+            <div style="margin-bottom: 20px;">
+                {% if company_info.logo_url %}
+                <img src="{{ company_info.logo_url }}" alt="M1 Limousine" style="height: 60px; width: auto; display: inline-block;">
+                {% else %}
+                <div style="font-size: 32px; font-weight: 700; letter-spacing: -0.02em;">M1</div>
+                <div style="font-size: 14px; font-weight: 400; letter-spacing: 0.1em; margin-top: 4px;">Limousine</div>
+                {% endif %}
+            </div>
+            <h1>
+                {% if is_return %}
+                    Return Trip Reminder
+                {% else %}
+                    Pickup Reminder
+                {% endif %}
+            </h1>
+            <p>Your trip is in 2 hours</p>
+            <span class="reminder-badge">Upcoming</span>
+        </div>
+
+        <div class="content">
+            <p class="booking-ref">Booking Reference: <strong>#{{ booking.id }}</strong></p>
+
+            <div class="date-display">
+                {{ booking.pick_up_date|date:"l, F j, Y" }}
+            </div>
+
+            <div class="time-display">
+                {% if is_return %}
+                    {{ booking.return_time }}
+                {% else %}
+                    {{ booking.pick_up_time }}
+                {% endif %}
+            </div>
+
+            <p class="message">
+                {% if is_return %}
+                    Your return trip is scheduled in approximately 2 hours.
+                {% else %}
+                    Your pickup is scheduled in approximately 2 hours.
+                {% endif %}
+                <br>Please be ready at the pickup location.
+            </p>
+
+            <a href="{{ company_info.dashboard_url|default:'#' }}" class="btn">View Details</a>
+        </div>
+
+        <div class="footer">
+            <p><strong>M1 Limousine Service</strong></p>
+            {% if company_info %}
+            <p>{{ company_info.phone }} | {{ company_info.email }}</p>
+            {% endif %}
+            <p style="margin-top: 12px; font-size: 11px;">&copy; {% now "Y" %} M1 Limousine Service</p>
+        </div>
+    </div>
+</body>
+</html>

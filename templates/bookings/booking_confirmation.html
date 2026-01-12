@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmed - M1 Limousine Service{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 800px; margin: 0 auto;">
+    <!-- Success Header -->
+    <div style="text-align: center; margin-bottom: 40px;">
+        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);">
+            <svg style="width: 44px; height: 44px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <h1 style="font-size: 32px; font-weight: 700; color: var(--dark); margin-bottom: 12px;">
+            {% if booking.status == 'Confirmed' %}
+            Booking Confirmed!
+            {% else %}
+            Booking Request Submitted!
+            {% endif %}
+        </h1>
+        <p style="font-size: 16px; color: #64748b; margin-bottom: 24px;">
+            {% if booking.status == 'Confirmed' %}
+            Your reservation has been confirmed. We'll send you a reminder before your pickup.
+            {% else %}
+            We've received your booking request and will confirm it shortly.
+            {% endif %}
+        </p>
+
+        {% if booking.booking_reference %}
+        <div style="background: linear-gradient(135deg, #fef3c7, #fff7ed); padding: 20px; border-radius: 12px; border: 2px solid var(--primary); margin-bottom: 32px;">
+            <p style="font-size: 13px; color: #92400e; margin-bottom: 8px; font-weight: 600;">YOUR BOOKING REFERENCE</p>
+            <p style="font-size: 32px; font-weight: 700; color: var(--primary); letter-spacing: 2px;">{{ booking.booking_reference }}</p>
+            <p style="font-size: 13px; color: #92400e; margin-top: 8px;">Save this number for future reference</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Booking Summary -->
+    <div class="card" style="margin-bottom: 24px;">
+        <h2 class="card-title">Trip Summary</h2>
+
+        <div style="display: grid; gap: 20px;">
+            <!-- Passenger -->
+            <div>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 6px; font-weight: 600;">PASSENGER</p>
+                <p style="font-weight: 600; font-size: 16px; color: var(--dark);">{{ booking.passenger_name }}</p>
+                <p style="color: #64748b;">{{ booking.phone_number }}{% if booking.passenger_email %} • {{ booking.passenger_email }}{% endif %}</p>
+            </div>
+
+            <!-- Trip Details -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 6px; font-weight: 600;">PICKUP DATE & TIME</p>
+                    <p style="font-weight: 600; color: var(--dark);">{{ booking.pick_up_date|date:"l, M d, Y" }}</p>
+                    <p style="color: var(--primary); font-weight: 600;">{{ booking.pick_up_time|time:"g:i A" }}</p>
+                </div>
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 6px; font-weight: 600;">VEHICLE</p>
+                    <p style="font-weight: 600; color: var(--dark);">{{ booking.vehicle_type }}</p>
+                    <p style="color: #64748b;">{{ booking.number_of_passengers }} passenger{{ booking.number_of_passengers|pluralize }}</p>
+                </div>
+            </div>
+
+            <!-- Route -->
+            <div>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 8px; font-weight: 600;">ROUTE</p>
+                <div style="background: var(--light); padding: 16px; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <div style="width: 20px; height: 20px; background: var(--primary); border-radius: 50%; flex-shrink: 0;"></div>
+                        <div>
+                            <p style="font-size: 12px; color: #64748b;">From</p>
+                            <p style="font-weight: 600; color: var(--dark);">{{ booking.pick_up_address }}</p>
+                        </div>
+                    </div>
+                    {% if booking.drop_off_address %}
+                    <div style="width: 2px; height: 16px; background: #cbd5e1; margin-left: 9px; margin-bottom: 8px;"></div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 20px; height: 20px; background: #10b981; border-radius: 50%; flex-shrink: 0;"></div>
+                        <div>
+                            <p style="font-size: 12px; color: #64748b;">To</p>
+                            <p style="font-weight: 600; color: var(--dark);">{{ booking.drop_off_address }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if booking.notes %}
+            <div>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 6px; font-weight: 600;">SPECIAL REQUESTS</p>
+                <div style="background: var(--light); padding: 12px; border-radius: 6px;">
+                    {{ booking.notes|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Linked Booking -->
+    {% if linked_booking %}
+    <div class="card" style="margin-bottom: 24px; border: 2px solid #e0e7ff;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 32px; height: 32px; background: #e0e7ff; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <svg style="width: 18px; height: 18px; color: #3730a3;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                </svg>
+            </div>
+            <h2 class="card-title" style="margin: 0;">Return Trip Also Booked</h2>
+        </div>
+
+        <div style="background: var(--light); padding: 16px; border-radius: 8px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Date & Time</p>
+                    <p style="font-weight: 600;">{{ linked_booking.pick_up_date|date:"M d, Y" }} at {{ linked_booking.pick_up_time|time:"g:i A" }}</p>
+                </div>
+                <div>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Reference</p>
+                    <p style="font-weight: 700; color: var(--primary);">{{ linked_booking.booking_reference }}</p>
+                </div>
+            </div>
+            <div>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Route</p>
+                <p style="font-weight: 500;">{{ linked_booking.pick_up_address }} → {{ linked_booking.drop_off_address }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Next Steps -->
+    <div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, #dbeafe, #eff6ff);">
+        <h2 class="card-title">What Happens Next?</h2>
+        <div style="display: grid; gap: 16px;">
+            {% if booking.status == 'Pending' %}
+            <div style="display: flex; gap: 12px;">
+                <div style="width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-weight: 700; color: #3b82f6;">1</span>
+                </div>
+                <div>
+                    <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Awaiting Confirmation</p>
+                    <p style="color: #475569; font-size: 14px;">Our team will review and confirm your booking shortly.</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <div style="width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-weight: 700; color: #3b82f6;">2</span>
+                </div>
+                <div style="flex: 1;">
+                    <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Email Notification</p>
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">You'll receive an email once your booking is confirmed.</p>
+                    {% if notification_recipients %}
+                    <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #3b82f6;">
+                        <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Will be sent to:</p>
+                        {% for email in notification_recipients %}
+                        <p style="font-size: 13px; color: var(--dark); font-weight: 500;">
+                            <span style="color: #3b82f6;">•</span> {{ email }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <div style="width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-weight: 700; color: #3b82f6;">3</span>
+                </div>
+                <div style="flex: 1;">
+                    <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Pickup Reminder</p>
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">We'll send you a reminder 24 hours before your scheduled pickup.</p>
+                    {% if reminder_recipients %}
+                    <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #3b82f6;">
+                        <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Will be sent to:</p>
+                        {% for email in reminder_recipients %}
+                        <p style="font-size: 13px; color: var(--dark); font-weight: 500;">
+                            <span style="color: #3b82f6;">•</span> {{ email }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div style="display: flex; gap: 12px;">
+                <div style="width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-weight: 700; color: #10b981;">✓</span>
+                </div>
+                <div style="flex: 1;">
+                    <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Confirmation Email Sent</p>
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">Check your email for booking details and confirmation.</p>
+                    {% if notification_recipients %}
+                    <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #10b981;">
+                        <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Sent to:</p>
+                        {% for email in notification_recipients %}
+                        <p style="font-size: 13px; color: var(--dark); font-weight: 500;">
+                            <span style="color: #10b981;">✓</span> {{ email }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <div style="width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-weight: 700; color: #3b82f6;">!</span>
+                </div>
+                <div style="flex: 1;">
+                    <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Pickup Reminder</p>
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">We'll send you a reminder 24 hours before your scheduled pickup.</p>
+                    {% if reminder_recipients %}
+                    <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #3b82f6;">
+                        <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Will be sent to:</p>
+                        {% for email in reminder_recipients %}
+                        <p style="font-size: 13px; color: var(--dark); font-weight: 500;">
+                            <span style="color: #3b82f6;">•</span> {{ email }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'booking_detail' booking.id %}" class="btn btn-primary" style="flex: 1 1 auto; min-width: 200px;">View Full Details</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="flex: 1 1 auto; min-width: 200px;">Go to Dashboard</a>
+        <a href="{% url 'new_booking' %}" class="btn btn-secondary" style="flex: 1 1 auto; min-width: 200px;">Book Another Trip</a>
+    </div>
+</div>
+
+<style>
+/* Mobile responsive button fixes */
+@media (max-width: 768px) {
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 600px) {
+    div[style*="display: flex"] > .btn {
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
+}
+</style>
+
+{% endblock %}

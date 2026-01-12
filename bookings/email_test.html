@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Email Test - M1 Limo{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl mb-4">
+                <i class="fas fa-envelope-open-text mr-2"></i>
+                Email System Test
+            </h2>
+
+            <!-- Admin Only Notice -->
+            <div class="alert alert-info mb-6">
+                <div>
+                    <i class="fas fa-user-shield mr-2"></i>
+                    <span><strong>Admin Only:</strong> This page allows you to test the email notification system.</span>
+                </div>
+            </div>
+
+            <!-- Test Form -->
+            <form method="get" class="mb-6">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Test Email Address</span>
+                    </label>
+                    <div class="input-group">
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Enter email address"
+                            class="input input-bordered flex-1"
+                            value="{{ request.GET.email|default:request.user.email }}"
+                            required
+                        >
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Send Test Email
+                        </button>
+                    </div>
+                    <label class="label">
+                        <span class="label-text-alt">Default: {{ request.user.email }}</span>
+                    </label>
+                </div>
+            </form>
+
+            <!-- Results -->
+            {% if results %}
+                <div class="divider"></div>
+
+                <h3 class="text-xl font-bold mb-4">Test Results</h3>
+
+                {% if results.success %}
+                    <div class="alert alert-success mb-4">
+                        <div>
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <div>
+                                <h3 class="font-bold">Email Sent Successfully!</h3>
+                                <p>{{ results.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-error mb-4">
+                        <div>
+                            <i class="fas fa-times-circle mr-2"></i>
+                            <div>
+                                <h3 class="font-bold">Email Sending Failed</h3>
+                                <p>{{ results.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Email Configuration Info -->
+                <div class="card bg-base-200 mt-4">
+                    <div class="card-body">
+                        <h4 class="card-title text-lg">Email Configuration</h4>
+                        <div class="overflow-x-auto">
+                            <table class="table table-compact w-full">
+                                <tbody>
+                                    <tr>
+                                        <td class="font-semibold">Email Backend:</td>
+                                        <td><code class="bg-base-300 px-2 py-1 rounded">{{ results.config.backend }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-semibold">SMTP Host:</td>
+                                        <td><code class="bg-base-300 px-2 py-1 rounded">{{ results.config.host }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-semibold">SMTP Port:</td>
+                                        <td><code class="bg-base-300 px-2 py-1 rounded">{{ results.config.port }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-semibold">Use TLS:</td>
+                                        <td>
+                                            {% if results.config.use_tls %}
+                                                <span class="badge badge-success">Enabled</span>
+                                            {% else %}
+                                                <span class="badge badge-warning">Disabled</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-semibold">From Email:</td>
+                                        <td><code class="bg-base-300 px-2 py-1 rounded">{{ results.config.from_email }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-semibold">Host User:</td>
+                                        <td><code class="bg-base-300 px-2 py-1 rounded">{{ results.config.host_user }}</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting Tips -->
+                {% if not results.success %}
+                    <div class="card bg-base-200 mt-4">
+                        <div class="card-body">
+                            <h4 class="card-title text-lg">
+                                <i class="fas fa-tools mr-2"></i>
+                                Troubleshooting Tips
+                            </h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Verify your SMTP credentials in the environment variables (.env file)</li>
+                                <li>Check that EMAIL_HOST_PASSWORD is correct (for Gmail, use an App Password)</li>
+                                <li>Ensure your email provider allows SMTP connections</li>
+                                <li>Verify firewall settings allow outbound connections on port {{ results.config.port }}</li>
+                                <li>For Gmail: Enable "Less secure app access" or use App Passwords with 2FA</li>
+                                <li>Check the logs in logs/m1limo.log for detailed error messages</li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <!-- Back Button -->
+            <div class="card-actions justify-end mt-6">
+                <a href="{% url 'dashboard' %}" class="btn btn-ghost">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

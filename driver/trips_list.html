@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>My Trips - M1 Limousine Service</title>
+
+    <!-- Poppins Font to match main app -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #475569;
+            font-size: 14px;
+        }
+        .driver-info {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        }
+        .driver-info h2 {
+            color: #0f172a;
+            font-weight: 700;
+        }
+        .driver-info p {
+            color: #475569;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #0f172a;
+            padding: 10px;
+            background: #f1f5f9;
+            border-left: 4px solid #0f172a;
+        }
+        .trip-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .trip-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .trip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .trip-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-upcoming {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .status-completed {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        .trip-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .trip-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+        }
+        .payment-info {
+            background: #fff8e1;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        .payment-info strong {
+            color: #f57c00;
+        }
+
+        /* =================================
+           MOBILE RESPONSIVENESS
+           ================================= */
+
+        /* Tablet (1024px and below) */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 16px;
+            }
+            .trip-details {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        /* Mobile (768px and below) */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            .container {
+                padding: 0;
+            }
+            .header {
+                margin-bottom: 24px;
+                padding: 16px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .header p {
+                font-size: 13px;
+            }
+            .driver-info {
+                padding: 16px;
+            }
+            .section-title {
+                font-size: 16px;
+                padding: 8px;
+            }
+            .trip-card {
+                padding: 16px;
+            }
+            .trip-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .trip-id {
+                font-size: 16px;
+            }
+            .detail-label {
+                font-size: 10px;
+            }
+            .detail-value {
+                font-size: 14px;
+            }
+            .status-badge {
+                font-size: 11px;
+                padding: 5px 10px;
+            }
+            .btn {
+                width: 100%;
+                text-align: center;
+                padding: 12px 20px;
+            }
+            .trip-actions {
+                margin-top: 12px;
+                padding-top: 12px;
+            }
+        }
+
+        /* Small Mobile (480px and below) */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            .trip-card {
+                padding: 14px;
+            }
+            .detail-value {
+                font-size: 13px;
+            }
+            .payment-info {
+                padding: 10px;
+                margin-left: -14px;
+                margin-right: -14px;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>M1 Limousine Service</h1>
+            <p>Driver Trip Management Portal</p>
+        </div>
+
+        {% if invalid %}
+            <div style="background: white; padding: 40px; border-radius: 12px; text-align: center;">
+                <h2 style="color: #d32f2f; margin-bottom: 15px;">Invalid Access</h2>
+                <p>This link is invalid or has expired. Please contact M1 Limousine Service for a new link.</p>
+            </div>
+        {% else %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="driver-info">
+                <h2 style="margin-bottom: 10px;">Welcome, {{ driver.full_name }}!</h2>
+                <p style="color: #666;">{{ driver.email }} | {{ driver.phone_number }}</p>
+                <p style="color: #666; margin-top: 5px;">Vehicle: {{ driver.car_type }} ({{ driver.car_number }})</p>
+            </div>
+
+            <!-- Upcoming Trips -->
+            <div class="section">
+                <div class="section-title">
+                    Upcoming & Active Trips ({{ upcoming_trips|length }})
+                </div>
+                {% if upcoming_trips %}
+                    {% for trip in upcoming_trips %}
+                    <div class="trip-card">
+                        <div class="trip-header">
+                            <div class="trip-id">Trip #{{ trip.id }}</div>
+                            <span class="status-badge status-upcoming">Upcoming</span>
+                        </div>
+                        <div class="trip-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Pickup Date & Time</div>
+                                <div class="detail-value">{{ trip.pick_up_date|date:"l, F j, Y" }}</div>
+                                <div class="detail-value" style="color: #f4c430;">{{ trip.pick_up_time|time:"g:i A" }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Passenger</div>
+                                <div class="detail-value">{{ trip.passenger_name }}</div>
+                                <div style="font-size: 13px; color: #666;">{{ trip.phone_number }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Pickup Location</div>
+                                <div class="detail-value">{{ trip.pick_up_address }}</div>
+                            </div>
+                            {% if trip.drop_off_address %}
+                            <div class="detail-item">
+                                <div class="detail-label">Drop-off Location</div>
+                                <div class="detail-value">{{ trip.drop_off_address }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if trip.driver_payment_amount %}
+                        <div class="payment-info">
+                            <strong>Payment:</strong> ${{ trip.driver_payment_amount }}
+                        </div>
+                        {% endif %}
+                        <div class="trip-actions">
+                            {% if trip.can_complete %}
+                                <form method="post" style="display: inline-block; width: 100%;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="booking_id" value="{{ trip.id }}">
+                                    <input type="hidden" name="booking_token" value="{{ trip.trip_token }}">
+                                    <input type="hidden" name="action" value="complete">
+                                    <button type="submit" class="btn btn-success" style="width: 100%; border: none; cursor: pointer; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                        ✓ Confirm Trip Completion
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'driver_trip_response' trip.id trip.trip_token %}" class="btn btn-primary">
+                                    View Trip Details
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>No upcoming trips assigned.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Completed Trips -->
+            <div class="section">
+                <div class="section-title">
+                    Completed Trips ({{ completed_trips|length }})
+                </div>
+                {% if completed_trips %}
+                    {% for trip in completed_trips %}
+                    <div class="trip-card">
+                        <div class="trip-header">
+                            <div class="trip-id">Trip #{{ trip.id }}</div>
+                            <span class="status-badge status-completed">
+                                ✓ Completed
+                                {% if trip.driver_paid %} | Paid{% endif %}
+                            </span>
+                        </div>
+                        <div class="trip-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Trip Date</div>
+                                <div class="detail-value">{{ trip.pick_up_date|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Passenger</div>
+                                <div class="detail-value">{{ trip.passenger_name }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Route</div>
+                                <div class="detail-value">{{ trip.pick_up_address }}</div>
+                                {% if trip.drop_off_address %}
+                                <div style="font-size: 13px; color: #666;">→ {{ trip.drop_off_address }}</div>
+                                {% endif %}
+                            </div>
+                            {% if trip.driver_completed_at %}
+                            <div class="detail-item">
+                                <div class="detail-label">Completed At</div>
+                                <div class="detail-value">{{ trip.driver_completed_at|date:"M d, Y g:i A" }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if trip.driver_payment_amount %}
+                        <div class="payment-info" style="{% if trip.driver_paid %}background: #e8f5e9; border-color: #4caf50;{% endif %}">
+                            <strong>Payment:</strong> ${{ trip.driver_payment_amount }}
+                            {% if trip.driver_paid %}
+                            <span style="color: #2e7d32; margin-left: 10px;">✓ Paid on {{ trip.driver_paid_at|date:"M d, Y" }}</span>
+                            {% else %}
+                            <span style="color: #f57c00; margin-left: 10px;">⏳ Pending Payment</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>No completed trips yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        {% endif %}
+    </div>
+</body>
+</html>

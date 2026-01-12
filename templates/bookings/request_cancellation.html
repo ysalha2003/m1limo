@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Request Cancellation - M1 Limo{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl mb-4">
+                <i class="fas fa-ban mr-2"></i>
+                Request Booking Cancellation
+            </h2>
+
+            <!-- Booking Details -->
+            <div class="alert alert-info mb-6">
+                <div>
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <div>
+                        <h3 class="font-bold">Booking Details</h3>
+                        <p><strong>Passenger:</strong> {{ booking.passenger_name }}</p>
+                        <p><strong>Pickup:</strong> {{ booking.pick_up_address }}</p>
+                        <p><strong>Date & Time:</strong> {{ booking.pick_up_date|date:"F d, Y" }} at {{ booking.pick_up_time|time:"g:i A" }}</p>
+                        <p><strong>Status:</strong> <span class="badge {{ booking.status_color }}">{{ booking.get_status_display }}</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cancellation Policy Alert -->
+            {% with can_cancel_info=booking.can_cancel_formatted %}
+            <div class="alert {% if can_cancel_info.1 %}alert-warning{% else %}alert-success{% endif %} mb-6">
+                <div>
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <div>
+                        <h3 class="font-bold">Cancellation Policy</h3>
+                        {% if can_cancel_info.1 %}
+                            <p class="text-warning-content">
+                                <strong>Warning:</strong> Your pickup is less than 4 hours away ({{ can_cancel_info.2 }} remaining).
+                                Cancelling now will result in <strong>full charges</strong> being applied.
+                            </p>
+                        {% else %}
+                            <p class="text-success-content">
+                                Your pickup is more than 4 hours away ({{ can_cancel_info.2 }} remaining).
+                                You can cancel <strong>free of charge</strong>.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+
+            <!-- Cancellation Form -->
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                <!-- Display Form Errors -->
+                {% if form.errors %}
+                    <div class="alert alert-error mb-4">
+                        <div>
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            <div>
+                                <h3 class="font-bold">Please correct the following errors:</h3>
+                                <ul class="list-disc list-inside">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Cancellation Reason -->
+                <div class="form-control">
+                    <label class="label" for="{{ form.cancellation_reason.id_for_label }}">
+                        <span class="label-text font-semibold">
+                            Reason for Cancellation <span class="text-error">*</span>
+                        </span>
+                    </label>
+                    {{ form.cancellation_reason }}
+                    {% if form.cancellation_reason.help_text %}
+                        <label class="label">
+                            <span class="label-text-alt">{{ form.cancellation_reason.help_text }}</span>
+                        </label>
+                    {% endif %}
+                    {% if form.cancellation_reason.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ form.cancellation_reason.errors.0 }}</span>
+                        </label>
+                    {% endif %}
+                </div>
+
+                <!-- Policy Acknowledgment -->
+                <div class="form-control">
+                    <label class="label cursor-pointer justify-start">
+                        <input type="checkbox" required class="checkbox checkbox-primary mr-3" name="acknowledge_policy" id="acknowledge_policy">
+                        <span class="label-text">
+                            I understand and acknowledge the cancellation policy stated above
+                            <span class="text-error">*</span>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card-actions justify-end gap-2 pt-4">
+                    <a href="{% url 'dashboard' %}" class="btn btn-ghost">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Dashboard
+                    </a>
+                    <button type="submit" class="btn btn-error">
+                        <i class="fas fa-ban mr-2"></i>
+                        Submit Cancellation Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    {{ form.cancellation_reason }} {
+        @apply textarea textarea-bordered w-full;
+    }
+</style>
+{% endblock %}

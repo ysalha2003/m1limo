@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - M1 Limousine{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 24px;
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    }
+
+    .error-content {
+        max-width: 600px;
+        text-align: center;
+    }
+
+    .error-code {
+        font-size: clamp(80px, 15vw, 140px);
+        font-weight: 800;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        margin: 0 0 24px 0;
+        letter-spacing: -0.05em;
+    }
+
+    .error-title {
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 16px 0;
+        letter-spacing: -0.02em;
+    }
+
+    .error-description {
+        font-size: 16px;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0 0 40px 0;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .error-actions .btn {
+        min-width: 160px;
+        padding: 14px 28px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+
+    .error-illustration {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 32px;
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .error-illustration svg {
+        width: 100px;
+        height: 100px;
+        color: #dc2626;
+    }
+
+    @media (max-width: 768px) {
+        .error-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .error-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-illustration">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+
+        <div class="error-code">500</div>
+        <h1 class="error-title">Server Error</h1>
+        <p class="error-description">
+            Something went wrong on our end. We're working to fix it. Please try again in a few moments or contact support if the issue persists.
+        </p>
+
+        <div class="error-actions">
+            <a href="{% url 'home' %}" class="btn btn-primary">Go to Homepage</a>
+            <a href="mailto:mo@m1limo.com" class="btn btn-secondary">Contact Support</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
