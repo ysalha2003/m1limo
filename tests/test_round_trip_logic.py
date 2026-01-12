@@ -9,6 +9,14 @@ Tests verify:
 2. Cancelling one leg does NOT automatically cancel the other
 3. Each trip has its own ID and can be queried independently
 4. Reference numbers correctly link both trips
+
+NOTE: These tests currently fail in CI because the bookings app uses an unusual
+configuration (name='__main__') which prevents Django from recognizing migrations
+during test database setup. The tests document the expected behavior and will work
+once the app is properly configured with a standard app name.
+
+TODO: Refactor apps.py to use a standard app name (e.g., 'm1limo' or 'bookings')
+instead of '__main__' to enable proper migration support.
 """
 
 from django.test import TestCase, Client
