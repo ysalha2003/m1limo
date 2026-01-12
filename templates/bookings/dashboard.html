@@ -331,6 +331,25 @@
             padding: 16px;
         }
 
+        /* Make search form stack on mobile */
+        .search-form > div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+
+        .search-form .form-group {
+            width: 100%;
+        }
+
+        .search-form > div > div:last-child {
+            flex-direction: row;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .search-form > div > div:last-child .btn {
+            flex: 1;
+        }
+
         table {
             font-size: 12px;
         }
