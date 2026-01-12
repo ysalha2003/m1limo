@@ -11,7 +11,10 @@
       "Bash(git log:*)",
       "Bash(git ls-tree:*)",
       "Bash(timeout 3 python manage.py check:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)"
     ]
   }
 }
