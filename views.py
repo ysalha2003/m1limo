@@ -247,8 +247,14 @@ def dashboard(request):
     if status_filter:
         base_queryset = base_queryset.filter(status=status_filter)
 
-    # Create display queryset: exclude return trips (they're shown as expandable rows)
-    queryset = base_queryset.exclude(is_return_trip=True)
+    # PART 2: Fix Date Search - When filtering by date/status, show ALL matching trips
+    # including return trips. Only exclude return trips when no filters are applied.
+    if date_filter or status_filter or search_query:
+        # Filtering active: Show all matching trips (including return legs)
+        queryset = base_queryset
+    else:
+        # No filters: Exclude return trips (they're shown as expandable rows under parent)
+        queryset = base_queryset.exclude(is_return_trip=True)
 
     # Optimize queries to prevent N+1 problem with select_related and prefetch_related
     queryset = queryset.select_related(
@@ -832,6 +838,17 @@ def cancel_booking(request, booking_id):
         else:
             messages.error(request, f"Cannot cancel trips with status: {booking.get_status_display()}")
         return redirect('dashboard')
+
+    # PART 1: User cancellation permissions - only allow if:
+    # a) User created the reservation, b) Status is Pending, c) Admin hasn't reviewed it
+    if not request.user.is_staff:
+        if booking.status != 'Pending':
+            messages.error(request, "You can only cancel bookings with 'Pending' status. Contact admin for confirmed bookings.")
+            return redirect('dashboard')
+
+        if booking.admin_reviewed:
+            messages.error(request, "This booking has been reviewed by admin and cannot be cancelled. Please contact us.")
+            return redirect('dashboard')
 
     is_round_trip = booking.linked_booking is not None
 

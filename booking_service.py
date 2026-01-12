@@ -441,6 +441,12 @@ class BookingService:
 
         if admin_comment:
             booking.admin_comment = admin_comment
+
+        # Mark as admin_reviewed when confirming (PART 1: Cancellation permissions)
+        if new_status == 'Confirmed' and changed_by and changed_by.is_staff:
+            booking.admin_reviewed = True
+            logger.info(f"Booking {booking.id} marked as admin_reviewed")
+
         booking.save()
 
         # Create history entry for status change
@@ -462,6 +468,7 @@ class BookingService:
                 logger.info(f"Auto-confirming linked return booking {linked_booking.id}")
                 linked_original_status = linked_booking.status
                 linked_booking.status = 'Confirmed'
+                linked_booking.admin_reviewed = True  # Also mark linked booking as reviewed
                 if admin_comment:
                     linked_booking.admin_comment = f"Auto-confirmed with outbound trip. {admin_comment}"
                 else:

@@ -89,6 +89,34 @@
         letter-spacing: -0.01em;
     }
 
+    /* PART 3: CSS for cancelled/past trips */
+    .trip-cancelled {
+        opacity: 0.5;
+        background-color: rgba(0, 0, 0, 0.02);
+        color: var(--text-muted);
+        position: relative;
+    }
+
+    .trip-cancelled::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(to bottom, transparent, #6b7280, transparent);
+    }
+
+    .trip-cancelled .badge {
+        opacity: 0.8;
+    }
+
+    .trip-past {
+        opacity: 0.5;
+        background-color: rgba(0, 0, 0, 0.02);
+        color: var(--text-muted);
+    }
+
     .today-pickups-card {
         background: linear-gradient(135deg, rgba(30, 41, 59, 0.04) 0%, rgba(51, 65, 85, 0.04) 100%);
         border: 1.5px solid rgba(30, 41, 59, 0.15);
@@ -569,7 +597,7 @@
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
-                    <tr class="booking-row-{{ booking.id }}" {% if booking.is_past_trip or booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}style="opacity: 0.5; background-color: rgba(0,0,0,0.02); color: var(--text-muted);"{% endif %}>
+                    <tr class="booking-row-{{ booking.id }} {% if booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}trip-cancelled{% elif booking.is_past_trip %}trip-past{% endif %}">
                         <td>
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                 <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">ID #{{ booking.id }}</span>

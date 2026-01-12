@@ -340,6 +340,10 @@ class Booking(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
     status = models.CharField(max_length=25, choices=STATUS_CHOICES, default="Pending", db_index=True)
+    admin_reviewed = models.BooleanField(
+        default=False,
+        help_text="True if admin has reviewed/confirmed this booking"
+    )
     admin_comment = models.TextField(blank=True, null=True, help_text="Internal admin notes (not visible to customer)")
     cancellation_reason = models.TextField(blank=True, null=True)
 
