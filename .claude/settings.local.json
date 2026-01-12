@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del \"static\\\\images\\\\logo-white.png.back\")",
+      "Bash(del \"static\\\\images\\\\logo-white.png.back2\")",
+      "Bash(del \"static\\\\images\\\\logo-white.png.c\")",
+      "Bash(del \"static\\\\images\\\\logo-white.png.cx\")",
+      "Bash(python manage.py:*)",
+      "Bash(python -c:*)",
+      "Bash(pip install:*)",
+      "Bash(git log:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(timeout 3 python manage.py check:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
