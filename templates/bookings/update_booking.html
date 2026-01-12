@@ -5,11 +5,37 @@
 {% block content %}
 <div class="card" style="max-width: 900px; margin: 0 auto;">
     <div class="card-header">
-        <h1 class="card-title">Edit Booking #{{ booking.id }}</h1>
-        <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+        <h1 class="card-title">
+            Edit Booking #{{ booking.id }}
+            {% if trip_role == 'outbound' %}
+                <span style="color: #2563eb; font-size: 16px; font-weight: 600; margin-left: 12px;">(Outbound Trip)</span>
+            {% elif trip_role == 'return' %}
+                <span style="color: #7c3aed; font-size: 16px; font-weight: 600; margin-left: 12px;">(Return Trip)</span>
+            {% endif %}
+        </h1>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
             <span class="badge badge-{{ booking.status|lower }}">{{ booking.get_status_display }}</span>
             <span style="color: #64748b; font-size: 14px;">Created {{ booking.created_at|date:"M d, Y" }}</span>
+            {% if is_single_leg_edit and linked_booking %}
+                <span style="color: #059669; font-size: 13px; font-weight: 600; background: #d1fae5; padding: 4px 10px; border-radius: 6px;">
+                    {% if trip_role == 'outbound' %}
+                        Part of Round Trip with Return Trip #{{ linked_booking.id }}
+                    {% else %}
+                        Part of Round Trip with Outbound Trip #{{ linked_booking.id }}
+                    {% endif %}
+                </span>
+            {% endif %}
         </div>
+        {% if is_single_leg_edit %}
+        <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px 16px; margin-top: 16px; border-radius: 6px;">
+            <p style="color: #1e40af; font-size: 14px; font-weight: 500; margin: 0;">
+                <svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                You are editing ONLY this {{ trip_role }} leg. The {% if trip_role == 'outbound' %}return{% else %}outbound{% endif %} leg (#{{ linked_booking.id }}) will not be affected.
+            </p>
+        </div>
+        {% endif %}
     </div>
 
     <form method="post" id="bookingForm">

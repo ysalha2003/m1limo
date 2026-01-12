@@ -586,7 +586,11 @@ def booking_detail(request, booking_id):
 
 @login_required
 def update_booking(request, booking_id):
-    """Edit existing booking with 2-hour restriction for non-admin users."""
+    """
+    Edit a single trip (leg) independently.
+    For round trips, this edits ONLY the specified trip ID - not both legs.
+    Use this for both standalone trips and individual legs of round trips.
+    """
     booking = get_object_or_404(Booking, id=booking_id)
 
     can_edit, error_message = BookingService.can_user_edit_booking(request.user, booking)
@@ -681,13 +685,24 @@ def update_booking(request, booking_id):
 
     # Determine if this is part of a round trip for UI display
     is_round_trip_leg = original_trip_type == 'Round'
-    linked_booking = original_linked_booking if not booking.is_return_trip else None
+
+    # Get linked booking info for display context
+    linked_booking = original_linked_booking
+    trip_role = None  # 'outbound' or 'return'
+
+    if is_round_trip_leg:
+        if booking.is_return_trip:
+            trip_role = 'return'
+        else:
+            trip_role = 'outbound'
 
     context = {
         'form': form,
         'booking': booking,
         'is_single_leg_edit': is_round_trip_leg,
+        'trip_role': trip_role,  # NEW: Clear indication of which leg
         'linked_booking': linked_booking,
+        'editing_trip_id': booking.id,  # NEW: Explicit trip ID being edited
     }
     return render(request, 'bookings/update_booking.html', context)
 
@@ -904,165 +919,25 @@ delete_booking = cancel_booking
 
 @login_required
 def update_round_trip(request, booking_id):
-    """Edit entire round trip booking with both legs."""
-    # Get the outbound booking (could be either leg, normalize it)
+    """
+    DEPRECATED: Redirect to per-trip editing.
+    Round trips should be edited individually per leg for clarity.
+    This view redirects to the update_booking view for the specified trip.
+
+    The old logic that edited both legs simultaneously was confusing and risky.
+    Now each trip is edited independently at /booking/{trip_id}/update/
+    """
     booking = get_object_or_404(Booking, id=booking_id)
 
-    # Determine which is outbound and which is return
-    if booking.is_return_trip:
-        # User clicked on return trip, get the outbound
-        outbound_booking = booking.linked_booking
-        return_booking = booking
-    else:
-        # User clicked on outbound
-        outbound_booking = booking
-        return_booking = booking.linked_booking
+    # Add informational message
+    messages.info(
+        request,
+        f"Editing trip #{booking.id} individually. "
+        f"{'The return trip' if not booking.is_return_trip else 'The outbound trip'} can be edited separately."
+    )
 
-    if not return_booking:
-        messages.error(request, "This is not a round trip booking.")
-        return redirect('dashboard')
-
-    # Check permissions for both legs
-    can_edit_outbound, error_msg_outbound = BookingService.can_user_edit_booking(request.user, outbound_booking)
-    can_edit_return, error_msg_return = BookingService.can_user_edit_booking(request.user, return_booking)
-
-    if not can_edit_outbound:
-        messages.error(request, f"Cannot edit outbound: {error_msg_outbound}")
-        return redirect('dashboard')
-    if not can_edit_return:
-        messages.error(request, f"Cannot edit return: {error_msg_return}")
-        return redirect('dashboard')
-
-    if request.method == "POST":
-        form = BookingForm(request.POST, instance=outbound_booking)
-
-        if form.is_valid():
-            try:
-                # Outbound booking data
-                outbound_data = {
-                    'passenger_name': form.cleaned_data['passenger_name'],
-                    'phone_number': form.cleaned_data['phone_number'],
-                    'passenger_email': form.cleaned_data['passenger_email'],
-                    'number_of_passengers': form.cleaned_data['number_of_passengers'],
-                    'vehicle_type': form.cleaned_data['vehicle_type'],
-                    'pick_up_address': form.cleaned_data['pick_up_address'],
-                    'drop_off_address': form.cleaned_data['drop_off_address'],
-                    'pick_up_date': form.cleaned_data['pick_up_date'],
-                    'pick_up_time': form.cleaned_data['pick_up_time'],
-                    'flight_number': form.cleaned_data.get('flight_number', ''),
-                    'notes': form.cleaned_data.get('notes', ''),
-                    'trip_type': 'Round',
-                }
-
-                # Return booking data
-                return_data = {
-                    'passenger_name': form.cleaned_data['passenger_name'],
-                    'phone_number': form.cleaned_data['phone_number'],
-                    'passenger_email': form.cleaned_data['passenger_email'],
-                    'number_of_passengers': form.cleaned_data['number_of_passengers'],
-                    'vehicle_type': form.cleaned_data['vehicle_type'],
-                    'pick_up_address': form.cleaned_data.get('return_pickup_address'),
-                    'drop_off_address': form.cleaned_data.get('return_dropoff_address'),
-                    'pick_up_date': form.cleaned_data.get('return_date'),
-                    'pick_up_time': form.cleaned_data.get('return_time'),
-                    'flight_number': form.cleaned_data.get('return_flight_number', ''),
-                    'notes': form.cleaned_data.get('return_special_requests', ''),
-                    'trip_type': 'Round',
-                }
-
-                # Extract stops data
-                stops_data = []
-                return_stops_data = []
-
-                if form.cleaned_data.get('needs_stop'):
-                    for key, value in request.POST.items():
-                        if key.startswith('stop_address_') and value.strip():
-                            try:
-                                stop_number = int(key.replace('stop_address_', ''))
-                                stops_data.append({
-                                    'address': value.strip(),
-                                    'stop_number': stop_number
-                                })
-                            except ValueError:
-                                continue
-
-                if form.cleaned_data.get('needs_return_stop'):
-                    for key, value in request.POST.items():
-                        if key.startswith('return_stop_address_') and value.strip():
-                            try:
-                                stop_number = int(key.replace('return_stop_address_', ''))
-                                return_stops_data.append({
-                                    'address': value.strip(),
-                                    'stop_number': stop_number
-                                })
-                            except ValueError:
-                                continue
-
-                # Update outbound booking
-                BookingService.update_booking(
-                    booking=outbound_booking,
-                    booking_data=outbound_data,
-                    stops_data=stops_data if stops_data else None,
-                    changed_by=request.user
-                )
-
-                # Update return booking
-                BookingService.update_booking(
-                    booking=return_booking,
-                    booking_data=return_data,
-                    stops_data=return_stops_data if return_stops_data else None,
-                    changed_by=request.user
-                )
-
-                messages.success(request, "Round trip booking updated successfully.")
-                return redirect('booking_detail', booking_id=outbound_booking.id)
-
-            except ValidationError as e:
-                logger.error(f"Validation error updating round trip: {e}")
-                messages.error(request, str(e))
-            except Exception as e:
-                logger.error(f"Error updating round trip: {e}", exc_info=True)
-                messages.error(request, f"Error updating round trip: {str(e)}")
-        else:
-            messages.error(request, "Please correct the errors below.")
-    else:
-        # Pre-populate form with outbound data and return data
-        initial_data = {
-            'passenger_name': outbound_booking.passenger_name,
-            'phone_number': outbound_booking.phone_number,
-            'passenger_email': outbound_booking.passenger_email,
-            'number_of_passengers': outbound_booking.number_of_passengers,
-            'vehicle_type': outbound_booking.vehicle_type,
-            'pick_up_address': outbound_booking.pick_up_address,
-            'drop_off_address': outbound_booking.drop_off_address,
-            'pick_up_date': outbound_booking.pick_up_date,
-            'pick_up_time': outbound_booking.pick_up_time,
-            'flight_number': outbound_booking.flight_number,
-            'notes': outbound_booking.notes,
-            'trip_type': 'Round',
-            'return_pickup_address': return_booking.pick_up_address,
-            'return_dropoff_address': return_booking.drop_off_address,
-            'return_date': return_booking.pick_up_date,
-            'return_time': return_booking.pick_up_time,
-            'return_flight_number': return_booking.flight_number,
-            'return_special_requests': return_booking.notes,
-        }
-
-        # Set passenger_contact based on what's available
-        if outbound_booking.phone_number:
-            initial_data['passenger_contact'] = outbound_booking.phone_number
-        elif outbound_booking.passenger_email:
-            initial_data['passenger_contact'] = outbound_booking.passenger_email
-
-        form = BookingForm(initial=initial_data)
-
-    context = {
-        'form': form,
-        'booking': outbound_booking,
-        'return_booking': return_booking,
-        'is_round_trip_edit': True,
-    }
-    return render(request, 'bookings/update_booking.html', context)
+    # Redirect to single-trip edit
+    return redirect('update_booking', booking_id=booking.id)
 
 
 @login_required

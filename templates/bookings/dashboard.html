@@ -719,7 +719,11 @@
                                         {% endif %}
                                     {% else %}
                                         {% if booking.status in 'Pending,Confirmed' and booking.hours_until_pickup > 2 %}
-                                            <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit</a>
+                                            {% if booking.trip_type == 'Round' %}
+                                                <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit Outbound</a>
+                                            {% else %}
+                                                <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit</a>
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
@@ -777,6 +781,10 @@
                                             <a href="{% url 'booking_detail' booking.linked_booking.id %}" class="action-link">View</a>
                                             {% if is_admin %}
                                                 <a href="{% url 'assign_driver' booking.linked_booking.id %}" class="action-link">Assign Driver</a>
+                                            {% else %}
+                                                {% if booking.linked_booking.status in 'Pending,Confirmed' and booking.linked_booking.hours_until_pickup > 2 %}
+                                                    <a href="{% url 'update_booking' booking.linked_booking.id %}" class="action-link">Edit Return</a>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     </div>
