@@ -1032,9 +1032,43 @@ def assign_driver(request, booking_id):
         action = request.POST.get('action')
 
         # ================================================================
+        # TOGGLE SHARE DRIVER INFO (No Notification)
+        # ================================================================
+        if action == 'toggle_share_info':
+            if booking.assigned_driver:
+                old_value = booking.share_driver_info
+                booking.share_driver_info = not old_value
+                booking.save(update_fields=['share_driver_info'])
+
+                # Create history entry
+                BookingHistory.objects.create(
+                    booking=booking,
+                    action='updated',
+                    changed_by=request.user,
+                    booking_snapshot={},
+                    changes={
+                        'share_driver_info': {
+                            'old': old_value,
+                            'new': booking.share_driver_info
+                        }
+                    },
+                    change_reason=f"Driver info sharing {'enabled' if booking.share_driver_info else 'disabled'} (no notification sent)"
+                )
+
+                if booking.share_driver_info:
+                    messages.success(request, f"Driver info is now shared with the customer (no notification sent).")
+                else:
+                    messages.success(request, f"Driver info is now hidden from the customer (no notification sent).")
+
+                return redirect('booking_detail', booking_id=booking.id)
+            else:
+                messages.error(request, "No driver is currently assigned. Please assign a driver first.")
+                return redirect('assign_driver', booking_id=booking_id)
+
+        # ================================================================
         # UNASSIGN DRIVER
         # ================================================================
-        if action == 'unassign':
+        elif action == 'unassign':
             if booking.assigned_driver:
                 old_driver_name = booking.assigned_driver.full_name
                 old_payment = booking.driver_payment_amount
