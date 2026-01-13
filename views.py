@@ -246,15 +246,13 @@ def dashboard(request):
     status_filter = request.GET.get('status')
     if status_filter:
         base_queryset = base_queryset.filter(status=status_filter)
-
-    # PART 2: Fix Date Search - When filtering by date/status, show ALL matching trips
-    # including return trips. Only exclude return trips when no filters are applied.
-    if date_filter or status_filter or search_query:
-        # Filtering active: Show all matching trips (including return legs)
-        queryset = base_queryset
     else:
-        # No filters: Exclude return trips (they're shown as expandable rows under parent)
-        queryset = base_queryset.exclude(is_return_trip=True)
+        # Exclude cancelled bookings when no specific status filter is applied
+        base_queryset = base_queryset.exclude(status__in=['Cancelled', 'Cancelled_Full_Charge'])
+
+    # Show all trips individually - each trip is displayed as its own row
+    # This includes both legs of round trips as separate entries
+    queryset = base_queryset
 
     # Optimize queries to prevent N+1 problem with select_related and prefetch_related
     queryset = queryset.select_related(

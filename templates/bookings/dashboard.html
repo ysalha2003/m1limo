@@ -672,10 +672,10 @@
                                     {# Active trips: Normal actions #}
                                     {% if booking.trip_type == 'Round' and booking.linked_booking %}
                                         <button onclick="toggleReturn({{ booking.id }})" class="expand-btn expand-btn-{{ booking.id }}">
-                                            <svg class="expand-icon expand-icon-{{ booking.id }}" style="transform: rotate(180deg);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="expand-icon expand-icon-{{ booking.id }}" style="transform: rotate(0deg);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                             </svg>
-                                            Hide Return
+                                            Show Return
                                         </button>
                                     {% endif %}
                                     <a href="{% url 'booking_detail' booking.id %}" class="action-link">View</a>
@@ -700,7 +700,7 @@
                     </tr>
 
                     {% if booking.trip_type == 'Round' and booking.linked_booking %}
-                    <tr class="return-row return-row-{{ booking.id }}" style="display: table-row;">
+                    <tr class="return-row return-row-{{ booking.id }}" style="display: none;">
                         <td colspan="{% if is_admin %}7{% else %}6{% endif %}" style="padding: 16px 24px;">
                             <div class="return-trip-content">
                                 <div style="font-weight: 600; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
