@@ -1,4 +1,6 @@
 from django import template
+from django.utils import timezone
+from datetime import datetime, timedelta
 from models import BookingStop
 
 register = template.Library()
@@ -92,3 +94,36 @@ def get_changed_fields(history):
     Usage: {% for field in history.get_changed_fields %}
     """
     return history.get_changed_fields()
+
+
+@register.filter
+def hours_until_pickup(booking):
+    """
+    Calculate hours remaining until pickup time
+    Returns rounded hours, or None if pickup time has passed
+    """
+    if not booking or not booking.pick_up_date or not booking.pick_up_time:
+        return None
+    
+    try:
+        # Combine date and time into a datetime object
+        pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+        
+        # Make it timezone aware if needed
+        if timezone.is_naive(pickup_datetime):
+            pickup_datetime = timezone.make_aware(pickup_datetime)
+        
+        # Get current time
+        now = timezone.now()
+        
+        # Calculate difference
+        time_diff = pickup_datetime - now
+        
+        # Only return positive hours (future pickups)
+        if time_diff.total_seconds() > 0:
+            hours = round(time_diff.total_seconds() / 3600)
+            return hours
+        
+        return None
+    except Exception:
+        return None

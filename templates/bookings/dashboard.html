@@ -392,10 +392,17 @@
     <a href="?upcoming=true" class="stat-card {% if request.GET.upcoming == 'true' %}active{% endif %}">
         <div style="display: flex; justify-content: space-between; align-items: start;">
             <div style="flex: 1;">
-                <p class="stat-label">Upcoming Trips ({{ stats.upcoming_count|default:0 }})</p>
+                <p class="stat-label">Upcoming Trip</p>
                 {% if next_upcoming_trip %}
                     <p style="color: var(--info); font-size: 14px; font-weight: 600; margin: 4px 0 2px 0;">{{ next_upcoming_trip.pick_up_date|date:"M d, Y" }} at {{ next_upcoming_trip.pick_up_time|time:"g:i A" }}</p>
-                    <p style="color: var(--text-secondary); font-size: 12px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ next_upcoming_trip.pick_up_location|truncatewords:5 }}</p>
+                    {% load booking_filters %}
+                    {% with hours_remaining=next_upcoming_trip|hours_until_pickup %}
+                        {% if hours_remaining is not None %}
+                            <p style="color: var(--warning); font-size: 12px; font-weight: 600; margin: 2px 0;">{{ hours_remaining }} hours remaining</p>
+                        {% endif %}
+                    {% endwith %}
+                    <p style="color: var(--text-secondary); font-size: 12px; margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">📍 {{ next_upcoming_trip.pick_up_location|truncatewords:8 }}</p>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin: 2px 0;">👤 {{ next_upcoming_trip.passenger_name }}</p>
                 {% else %}
                     <p class="stat-value" style="color: var(--text-secondary);">No upcoming trips</p>
                 {% endif %}
