@@ -16,6 +16,9 @@ ALLOWED_HOSTS = ['62.169.19.39', 'localhost', '127.0.0.1', 'm1limo.com']
 # This tells Django to trust requests coming from this specific IP and Port
 CSRF_TRUSTED_ORIGINS = ['http://62.169.19.39:8081']
 
+# Base URL for generating absolute URLs (used in emails, etc.)
+BASE_URL = os.environ.get('BASE_URL', 'http://62.169.19.39:8081')
+
 # Force custom error pages even in DEBUG mode (for testing custom 404/500 pages)
 FORCE_CUSTOM_ERROR_PAGES = os.environ.get('FORCE_CUSTOM_ERROR_PAGES', 'True').lower() == 'true'
 

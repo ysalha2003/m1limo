@@ -230,18 +230,35 @@ def dashboard(request):
             filters |= Q(id=int(search_query))
         base_queryset = base_queryset.filter(filters)
 
-    date_filter = request.GET.get('date')
-    if date_filter:
+    # Date range filtering - supports both single date and date range
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    if date_from and date_to:
+        # Date range: from-to
         from datetime import datetime
-        if date_filter == 'today':
-            # Special handling for "today" filter
-            base_queryset = base_queryset.filter(pick_up_date=timezone.now().date())
-        else:
-            try:
-                filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-                base_queryset = base_queryset.filter(pick_up_date=filter_date)
-            except ValueError:
-                pass
+        try:
+            from_date = datetime.strptime(date_from, '%Y-%m-%d').date()
+            to_date = datetime.strptime(date_to, '%Y-%m-%d').date()
+            base_queryset = base_queryset.filter(pick_up_date__gte=from_date, pick_up_date__lte=to_date)
+        except ValueError:
+            pass
+    elif date_from:
+        # Single date: from date onwards
+        from datetime import datetime
+        try:
+            from_date = datetime.strptime(date_from, '%Y-%m-%d').date()
+            base_queryset = base_queryset.filter(pick_up_date__gte=from_date)
+        except ValueError:
+            pass
+    elif date_to:
+        # Single date: up to this date
+        from datetime import datetime
+        try:
+            to_date = datetime.strptime(date_to, '%Y-%m-%d').date()
+            base_queryset = base_queryset.filter(pick_up_date__lte=to_date)
+        except ValueError:
+            pass
 
     status_filter = request.GET.get('status')
     upcoming_filter = request.GET.get('upcoming')

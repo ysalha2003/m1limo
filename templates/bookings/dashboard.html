@@ -484,15 +484,20 @@
 
     <!-- Search & Filter -->
     <form method="get" class="search-form">
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
             <div class="form-group" style="margin: 0;">
                 <label class="form-label">Search</label>
                 <input type="text" name="search" class="form-input" placeholder="Booking ID, Name, Phone, or Reference Number" value="{{ request.GET.search }}" style="margin: 0;">
             </div>
 
             <div class="form-group" style="margin: 0;">
-                <label class="form-label">Date</label>
-                <input type="date" name="date" class="form-input" value="{{ request.GET.date }}" style="margin: 0;">
+                <label class="form-label">Date From</label>
+                <input type="date" name="date_from" class="form-input" value="{{ request.GET.date_from }}" style="margin: 0;">
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+                <label class="form-label">Date To</label>
+                <input type="date" name="date_to" class="form-input" value="{{ request.GET.date_to }}" style="margin: 0;">
             </div>
 
             <div class="form-group" style="margin: 0;">
@@ -513,7 +518,7 @@
             </div>
         </div>
 
-        {% if request.GET.search or request.GET.date or request.GET.status %}
+        {% if request.GET.search or request.GET.date_from or request.GET.date_to or request.GET.status %}
         <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: space-between;">
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -521,8 +526,12 @@
                     {% if request.GET.search %}
                     <span class="badge" style="background: var(--info-light); color: #1e40af;">Search: "{{ request.GET.search }}"</span>
                     {% endif %}
-                    {% if request.GET.date %}
-                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Date: {{ request.GET.date }}</span>
+                    {% if request.GET.date_from and request.GET.date_to %}
+                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Date Range: {{ request.GET.date_from }} to {{ request.GET.date_to }}</span>
+                    {% elif request.GET.date_from %}
+                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Date From: {{ request.GET.date_from }}</span>
+                    {% elif request.GET.date_to %}
+                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Date To: {{ request.GET.date_to }}</span>
                     {% endif %}
                     {% if request.GET.status %}
                     <span class="badge" style="background: var(--info-light); color: #1e40af;">Status: {{ request.GET.status }}</span>
@@ -541,7 +550,7 @@
 
     {% if bookings %}
         <!-- Trip Count Display (shown even without filters) -->
-        {% if not request.GET.search and not request.GET.date and not request.GET.status %}
+        {% if not request.GET.search and not request.GET.date_from and not request.GET.date_to and not request.GET.status %}
         <div style="margin-bottom: 16px; display: flex; justify-content: flex-end;">
             <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: linear-gradient(135deg, var(--primary-light) 0%, #e2e8f0 100%); border-radius: 6px; border: 1px solid var(--border);">
                 <svg style="width: 16px; height: 16px; color: var(--primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
