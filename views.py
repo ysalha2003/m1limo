@@ -866,8 +866,14 @@ def cancel_booking(request, booking_id):
         cancel_type = request.POST.get('cancel_type', 'entire')
 
         try:
+            # Store old status and who cancelled for history
+            booking._old_status = booking.status
+            booking._cancelled_by = request.user
             if is_round_trip and cancel_type == 'entire':
                 logger.info(f"Cancelling entire round-trip booking (ID: {booking.id})")
+                if linked_booking:
+                    linked_booking._old_status = linked_booking.status
+                    linked_booking._cancelled_by = request.user
                 first_trip, return_trip = BookingService.cancel_entire_booking(booking, cancellation_reason)
                 messages.success(request, "Entire round trip booking cancelled successfully.")
             else:

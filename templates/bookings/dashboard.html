@@ -909,20 +909,24 @@
                                     <div style="font-weight: 600; color: #2563eb; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
                                         {{ field|format_field_name }}
                                     </div>
-                                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
-                                        <span style="color: #dc2626; background: rgba(220, 38, 38, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace;">
+                                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; flex-wrap: wrap;">
+                                        <span style="color: #dc2626; background: rgba(220, 38, 38, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; word-break: break-word;">
                                             {{ change_data.old|default:"(empty)" }}
                                         </span>
-                                        <svg style="width: 12px; height: 12px; color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg style="width: 12px; height: 12px; color: var(--text-secondary); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                         </svg>
-                                        <span style="color: #059669; background: rgba(5, 150, 105, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace;">
+                                        <span style="color: #059669; background: rgba(5, 150, 105, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; word-break: break-word;">
                                             {{ change_data.new|default:"(empty)" }}
                                         </span>
                                     </div>
                                 </div>
                                 {% endwith %}
                                 {% endfor %}
+                            </div>
+                            {% elif history.change_reason %}
+                            <div style="background: rgba(248, 250, 252, 1); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(226, 232, 240, 1);">
+                                <span style="color: var(--dark); font-size: 12px;">{{ history.change_reason }}</span>
                             </div>
                             {% else %}
                             <span style="color: var(--text-secondary); font-size: 12px;">Initial creation</span>

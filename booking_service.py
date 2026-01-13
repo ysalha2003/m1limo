@@ -752,6 +752,72 @@ class BookingService:
         first_trip.save()
         logger.info(f"First trip {first_trip.id} cancelled (charge: {first_trip.status == 'Cancelled_Full_Charge'})")
 
+        # Create history entry for first trip cancellation
+        from models import BookingHistory
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        # Try to get the user who initiated cancellation (will be set by caller)
+        changed_by = getattr(first_trip, '_cancelled_by', None)
+        
+        changes = {
+            'status': {
+                'old': 'Pending' if not hasattr(first_trip, '_old_status') else first_trip._old_status,
+                'new': first_trip.status
+            },
+            'cancellation_reason': {
+                'old': None,
+                'new': cancellation_reason if cancellation_reason else '(No reason provided)'
+            },
+            'charge_applied': {
+                'old': None,
+                'new': 'Full charge' if first_trip.status == 'Cancelled_Full_Charge' else 'No charge'
+            },
+            'hours_until_pickup': {
+                'old': None,
+                'new': f'{hours_until:.1f} hours'
+            }
+        }
+        
+        BookingHistory.objects.create(
+            booking=first_trip,
+            action='cancelled',
+            changed_by=changed_by if changed_by else first_trip.user,
+            booking_snapshot={},
+            changes=changes,
+            change_reason=f"Trip cancelled by {changed_by.username if changed_by else first_trip.user.username}. Reason: {cancellation_reason if cancellation_reason else 'Not provided'}. {'Full charge applied' if first_trip.status == 'Cancelled_Full_Charge' else 'No charge'} ({hours_until:.1f}h notice)."
+        )
+        
+        # Create history entry for return trip if exists
+        if return_trip:
+            return_changes = {
+                'status': {
+                    'old': 'Pending' if not hasattr(return_trip, '_old_status') else return_trip._old_status,
+                    'new': return_trip.status
+                },
+                'cancellation_reason': {
+                    'old': None,
+                    'new': cancellation_reason if cancellation_reason else '(No reason provided)'
+                },
+                'charge_applied': {
+                    'old': None,
+                    'new': 'Full charge' if return_trip.status == 'Cancelled_Full_Charge' else 'No charge'
+                },
+                'hours_until_pickup': {
+                    'old': None,
+                    'new': f'{hours_return:.1f} hours'
+                }
+            }
+            
+            BookingHistory.objects.create(
+                booking=return_trip,
+                action='cancelled',
+                changed_by=changed_by if changed_by else return_trip.user,
+                booking_snapshot={},
+                changes=return_changes,
+                change_reason=f"Return trip cancelled as part of round trip cancellation by {changed_by.username if changed_by else return_trip.user.username}. Reason: {cancellation_reason if cancellation_reason else 'Not provided'}. {'Full charge applied' if return_trip.status == 'Cancelled_Full_Charge' else 'No charge'} ({hours_return:.1f}h notice)."
+            )
+
         cache.delete('dashboard_stats')
 
         if return_trip:
@@ -802,6 +868,42 @@ class BookingService:
         booking.save()
 
         logger.info(f"Booking {booking.id} cancelled individually (charge: {booking.status == 'Cancelled_Full_Charge'})")
+
+        # Create history entry for single trip cancellation
+        from models import BookingHistory
+        
+        # Try to get the user who initiated cancellation (will be set by caller)
+        changed_by = getattr(booking, '_cancelled_by', None)
+        
+        linked_hours_str = f'{linked_hours:.1f} hours' if booking.linked_booking else 'N/A'
+        
+        changes = {
+            'status': {
+                'old': 'Pending' if not hasattr(booking, '_old_status') else booking._old_status,
+                'new': booking.status
+            },
+            'cancellation_reason': {
+                'old': None,
+                'new': cancellation_reason if cancellation_reason else '(No reason provided)'
+            },
+            'charge_applied': {
+                'old': None,
+                'new': 'Full charge' if booking.status == 'Cancelled_Full_Charge' else 'No charge'
+            },
+            'hours_until_pickup': {
+                'old': None,
+                'new': f'{hours_until:.1f} hours (Linked trip: {linked_hours_str})' if booking.linked_booking else f'{hours_until:.1f} hours'
+            }
+        }
+        
+        BookingHistory.objects.create(
+            booking=booking,
+            action='cancelled',
+            changed_by=changed_by if changed_by else booking.user,
+            booking_snapshot={},
+            changes=changes,
+            change_reason=f"Single trip cancelled by {changed_by.username if changed_by else booking.user.username}. Reason: {cancellation_reason if cancellation_reason else 'Not provided'}. {'Full charge applied' if booking.status == 'Cancelled_Full_Charge' else 'No charge'} ({hours_until:.1f}h notice). Linked trip remains active." if booking.linked_booking else f"Trip cancelled by {changed_by.username if changed_by else booking.user.username}. Reason: {cancellation_reason if cancellation_reason else 'Not provided'}. {'Full charge applied' if booking.status == 'Cancelled_Full_Charge' else 'No charge'} ({hours_until:.1f}h notice)."
+        )
 
         cache.delete('dashboard_stats')
 
