@@ -1,6 +1,7 @@
 # bookings/admin.py
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -627,7 +628,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
     def variable_documentation(self, obj):
         """Display available variables as formatted HTML."""
         if not obj.id:
-            return format_html('<p style="color: #666;">Save template first to see available variables</p>')
+            return mark_safe('<p style="color: #666;">Save template first to see available variables</p>')
         
         variables = obj.get_available_variables()
         html_parts = ['<div style="font-family: monospace; line-height: 1.8;">']
@@ -641,7 +642,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
         html_parts.append('</tbody></table></div>')
         html_parts.append('<p style="margin-top: 12px; color: #666;"><strong>Usage Example:</strong> <code>Trip Confirmed: {passenger_name} - {pick_up_date}</code></p>')
         
-        return format_html(''.join(html_parts))
+        return mark_safe(''.join(html_parts))
     variable_documentation.short_description = 'Available Template Variables'
 
     def save_model(self, request, obj, form, change):
