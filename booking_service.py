@@ -553,28 +553,24 @@ class BookingService:
     
     @staticmethod
     def get_dashboard_stats() -> Dict[str, int]:
-        """Get dashboard statistics with 5-minute cache.
+        """Get dashboard statistics in real-time without caching.
 
         Note: Counts include ALL trips. Round trips consist of 2 separate bookings
         (outbound + return), and each is counted individually.
         """
-        cache_key = 'dashboard_stats'
-        stats = cache.get(cache_key)
-
-        if stats is None:
-            today = timezone.now().date()
-            # Count ALL bookings - each trip is counted individually
-            stats = {
-                'total_bookings': Booking.objects.count(),
-                'active_bookings': Booking.objects.active().count(),
-                'pending_count': Booking.objects.pending().count(),
-                'confirmed_count': Booking.objects.confirmed().count(),
-                'today_trips': Booking.objects.today().count(),
-                'upcoming_trips': Booking.objects.upcoming().count(),
-                'completed_trips': Booking.objects.completed().count(),
-            }
-            cache.set(cache_key, stats, 300)
-            logger.debug(f"Dashboard stats cached: {stats}")
+        today = timezone.now().date()
+        # Count ALL bookings - each trip is counted individually
+        # No caching to ensure real-time reactive updates
+        stats = {
+            'total_bookings': Booking.objects.count(),
+            'active_bookings': Booking.objects.active().count(),
+            'pending_count': Booking.objects.pending().count(),
+            'confirmed_count': Booking.objects.confirmed().count(),
+            'today_trips': Booking.objects.today().count(),
+            'upcoming_trips': Booking.objects.upcoming().count(),
+            'completed_trips': Booking.objects.completed().count(),
+        }
+        logger.debug(f"Dashboard stats calculated: {stats}")
 
         return stats
     
