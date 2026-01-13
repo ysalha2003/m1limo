@@ -16,10 +16,16 @@ with connection.schema_editor() as schema_editor:
 
 print("✓ EmailTemplate table created successfully")
 
-# Create the index
+# Create the index (skip if already exists)
 from django.db.models import Index
 index = Index(fields=['template_type', 'is_active'], name='bookings_em_templat_2780bb_idx')
-with connection.schema_editor() as schema_editor:
-    schema_editor.add_index(EmailTemplate, index)
-
-print("✓ EmailTemplate index created successfully")
+try:
+    with connection.schema_editor() as schema_editor:
+        schema_editor.add_index(EmailTemplate, index)
+    print("✓ EmailTemplate index created successfully")
+except Exception as e:
+    if "already exists" in str(e):
+        print("⚠ Index already exists (OK)")
+    else:
+        print(f"✗ Error creating index: {e}")
+        raise
