@@ -273,7 +273,7 @@ def dashboard(request):
         'linked_booking__stops',
         'notifications',
         'notifications__recipient'
-    )
+    ).distinct()
 
     today = timezone.now().date()
     now = timezone.now()
