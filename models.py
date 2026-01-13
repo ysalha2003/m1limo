@@ -1111,3 +1111,199 @@ Booking.add_to_class(
         help_text="Share driver name, vehicle, and phone with customer"
     )
 )
+
+
+class EmailTemplate(models.Model):
+    """Admin-manageable email templates for automated notifications"""
+
+    TEMPLATE_TYPE_CHOICES = [
+        ('booking_new', 'New Booking'),
+        ('booking_confirmed', 'Booking Confirmed'),
+        ('booking_cancelled', 'Booking Cancelled'),
+        ('booking_status_change', 'Status Change'),
+        ('booking_reminder', 'Pickup Reminder'),
+        ('driver_assignment', 'Driver Assignment'),
+        ('round_trip_new', 'Round Trip - New'),
+        ('round_trip_confirmed', 'Round Trip - Confirmed'),
+        ('round_trip_cancelled', 'Round Trip - Cancelled'),
+        ('round_trip_status_change', 'Round Trip - Status Change'),
+    ]
+
+    # Identification
+    template_type = models.CharField(
+        max_length=30,
+        choices=TEMPLATE_TYPE_CHOICES,
+        unique=True,
+        help_text="Type of notification this template is used for"
+    )
+    name = models.CharField(
+        max_length=100,
+        help_text="Friendly name for this template"
+    )
+    description = models.TextField(
+        blank=True,
+        help_text="Internal notes about this template's purpose"
+    )
+
+    # Content (Admin-editable)
+    subject_template = models.CharField(
+        max_length=200,
+        help_text="Subject line. Use {variable_name} for dynamic content. Example: Trip Confirmed: {passenger_name} - {pick_up_date}"
+    )
+    html_template = models.TextField(
+        help_text="HTML email body. Use {variable_name} for dynamic content. Available variables documented below."
+    )
+
+    # Configuration
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Inactive templates will fall back to file-based templates"
+    )
+    send_to_user = models.BooleanField(
+        default=True,
+        help_text="Send to booking user's email"
+    )
+    send_to_admin = models.BooleanField(
+        default=True,
+        help_text="Send to admin emails"
+    )
+    send_to_passenger = models.BooleanField(
+        default=False,
+        help_text="Send to passenger email (if different from user)"
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_email_templates'
+    )
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='updated_email_templates'
+    )
+
+    # Statistics
+    total_sent = models.IntegerField(
+        default=0,
+        help_text="Total number of emails sent using this template"
+    )
+    total_failed = models.IntegerField(
+        default=0,
+        help_text="Total number of failed sends"
+    )
+    last_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Last time this template was used"
+    )
+
+    class Meta:
+        app_label = 'bookings'
+        verbose_name = 'Email Template'
+        verbose_name_plural = 'Email Templates'
+        ordering = ['template_type']
+        indexes = [
+            models.Index(fields=['template_type', 'is_active']),
+        ]
+
+    def __str__(self):
+        return f"{self.name} ({self.get_template_type_display()})"
+
+    @property
+    def success_rate(self):
+        """Calculate success rate percentage"""
+        total = self.total_sent + self.total_failed
+        if total == 0:
+            return 0
+        return round((self.total_sent / total) * 100, 1)
+
+    def get_available_variables(self):
+        """Return list of available variables for this template type"""
+        # Common variables for all templates
+        common_vars = {
+            'booking_reference': 'Unique booking reference number',
+            'passenger_name': 'Passenger full name',
+            'phone_number': 'Contact phone number',
+            'passenger_email': 'Passenger email address',
+            'pick_up_date': 'Pickup date',
+            'pick_up_time': 'Pickup time',
+            'pick_up_address': 'Pickup location address',
+            'drop_off_address': 'Drop-off location address',
+            'vehicle_type': 'Type of vehicle (Sedan, SUV, etc.)',
+            'trip_type': 'Point-to-Point, Round Trip, or Hourly',
+            'number_of_passengers': 'Number of passengers',
+            'flight_number': 'Flight number (if provided)',
+            'notes': 'Special requests or notes',
+            'status': 'Current booking status',
+            'user_email': 'User account email',
+            'user_username': 'User account username',
+            'company_name': 'M1 Limousine Service',
+            'support_email': 'Support contact email',
+            'dashboard_url': 'Link to user dashboard',
+        }
+
+        # Template-specific variables
+        if 'status_change' in self.template_type:
+            common_vars.update({
+                'old_status': 'Previous booking status',
+                'new_status': 'New booking status',
+            })
+
+        if 'driver' in self.template_type:
+            common_vars.update({
+                'driver_name': 'Assigned driver name',
+                'driver_phone': 'Driver phone number',
+                'driver_vehicle': 'Driver vehicle information',
+                'driver_portal_url': 'Driver action portal link',
+            })
+
+        if 'round_trip' in self.template_type:
+            common_vars.update({
+                'return_pick_up_date': 'Return trip pickup date',
+                'return_pick_up_time': 'Return trip pickup time',
+                'return_pick_up_address': 'Return trip pickup address',
+                'return_drop_off_address': 'Return trip drop-off address',
+            })
+
+        return common_vars
+
+    def render_subject(self, context):
+        """Render subject line with context variables"""
+        try:
+            return self.subject_template.format(**context)
+        except KeyError as e:
+            logger.warning(f"Missing variable in subject template: {e}")
+            return self.subject_template
+        except Exception as e:
+            logger.error(f"Error rendering subject: {e}")
+            return self.subject_template
+
+    def render_html(self, context):
+        """Render HTML body with context variables"""
+        try:
+            return self.html_template.format(**context)
+        except KeyError as e:
+            logger.warning(f"Missing variable in HTML template: {e}")
+            return self.html_template
+        except Exception as e:
+            logger.error(f"Error rendering HTML: {e}")
+            return self.html_template
+
+    def increment_sent(self):
+        """Increment sent counter and update last_sent_at"""
+        self.total_sent += 1
+        self.last_sent_at = timezone.now()
+        self.save(update_fields=['total_sent', 'last_sent_at'])
+
+    def increment_failed(self):
+        """Increment failed counter"""
+        self.total_failed += 1
+        self.save(update_fields=['total_failed'])
