@@ -2,11 +2,12 @@
 Unit tests for Email Template Management System
 Tests EmailTemplate model, admin actions, and email service integration
 """
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.core import mail
 from django.utils import timezone
+from django.db.models.signals import post_save
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime, time
 
@@ -15,8 +16,23 @@ from admin import EmailTemplateAdmin
 from email_service import EmailService
 
 
+# Mock signal to prevent UserProfile creation in tests
+def mock_signal(*args, **kwargs):
+    pass
+
+
 class EmailTemplateModelTest(TestCase):
     """Test EmailTemplate model functionality"""
+    
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Disconnect UserProfile creation signal for all tests
+        try:
+            import signals
+            post_save.disconnect(signals.create_user_profile, sender=User)
+        except:
+            pass
     
     def setUp(self):
         """Create test user and template"""
@@ -188,6 +204,15 @@ class EmailTemplateModelTest(TestCase):
 
 class EmailTemplateAdminTest(TestCase):
     """Test EmailTemplateAdmin functionality"""
+    
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        try:
+            import signals
+            post_save.disconnect(signals.create_user_profile, sender=User)
+        except:
+            pass
     
     def setUp(self):
         """Create test data"""
@@ -394,6 +419,15 @@ class EmailTemplateAdminTest(TestCase):
 class EmailServiceIntegrationTest(TestCase):
     """Test EmailService integration with database templates"""
     
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        try:
+            import signals
+            post_save.disconnect(signals.create_user_profile, sender=User)
+        except:
+            pass
+    
     def setUp(self):
         """Create test data"""
         self.user = User.objects.create_user(
@@ -572,6 +606,15 @@ class EmailServiceIntegrationTest(TestCase):
 
 class EmailTemplateEdgeCasesTest(TestCase):
     """Test edge cases and error handling"""
+    
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        try:
+            import signals
+            post_save.disconnect(signals.create_user_profile, sender=User)
+        except:
+            pass
     
     def setUp(self):
         """Create test user"""
