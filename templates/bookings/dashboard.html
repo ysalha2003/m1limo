@@ -389,29 +389,66 @@
         </div>
     </a>
 
-    <a href="?upcoming=true" class="stat-card {% if request.GET.upcoming == 'true' %}active{% endif %}">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div style="flex: 1;">
-                <p class="stat-label">Upcoming Trip</p>
-                {% if next_upcoming_trip %}
-                    <p style="color: var(--info); font-size: 14px; font-weight: 600; margin: 4px 0 2px 0;">{{ next_upcoming_trip.pick_up_date|date:"M d, Y" }} at {{ next_upcoming_trip.pick_up_time|time:"g:i A" }}</p>
+    <a href="?upcoming=true" class="stat-card {% if request.GET.upcoming == 'true' %}active{% endif %}" style="overflow: visible;">
+        <div style="display: flex; flex-direction: column; height: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <p class="stat-label" style="margin: 0;">Upcoming Trip</p>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); width: 40px; height: 40px;">
+                    <svg style="width: 22px; height: 22px; color: white; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+            </div>
+            
+            {% if next_upcoming_trip %}
+                <!-- Date & Time Section -->
+                <div style="margin-bottom: 12px;">
+                    <p style="color: #1e40af; font-size: 18px; font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.01em;">
+                        {{ next_upcoming_trip.pick_up_date|date:"M d, Y" }} at {{ next_upcoming_trip.pick_up_time|time:"g:i A" }}
+                    </p>
                     {% load booking_filters %}
                     {% with hours_remaining=next_upcoming_trip|hours_until_pickup %}
                         {% if hours_remaining is not None %}
-                            <p style="color: var(--warning); font-size: 12px; font-weight: 600; margin: 2px 0;">{{ hours_remaining }} hours remaining</p>
+                            <div style="display: inline-block; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em;">
+                                {{ hours_remaining }} HOURS REMAINING
+                            </div>
                         {% endif %}
                     {% endwith %}
-                    <p style="color: var(--text-secondary); font-size: 12px; margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">📍 {{ next_upcoming_trip.pick_up_location|truncatewords:8 }}</p>
-                    <p style="color: var(--text-secondary); font-size: 12px; margin: 2px 0;">👤 {{ next_upcoming_trip.passenger_name }}</p>
-                {% else %}
-                    <p class="stat-value" style="color: var(--text-secondary);">No upcoming trips</p>
-                {% endif %}
-            </div>
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--info-light) 0%, #bfdbfe 100%);">
-                <svg style="width: 24px; height: 24px; color: var(--info); position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                </svg>
-            </div>
+                </div>
+                
+                <!-- Pickup Location -->
+                <div style="margin-bottom: 10px; display: flex; align-items: start; gap: 8px;">
+                    <svg style="width: 16px; height: 16px; color: #6b7280; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <p style="color: #374151; font-size: 13px; font-weight: 500; margin: 0; line-height: 1.4; flex: 1;">
+                        {{ next_upcoming_trip.pick_up_location|truncatewords:10 }}
+                    </p>
+                </div>
+                
+                <!-- Passenger Info -->
+                <div style="display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
+                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span style="color: white; font-weight: 700; font-size: 14px;">{{ next_upcoming_trip.passenger_name.0|upper }}</span>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {{ next_upcoming_trip.passenger_name }}
+                        </p>
+                        <p style="color: #6b7280; font-size: 11px; margin: 0;">
+                            {{ next_upcoming_trip.vehicle_type }}
+                        </p>
+                    </div>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 20px 0;">
+                    <svg style="width: 48px; height: 48px; color: #d1d5db; margin-bottom: 8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <p class="stat-value" style="color: #9ca3af; font-size: 14px; margin: 0;">No upcoming trips</p>
+                </div>
+            {% endif %}
         </div>
     </a>
 </div>
