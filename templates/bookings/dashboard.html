@@ -208,53 +208,47 @@
         vertical-align: top;
     }
 
-    /* Column width definitions */
+    /* Column width definitions - Without Driver column */
     table th:nth-child(1),
     table td:nth-child(1) {
-        width: 15%;
-        min-width: 150px;
+        width: 18%;
+        min-width: 160px;
     }
 
     table th:nth-child(2),
     table td:nth-child(2) {
-        width: 12%;
-        min-width: 120px;
+        width: 14%;
+        min-width: 130px;
     }
 
     table th:nth-child(3),
     table td:nth-child(3) {
-        width: 22%;
-        min-width: 180px;
+        width: 28%;
+        min-width: 220px;
     }
 
     table th:nth-child(4),
     table td:nth-child(4) {
-        width: 12%;
-        min-width: 110px;
+        width: 13%;
+        min-width: 120px;
     }
 
     table th:nth-child(5),
     table td:nth-child(5) {
-        width: 11%;
-        min-width: 100px;
-    }
-
-    table th:nth-child(6),
-    table td:nth-child(6) {
-        width: 10%;
-        min-width: 90px;
-    }
-
-    table th:nth-child(7),
-    table td:nth-child(7) {
         width: 12%;
         min-width: 110px;
     }
 
-    table th:nth-child(8),
-    table td:nth-child(8) {
+    table th:nth-child(6),
+    table td:nth-child(6) {
         width: auto;
-        min-width: 130px;
+        min-width: 100px;
+    }
+
+    table th:nth-child(7),
+    table td:nth-child(7) {
+        width: auto;
+        min-width: 150px;
     }
 
     /* Text overflow handling */
@@ -700,7 +694,6 @@
                         <th>Date & Time</th>
                         <th class="hide-mobile">Vehicle</th>
                         <th>Status</th>
-                        {% if is_admin %}<th class="hide-mobile">Driver</th>{% endif %}
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -779,24 +772,6 @@
                         <td>
                             <span class="badge badge-{{ booking.status|lower }}">{{ booking.get_status_display }}</span>
                         </td>
-                        {% if is_admin %}
-                        <td class="hide-mobile">
-                            {% if booking.assigned_driver %}
-                                <div style="font-weight: 500; color: var(--dark); margin-bottom: 3px;" class="text-truncate" title="{{ booking.assigned_driver.full_name }}">{{ booking.assigned_driver.full_name }}</div>
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
-                                    {% if booking.driver_response_status == 'accepted' %}
-                                        <span style="color: #059669;">✓ Accepted</span>
-                                    {% elif booking.driver_response_status == 'rejected' %}
-                                        <span style="color: #dc2626;">✗ Rejected</span>
-                                    {% elif booking.driver_response_status == 'completed' %}
-                                        <span style="color: #0c5460;">✓ Completed</span>
-                                    {% endif %}
-                                </div>
-                            {% else %}
-                                <span style="color: var(--text-muted); font-size: 13px;">Not Assigned</span>
-                            {% endif %}
-                        </td>
-                        {% endif %}
                         <td>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 {% if booking.is_past_trip %}
@@ -845,7 +820,7 @@
 
                     {% if booking.trip_type == 'Round' and booking.linked_booking %}
                     <tr class="return-row return-row-{{ booking.id }}" style="display: table-row;">
-                        <td colspan="{% if is_admin %}7{% else %}6{% endif %}" style="padding: 16px 24px;">
+                        <td colspan="{% if is_admin %}6{% else %}5{% endif %}" style="padding: 16px 24px;">
                             <div class="return-trip-content">
                                 <div style="font-weight: 600; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
