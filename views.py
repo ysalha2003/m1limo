@@ -854,16 +854,10 @@ def cancel_booking(request, booking_id):
             messages.error(request, f"Cannot cancel trips with status: {booking.get_status_display()}")
         return redirect('dashboard')
 
-    # PART 1: User cancellation permissions - only allow if:
-    # a) User created the reservation, b) Status is Pending, c) Admin hasn't reviewed it
-    if not request.user.is_staff:
-        if booking.status != 'Pending':
-            messages.error(request, "You can only cancel bookings with 'Pending' status. Contact admin for confirmed bookings.")
-            return redirect('dashboard')
-
-        if booking.admin_reviewed:
-            messages.error(request, "This booking has been reviewed by admin and cannot be cancelled. Please contact us.")
-            return redirect('dashboard')
+    # Users can now cancel both Pending and Confirmed bookings
+    # The 4-hour cancellation policy will be automatically applied:
+    # - More than 4 hours before pickup: Free cancellation
+    # - Within 4 hours of pickup: Full charges apply
 
     is_round_trip = booking.linked_booking is not None
 
