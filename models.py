@@ -1117,12 +1117,20 @@ class EmailTemplate(models.Model):
     """Admin-manageable email templates for automated notifications"""
 
     TEMPLATE_TYPE_CHOICES = [
+        # Customer notifications
         ('booking_new', 'New Booking'),
         ('booking_confirmed', 'Booking Confirmed'),
         ('booking_cancelled', 'Booking Cancelled'),
         ('booking_status_change', 'Status Change'),
         ('booking_reminder', 'Pickup Reminder'),
+        
+        # Driver notifications
         ('driver_assignment', 'Driver Assignment'),
+        ('driver_notification', 'Driver Trip Notification'),
+        ('driver_rejection', 'Driver Rejection (Admin Alert)'),
+        ('driver_completion', 'Driver Trip Completion (Admin Alert)'),
+        
+        # Round trip notifications
         ('round_trip_new', 'Round Trip - New'),
         ('round_trip_confirmed', 'Round Trip - Confirmed'),
         ('round_trip_cancelled', 'Round Trip - Cancelled'),
