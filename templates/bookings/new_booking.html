@@ -672,7 +672,12 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label" for="id_trip_type">Trip Type *</label>
-                        {{ form.trip_type }}
+                        <select name="trip_type" id="id_trip_type" class="form-select" required>
+                            <option value="">Select trip type</option>
+                            <option value="Point">Point to Point: One-way</option>
+                            <option value="Round">Round: Return trip</option>
+                            <option value="Hourly">Hourly: By the hour</option>
+                        </select>
                         {% if form.trip_type.errors %}
                             <div class="form-error">{{ form.trip_type.errors.0 }}</div>
                         {% else %}
@@ -695,12 +700,17 @@
                     </div>
 
                     <div class="form-group" id="hoursBookedGroup" style="display: none;">
-                        <label class="form-label" for="id_hours_booked">Hours Booked</label>
-                        {{ form.hours_booked }}
+                        <label class="form-label" for="id_hours_booked">Hours Booked * <span id="hoursCount" style="color: var(--primary); font-weight: 700;">3</span></label>
+                        <input type="range" id="hoursSlider" min="3" max="24" value="3" class="passenger-slider" style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, var(--primary) 0%, var(--primary) 0%, var(--border) 0%, var(--border) 100%); outline: none; -webkit-appearance: none;">
+                        <input type="hidden" id="id_hours_booked" name="hours_booked" value="3">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                            <span>3 hrs</span>
+                            <span>24 hrs</span>
+                        </div>
                         {% if form.hours_booked.errors %}
                             <div class="form-error">{{ form.hours_booked.errors.0 }}</div>
                         {% else %}
-                            <div class="form-hint">Minimum 3 hours</div>
+                            <div class="form-hint">Minimum 3 hours required for hourly service</div>
                         {% endif %}
                     </div>
                 </div>
@@ -767,6 +777,7 @@
                     <div class="form-group">
                         <label class="form-label" for="id_pick_up_date">Pick-up Date *</label>
                         {{ form.pick_up_date }}
+                        <div id="pickup_date_realtime_error" class="form-error" style="display: none;"></div>
                         {% if form.pick_up_date.errors %}
                             <div class="form-error">{{ form.pick_up_date.errors.0 }}</div>
                         {% endif %}
@@ -775,6 +786,7 @@
                     <div class="form-group">
                         <label class="form-label" for="id_pick_up_time">Pick-up Time *</label>
                         {{ form.pick_up_time }}
+                        <div id="pickup_time_realtime_error" class="form-error" style="display: none;"></div>
                         {% if form.pick_up_time.errors %}
                             <div class="form-error">{{ form.pick_up_time.errors.0 }}</div>
                         {% endif %}
@@ -782,26 +794,31 @@
                 </div>
             </div>
 
-            <div class="form-section">
-                <h3 class="section-header">
-                    <div class="section-icon">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                        </svg>
-                    </div>
-                    Flight & Additional Info
-                </h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="id_flight_number">Flight Number</label>
-                        {{ form.flight_number }}
-                        {% if form.flight_number.errors %}
-                            <div class="form-error">{{ form.flight_number.errors.0 }}</div>
-                        {% else %}
-                            <div class="form-hint">If applicable</div>
-                        {% endif %}
+            <!-- Flight Number (Optional) -->
+            <div id="flightSection" style="display: none; margin-top: 20px;">
+                <div class="form-section">
+                    <h3 class="section-header">
+                        <div class="section-icon">
+                            <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </div>
+                        Flight Information
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="id_flight_number">Flight Number</label>
+                            {{ form.flight_number }}
+                            {% if form.flight_number.errors %}
+                                <div class="form-error">{{ form.flight_number.errors.0 }}</div>
+                            {% endif %}
+                            <button type="button" onclick="removeFlightNumber()" class="btn-sm" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-top: 8px;">Remove Flight Number</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div style="margin: 20px 0;">
+                <button type="button" id="addFlightBtn" onclick="addFlightNumber()" class="btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;">+ Add Flight Number</button>
             </div>
 
             <div class="form-section">
@@ -907,13 +924,21 @@
                         {% endif %}
                     </div>
 
+                </div>
+
+                <!-- Return Flight Number (Optional) -->
+                <div id="returnFlightSection" style="display: none; margin-top: 20px;">
                     <div class="form-group">
                         <label class="form-label" for="id_return_flight_number">Return Flight Number</label>
                         {{ form.return_flight_number }}
                         {% if form.return_flight_number.errors %}
                             <div class="form-error">{{ form.return_flight_number.errors.0 }}</div>
                         {% endif %}
+                        <button type="button" onclick="removeReturnFlightNumber()" class="btn-sm" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-top: 8px;">Remove Flight Number</button>
                     </div>
+                </div>
+                <div style="margin: 20px 0;">
+                    <button type="button" id="addReturnFlightBtn" onclick="addReturnFlightNumber()" class="btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;">+ Add Flight Number</button>
                 </div>
 
                 <div class="form-group">
@@ -951,19 +976,36 @@
                 <div class="review-section">
                     <div class="review-header">
                         <span>Passenger Information</span>
-                        <a href="#" class="edit-link" onclick="goToStep(1); return false;">Edit</a>
+                        <button type="button" class="edit-link" onclick="toggleEditMode('passenger')" style="background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 600; font-size: 14px;">✎ Edit</button>
                     </div>
-                    <div class="review-item">
-                        <span class="review-label">Name</span>
-                        <span class="review-value" id="review_passenger_name">-</span>
+                    <div id="passenger_view_mode">
+                        <div class="review-item">
+                            <span class="review-label">Name</span>
+                            <span class="review-value" id="review_passenger_name">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="review-label">Phone</span>
+                            <span class="review-value" id="review_phone_number">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="review-label">Number of Passengers</span>
+                            <span class="review-value" id="review_number_of_passengers">-</span>
+                        </div>
                     </div>
-                    <div class="review-item">
-                        <span class="review-label">Phone</span>
-                        <span class="review-value" id="review_phone_number">-</span>
-                    </div>
-                    <div class="review-item">
-                        <span class="review-label">Number of Passengers</span>
-                        <span class="review-value" id="review_number_of_passengers">-</span>
+                    <div id="passenger_edit_mode" style="display: none;">
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Name</label>
+                            <input type="text" id="edit_passenger_name" class="form-input" onchange="updateReviewField('passenger_name', this.value)">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Contact</label>
+                            <input type="text" id="edit_passenger_contact" class="form-input" onchange="updateReviewField('passenger_contact', this.value)">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Passengers: <span id="edit_passenger_count">1</span></label>
+                            <input type="range" min="1" max="15" value="1" id="edit_passenger_slider" class="form-range" style="width: 100%;" oninput="updatePassengerCount(this.value)">
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEditMode('passenger')" style="margin-top: 8px;">Done</button>
                     </div>
                 </div>
 
@@ -991,27 +1033,50 @@
                 <div class="review-section">
                     <div class="review-header">
                         <span>Pickup Details</span>
-                        <a href="#" class="edit-link" onclick="goToStep(2); return false;">Edit</a>
+                        <button type="button" class="edit-link" onclick="toggleEditMode('pickup')" style="background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 600; font-size: 14px;">✎ Edit</button>
                     </div>
-                    <div class="review-item">
-                        <span class="review-label">Pickup Address</span>
-                        <span class="review-value" id="review_pick_up_address">-</span>
+                    <div id="pickup_view_mode">
+                        <div class="review-item">
+                            <span class="review-label">Pickup Address</span>
+                            <span class="review-value" id="review_pick_up_address">-</span>
+                        </div>
+                        <div class="review-item" id="review_drop_off_row">
+                            <span class="review-label">Drop-off Address</span>
+                            <span class="review-value" id="review_drop_off_address">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="review-label">Date & Time</span>
+                            <span class="review-value" id="review_pickup_datetime">-</span>
+                        </div>
+                        <div class="review-item" id="review_flight_row" style="display: none;">
+                            <span class="review-label">Flight Number</span>
+                            <span class="review-value" id="review_flight_number">-</span>
+                        </div>
+                        <div class="review-item" id="review_notes_row" style="display: none;">
+                            <span class="review-label">Special Requests</span>
+                            <span class="review-value" id="review_notes">-</span>
+                        </div>
                     </div>
-                    <div class="review-item" id="review_drop_off_row">
-                        <span class="review-label">Drop-off Address</span>
-                        <span class="review-value" id="review_drop_off_address">-</span>
-                    </div>
-                    <div class="review-item">
-                        <span class="review-label">Date & Time</span>
-                        <span class="review-value" id="review_pickup_datetime">-</span>
-                    </div>
-                    <div class="review-item" id="review_flight_row" style="display: none;">
-                        <span class="review-label">Flight Number</span>
-                        <span class="review-value" id="review_flight_number">-</span>
-                    </div>
-                    <div class="review-item" id="review_notes_row" style="display: none;">
-                        <span class="review-label">Special Requests</span>
-                        <span class="review-value" id="review_notes">-</span>
+                    <div id="pickup_edit_mode" style="display: none;">
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Pickup Address</label>
+                            <input type="text" id="edit_pick_up_address" class="form-input" onchange="updateReviewField('pick_up_address', this.value)">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Drop-off Address</label>
+                            <input type="text" id="edit_drop_off_address" class="form-input" onchange="updateReviewField('drop_off_address', this.value)">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Date</label>
+                                <input type="date" id="edit_pick_up_date" class="form-input" onchange="updateReviewField('pick_up_date', this.value); validatePickupDateTime();">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Time</label>
+                                <input type="time" id="edit_pick_up_time" class="form-input" onchange="updateReviewField('pick_up_time', this.value); validatePickupDateTime();">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEditMode('pickup')" style="margin-top: 8px;">Done</button>
                     </div>
                 </div>
 
@@ -1078,11 +1143,27 @@
         initializeFrequentPassengerSelect();
         initializeFormSubmission();
         initializePassengerSlider();
+        initializeHoursSlider();
         initializeVehicleValidation();
         initializeInstantValidation();
 
+        // Initialize flight number visibility based on existing values
+        const flightNumber = document.getElementById('id_flight_number').value;
+        const returnFlightNumber = document.getElementById('id_return_flight_number').value;
+        
+        if (flightNumber && flightNumber.trim()) {
+            document.getElementById('flightSection').style.display = 'block';
+            document.getElementById('addFlightBtn').style.display = 'none';
+        }
+        
+        if (returnFlightNumber && returnFlightNumber.trim()) {
+            document.getElementById('returnFlightSection').style.display = 'block';
+            document.getElementById('addReturnFlightBtn').style.display = 'none';
+        }
+
         // Update form on page load (if returning with errors)
         updateFormFields();
+        updateStep3Visibility();
         updateProgress();
     });
 
@@ -1104,6 +1185,34 @@
                 
                 // Validate against vehicle capacity
                 validateVehicleCapacity();
+            });
+        }
+    }
+
+    // Hours slider functionality (for Hourly bookings)
+    function initializeHoursSlider() {
+        const slider = document.getElementById('hoursSlider');
+        const hiddenInput = document.getElementById('id_hours_booked');
+        const countDisplay = document.getElementById('hoursCount');
+
+        if (slider && hiddenInput && countDisplay) {
+            // Set initial value if hours_booked already has a value
+            const initialValue = hiddenInput.value || 3;
+            slider.value = initialValue;
+            countDisplay.textContent = initialValue;
+            
+            // Set initial gradient
+            const initialPercentage = ((initialValue - 3) / (24 - 3)) * 100;
+            slider.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${initialPercentage}%, var(--border) ${initialPercentage}%, var(--border) 100%)`;
+            
+            slider.addEventListener('input', function() {
+                const value = this.value;
+                hiddenInput.value = value;
+                countDisplay.textContent = value;
+                
+                // Update slider gradient
+                const percentage = ((value - 3) / (24 - 3)) * 100;
+                this.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percentage}%, var(--border) ${percentage}%, var(--border) 100%)`;
             });
         }
     }
@@ -1628,7 +1737,7 @@
         }
     }
 
-    // Form submission protection
+    // Form submission protection with enhanced loading state
     function initializeFormSubmission() {
         const form = document.getElementById('bookingForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -1639,21 +1748,154 @@
                 return false;
             }
 
+            // Validate pickup time one final time before submission
+            if (!validatePickupDateTime()) {
+                e.preventDefault();
+                showErrorNotification('Pickup time has already passed. Please select a future date/time.');
+                return false;
+            }
+
             isSubmitting = true;
             submitBtn.classList.add('btn-submitting');
-            submitBtn.textContent = 'Creating Booking...';
+            submitBtn.innerHTML = '<span style="display: inline-flex; align-items: center; gap: 8px;"><svg style="width: 18px; height: 18px; animation: spin 1s linear infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="4" stroke="currentColor" stroke-dasharray="31.4 31.4" stroke-linecap="round"></circle></svg>Creating Booking...</span>';
             submitBtn.disabled = true;
+            
+            // Add style for spinner animation if not already present
+            if (!document.getElementById('spinnerStyle')) {
+                const style = document.createElement('style');
+                style.id = 'spinnerStyle';
+                style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+            }
 
-            // If submission fails (network error), reset after 5 seconds
+            // If submission fails (network error), reset after 10 seconds
             setTimeout(function() {
                 if (isSubmitting) {
                     isSubmitting = false;
                     submitBtn.classList.remove('btn-submitting');
-                    submitBtn.textContent = 'Create Booking ✓';
+                    submitBtn.innerHTML = 'Create Booking ✓';
                     submitBtn.disabled = false;
                 }
-            }, 5000);
+            }, 10000);
         });
+    }
+
+    // Flight number management functions
+    function addFlightNumber() {
+        document.getElementById('flightSection').style.display = 'block';
+        document.getElementById('addFlightBtn').style.display = 'none';
+    }
+
+    function removeFlightNumber() {
+        document.getElementById('id_flight_number').value = '';
+        document.getElementById('flightSection').style.display = 'none';
+        document.getElementById('addFlightBtn').style.display = 'block';
+    }
+
+    function addReturnFlightNumber() {
+        document.getElementById('returnFlightSection').style.display = 'block';
+        document.getElementById('addReturnFlightBtn').style.display = 'none';
+    }
+
+    function removeReturnFlightNumber() {
+        document.getElementById('id_return_flight_number').value = '';
+        document.getElementById('returnFlightSection').style.display = 'none';
+        document.getElementById('addReturnFlightBtn').style.display = 'block';
+    }
+
+    // Real-time pickup date/time validation
+    function validatePickupDateTime() {
+        const dateField = document.getElementById('id_pick_up_date');
+        const timeField = document.getElementById('id_pick_up_time');
+        const dateError = document.getElementById('pickup_date_realtime_error');
+        const timeError = document.getElementById('pickup_time_realtime_error');
+        
+        if (!dateField.value || !timeField.value) {
+            return true; // Don't show error if fields are empty
+        }
+
+        const pickupDate = new Date(dateField.value + 'T' + timeField.value);
+        const now = new Date();
+        
+        if (pickupDate <= now) {
+            const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            timeError.textContent = `⚠️ Pickup time has already passed. Current time: ${currentTime}`;
+            timeError.style.display = 'block';
+            dateField.style.borderColor = '#ef4444';
+            timeField.style.borderColor = '#ef4444';
+            return false;
+        } else {
+            timeError.style.display = 'none';
+            dateError.style.display = 'none';
+            dateField.style.borderColor = '';
+            timeField.style.borderColor = '';
+            return true;
+        }
+    }
+
+    // Initialize real-time validation for date/time
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateField = document.getElementById('id_pick_up_date');
+        const timeField = document.getElementById('id_pick_up_time');
+        
+        if (dateField) {
+            dateField.addEventListener('change', validatePickupDateTime);
+        }
+        
+        if (timeField) {
+            timeField.addEventListener('change', validatePickupDateTime);
+            timeField.addEventListener('blur', validatePickupDateTime);
+        }
+    });
+
+    // Inline editing functions for review step
+    function toggleEditMode(section) {
+        const viewMode = document.getElementById(section + '_view_mode');
+        const editMode = document.getElementById(section + '_edit_mode');
+        
+        if (editMode.style.display === 'none') {
+            // Switching to edit mode - populate edit fields
+            if (section === 'passenger') {
+                document.getElementById('edit_passenger_name').value = document.getElementById('id_passenger_name').value;
+                document.getElementById('edit_passenger_contact').value = document.getElementById('id_passenger_contact').value;
+                document.getElementById('edit_passenger_slider').value = document.getElementById('id_number_of_passengers').value;
+                document.getElementById('edit_passenger_count').textContent = document.getElementById('id_number_of_passengers').value;
+            } else if (section === 'pickup') {
+                document.getElementById('edit_pick_up_address').value = document.getElementById('id_pick_up_address').value;
+                document.getElementById('edit_drop_off_address').value = document.getElementById('id_drop_off_address').value;
+                document.getElementById('edit_pick_up_date').value = document.getElementById('id_pick_up_date').value;
+                document.getElementById('edit_pick_up_time').value = document.getElementById('id_pick_up_time').value;
+            }
+            
+            viewMode.style.display = 'none';
+            editMode.style.display = 'block';
+        } else {
+            // Switching back to view mode - update review display
+            viewMode.style.display = 'block';
+            editMode.style.display = 'none';
+            updateReviewData();
+        }
+    }
+
+    function updateReviewField(fieldName, value) {
+        const actualField = document.getElementById('id_' + fieldName);
+        if (actualField) {
+            actualField.value = value;
+        }
+    }
+
+    function updatePassengerCount(value) {
+        document.getElementById('edit_passenger_count').textContent = value;
+        document.getElementById('id_number_of_passengers').value = value;
+        document.getElementById('passengerSlider').value = value;
+        document.getElementById('passengerCount').textContent = value;
+        
+        // Update slider visual
+        const slider = document.getElementById('passengerSlider');
+        const percentage = ((value - 1) / (15 - 1)) * 100;
+        slider.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percentage}%, var(--border) ${percentage}%, var(--border) 100%)`;
+        
+        validateVehicleCapacity();
     }
 </script>
 {% endblock %}
