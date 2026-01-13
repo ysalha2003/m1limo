@@ -187,11 +187,12 @@
         width: 100%;
         border-collapse: collapse;
         font-size: 14px;
-        table-layout: fixed;
+        table-layout: auto;
+        min-width: 1100px;
     }
 
     th {
-        padding: 12px 12px;
+        padding: 14px 16px;
         color: var(--text-secondary);
         font-weight: 600;
         font-size: 12px;
@@ -200,55 +201,63 @@
         border-bottom: 2px solid var(--border);
         text-align: left;
         white-space: nowrap;
+        background: #fafafa;
     }
 
     td {
-        padding: 16px 12px;
+        padding: 14px 16px;
         border-bottom: 1px solid var(--border);
         vertical-align: top;
     }
 
-    /* Column width definitions - Without Driver column */
-    table th:nth-child(1),
-    table td:nth-child(1) {
-        width: 18%;
-        min-width: 160px;
+    /* Column width definitions using classes */
+    th[data-col="passenger"],
+    td[data-col="passenger"] {
+        width: 16%;
+        min-width: 180px;
+        max-width: 200px;
     }
 
-    table th:nth-child(2),
-    table td:nth-child(2) {
-        width: 14%;
-        min-width: 130px;
-    }
-
-    table th:nth-child(3),
-    table td:nth-child(3) {
-        width: 28%;
-        min-width: 220px;
-    }
-
-    table th:nth-child(4),
-    table td:nth-child(4) {
+    th[data-col="customer"],
+    td[data-col="customer"] {
         width: 13%;
-        min-width: 120px;
+        min-width: 140px;
+        max-width: 160px;
     }
 
-    table th:nth-child(5),
-    table td:nth-child(5) {
+    th[data-col="pickup"],
+    td[data-col="pickup"] {
+        width: 30%;
+        min-width: 250px;
+        max-width: none;
+    }
+
+    th[data-col="datetime"],
+    td[data-col="datetime"] {
         width: 12%;
-        min-width: 110px;
+        min-width: 120px;
+        max-width: 140px;
     }
 
-    table th:nth-child(6),
-    table td:nth-child(6) {
-        width: auto;
+    th[data-col="vehicle"],
+    td[data-col="vehicle"] {
+        width: 10%;
         min-width: 100px;
+        max-width: 120px;
     }
 
-    table th:nth-child(7),
-    table td:nth-child(7) {
+    th[data-col="status"],
+    td[data-col="status"] {
+        width: 10%;
+        min-width: 95px;
+        max-width: 110px;
+    }
+
+    th[data-col="actions"],
+    td[data-col="actions"] {
         width: auto;
-        min-width: 150px;
+        min-width: 160px;
+        white-space: nowrap;
     }
 
     /* Text overflow handling */
@@ -345,6 +354,17 @@
         justify-content: center;
     }
 
+    @media (max-width: 1200px) {
+        table {
+            min-width: 1000px;
+        }
+
+        th[data-col="pickup"],
+        td[data-col="pickup"] {
+            min-width: 220px;
+        }
+    }
+
     @media (max-width: 1024px) {
         .stat-card {
             padding: 16px;
@@ -356,16 +376,26 @@
 
         table {
             font-size: 13px;
-            table-layout: auto;
+            min-width: 900px;
         }
 
         th, td {
-            padding: 10px 8px;
+            padding: 12px 14px;
         }
 
-        table th,
-        table td {
-            min-width: 100px;
+        th[data-col="passenger"],
+        td[data-col="passenger"] {
+            min-width: 160px;
+        }
+
+        th[data-col="customer"],
+        td[data-col="customer"] {
+            min-width: 120px;
+        }
+
+        th[data-col="pickup"],
+        td[data-col="pickup"] {
+            min-width: 200px;
         }
     }
 
@@ -433,12 +463,12 @@
         }
 
         th {
-            padding: 10px 8px;
+            padding: 10px 12px;
             font-size: 11px;
         }
 
         td {
-            padding: 12px 8px;
+            padding: 12px;
         }
 
         .action-link {
@@ -451,9 +481,24 @@
         }
 
         /* Adjust column widths for mobile */
-        table th,
-        table td {
-            min-width: 80px;
+        th[data-col="passenger"],
+        td[data-col="passenger"] {
+            min-width: 140px;
+        }
+
+        th[data-col="pickup"],
+        td[data-col="pickup"] {
+            min-width: 180px;
+        }
+
+        th[data-col="datetime"],
+        td[data-col="datetime"] {
+            min-width: 100px;
+        }
+
+        th[data-col="actions"],
+        td[data-col="actions"] {
+            min-width: 120px;
         }
     }
 
@@ -688,19 +733,19 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Passenger</th>
-                        {% if is_admin %}<th class="hide-mobile">Customer</th>{% endif %}
-                        <th>Pickup</th>
-                        <th>Date & Time</th>
-                        <th class="hide-mobile">Vehicle</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th data-col="passenger">Passenger</th>
+                        {% if is_admin %}<th data-col="customer" class="hide-mobile">Customer</th>{% endif %}
+                        <th data-col="pickup">Pickup</th>
+                        <th data-col="datetime">Date & Time</th>
+                        <th data-col="vehicle" class="hide-mobile">Vehicle</th>
+                        <th data-col="status">Status</th>
+                        <th data-col="actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
                     <tr class="booking-row-{{ booking.id }} {% if booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}trip-cancelled{% elif booking.is_past_trip %}trip-past{% endif %}">
-                        <td>
+                        <td data-col="passenger">
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
                                 <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">ID #{{ booking.id }}</span>
                                 {% if not is_admin and booking.has_unviewed_changes %}
@@ -735,7 +780,7 @@
                             {% endif %}
                         </td>
                         {% if is_admin %}
-                        <td class="hide-mobile">
+                        <td data-col="customer" class="hide-mobile">
                             <div style="font-weight: 500; color: var(--dark); margin-bottom: 3px;" class="text-truncate" title="{{ booking.user.username }}">{{ booking.user.username }}</div>
                             {% if booking.user.profile.company_name %}
                             <div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 2px;" class="text-truncate" title="{{ booking.user.profile.company_name }}">
@@ -747,7 +792,7 @@
                             <div style="font-size: 13px; color: var(--text-secondary);" class="text-truncate" title="{{ booking.user.email|default:'No email' }}">{{ booking.user.email|default:"No email" }}</div>
                         </td>
                         {% endif %}
-                        <td>
+                        <td data-col="pickup">
                             <div style="font-size: 14px; color: var(--dark); margin-bottom: 3px;" class="text-truncate" title="{{ booking.pick_up_address }}">{{ booking.pick_up_address }}</div>
                             {% if booking.drop_off_address %}
                             <div style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 4px;">
@@ -756,7 +801,7 @@
                             </div>
                             {% endif %}
                         </td>
-                        <td>
+                        <td data-col="datetime">
                             <div style="font-weight: 500;">{{ booking.pick_up_date }}</div>
                             <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.pick_up_time }}</div>
                             {% if booking.hours_until_pickup > 0 and booking.hours_until_pickup <= 24 and booking.status in 'Pending,Confirmed' %}
@@ -765,15 +810,15 @@
                             </div>
                             {% endif %}
                         </td>
-                        <td class="hide-mobile">
+                        <td data-col="vehicle" class="hide-mobile">
                             <div>{{ booking.vehicle_type }}</div>
                             <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.get_trip_type_display }}</div>
                         </td>
-                        <td>
+                        <td data-col="status">
                             <span class="badge badge-{{ booking.status|lower }}">{{ booking.get_status_display }}</span>
                         </td>
-                        <td>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <td data-col="actions">
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
                                 {% if booking.is_past_trip %}
                                     {# Past trips: Only show View and Rebook #}
                                     <a href="{% url 'booking_detail' booking.id %}" class="action-link">View</a>
