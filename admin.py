@@ -8,7 +8,8 @@ from models import (
     Booking, BookingStop, SystemSettings, BookingPermission,
     NotificationRecipient, BookingNotification, FrequentPassenger,
     Notification, CommunicationLog, AdminNote, Driver,
-    BookingHistory, UserProfile, ViewedActivity, ViewedBooking
+    BookingHistory, UserProfile, ViewedActivity, ViewedBooking,
+    EmailTemplate
 )
 from booking_service import BookingService
 import logging
