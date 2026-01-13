@@ -89,34 +89,6 @@
         letter-spacing: -0.01em;
     }
 
-    /* PART 3: CSS for cancelled/past trips */
-    .trip-cancelled {
-        opacity: 0.5;
-        background-color: rgba(0, 0, 0, 0.02);
-        color: var(--text-muted);
-        position: relative;
-    }
-
-    .trip-cancelled::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background: linear-gradient(to bottom, transparent, #6b7280, transparent);
-    }
-
-    .trip-cancelled .badge {
-        opacity: 0.8;
-    }
-
-    .trip-past {
-        opacity: 0.5;
-        background-color: rgba(0, 0, 0, 0.02);
-        color: var(--text-muted);
-    }
-
     .today-pickups-card {
         background: linear-gradient(135deg, rgba(30, 41, 59, 0.04) 0%, rgba(51, 65, 85, 0.04) 100%);
         border: 1.5px solid rgba(30, 41, 59, 0.15);
@@ -166,18 +138,6 @@
         box-shadow: var(--shadow-xs);
     }
 
-    .search-form-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr auto;
-        gap: 12px;
-        align-items: end;
-    }
-
-    .search-form-actions {
-        display: flex;
-        gap: 8px;
-    }
-
     .table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -187,12 +147,10 @@
         width: 100%;
         border-collapse: collapse;
         font-size: 14px;
-        table-layout: auto;
-        min-width: 1100px;
     }
 
     th {
-        padding: 14px 16px;
+        padding: 12px 8px;
         color: var(--text-secondary);
         font-weight: 600;
         font-size: 12px;
@@ -201,77 +159,11 @@
         border-bottom: 2px solid var(--border);
         text-align: left;
         white-space: nowrap;
-        background: #fafafa;
     }
 
     td {
-        padding: 14px 16px;
+        padding: 16px 8px;
         border-bottom: 1px solid var(--border);
-        vertical-align: top;
-    }
-
-    /* Column width definitions using classes */
-    th[data-col="passenger"],
-    td[data-col="passenger"] {
-        width: 16%;
-        min-width: 180px;
-        max-width: 200px;
-    }
-
-    th[data-col="customer"],
-    td[data-col="customer"] {
-        width: 13%;
-        min-width: 140px;
-        max-width: 160px;
-    }
-
-    th[data-col="pickup"],
-    td[data-col="pickup"] {
-        width: 30%;
-        min-width: 250px;
-        max-width: none;
-    }
-
-    th[data-col="datetime"],
-    td[data-col="datetime"] {
-        width: 12%;
-        min-width: 120px;
-        max-width: 140px;
-    }
-
-    th[data-col="vehicle"],
-    td[data-col="vehicle"] {
-        width: 10%;
-        min-width: 100px;
-        max-width: 120px;
-    }
-
-    th[data-col="status"],
-    td[data-col="status"] {
-        width: 10%;
-        min-width: 95px;
-        max-width: 110px;
-    }
-
-    th[data-col="actions"],
-    td[data-col="actions"] {
-        width: auto;
-        min-width: 160px;
-        white-space: nowrap;
-    }
-
-    /* Text overflow handling */
-    .text-truncate {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        display: block;
-    }
-
-    .text-wrap-controlled {
-        word-break: break-word;
-        overflow-wrap: break-word;
-        line-height: 1.4;
     }
 
     tr:hover {
@@ -354,17 +246,6 @@
         justify-content: center;
     }
 
-    @media (max-width: 1200px) {
-        table {
-            min-width: 1000px;
-        }
-
-        th[data-col="pickup"],
-        td[data-col="pickup"] {
-            min-width: 220px;
-        }
-    }
-
     @media (max-width: 1024px) {
         .stat-card {
             padding: 16px;
@@ -376,26 +257,10 @@
 
         table {
             font-size: 13px;
-            min-width: 900px;
         }
 
         th, td {
-            padding: 12px 14px;
-        }
-
-        th[data-col="passenger"],
-        td[data-col="passenger"] {
-            min-width: 160px;
-        }
-
-        th[data-col="customer"],
-        td[data-col="customer"] {
-            min-width: 120px;
-        }
-
-        th[data-col="pickup"],
-        td[data-col="pickup"] {
-            min-width: 200px;
+            padding: 10px 6px;
         }
     }
 
@@ -438,37 +303,17 @@
             padding: 16px;
         }
 
-        /* Make search form stack on mobile */
-        .search-form .search-form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .search-form .form-group {
-            width: 100%;
-        }
-
-        .search-form-actions {
-            flex-direction: row;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .search-form-actions .btn {
-            flex: 1;
-        }
-
         table {
             font-size: 12px;
-            min-width: 800px;
         }
 
         th {
-            padding: 10px 12px;
+            padding: 10px 6px;
             font-size: 11px;
         }
 
         td {
-            padding: 12px;
+            padding: 12px 6px;
         }
 
         .action-link {
@@ -478,27 +323,6 @@
         /* Hide less important columns on mobile */
         .hide-mobile {
             display: none;
-        }
-
-        /* Adjust column widths for mobile */
-        th[data-col="passenger"],
-        td[data-col="passenger"] {
-            min-width: 140px;
-        }
-
-        th[data-col="pickup"],
-        td[data-col="pickup"] {
-            min-width: 180px;
-        }
-
-        th[data-col="datetime"],
-        td[data-col="datetime"] {
-            min-width: 100px;
-        }
-
-        th[data-col="actions"],
-        td[data-col="actions"] {
-            min-width: 120px;
         }
     }
 
@@ -663,7 +487,7 @@
 
     <!-- Search & Filter -->
     <form method="get" class="search-form">
-        <div class="search-form-grid">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end;">
             <div class="form-group" style="margin: 0;">
                 <label class="form-label">Search</label>
                 <input type="text" name="search" class="form-input" placeholder="Booking ID, Name, Phone, or Reference Number" value="{{ request.GET.search }}" style="margin: 0;">
@@ -685,7 +509,7 @@
                 </select>
             </div>
 
-            <div class="search-form-actions">
+            <div style="display: flex; gap: 8px;">
                 <button type="submit" class="btn btn-primary" style="margin: 0;">Search</button>
                 <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="margin: 0;">Clear</a>
             </div>
@@ -733,20 +557,21 @@
             <table>
                 <thead>
                     <tr>
-                        <th data-col="passenger">Passenger</th>
-                        {% if is_admin %}<th data-col="customer" class="hide-mobile">Customer</th>{% endif %}
-                        <th data-col="pickup">Pickup</th>
-                        <th data-col="datetime">Date & Time</th>
-                        <th data-col="vehicle" class="hide-mobile">Vehicle</th>
-                        <th data-col="status">Status</th>
-                        <th data-col="actions">Actions</th>
+                        <th>Passenger</th>
+                        {% if is_admin %}<th class="hide-mobile">Customer</th>{% endif %}
+                        <th>Pickup</th>
+                        <th>Date & Time</th>
+                        <th class="hide-mobile">Vehicle</th>
+                        <th>Status</th>
+                        {% if is_admin %}<th class="hide-mobile">Driver</th>{% endif %}
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for booking in bookings %}
-                    <tr class="booking-row-{{ booking.id }} {% if booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}trip-cancelled{% elif booking.is_past_trip %}trip-past{% endif %}">
-                        <td data-col="passenger">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+                    <tr class="booking-row-{{ booking.id }}" {% if booking.is_past_trip or booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}style="opacity: 0.5; background-color: rgba(0,0,0,0.02); color: var(--text-muted);"{% endif %}>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                 <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">ID #{{ booking.id }}</span>
                                 {% if not is_admin and booking.has_unviewed_changes %}
                                     <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;" title="Recent activity - status updated">
@@ -765,7 +590,7 @@
                                     </span>
                                 {% endif %}
                             </div>
-                            <div style="font-weight: 600; color: var(--dark); margin-bottom: 3px;" class="text-truncate" title="{{ booking.passenger_name }}">
+                            <div style="font-weight: 600; color: var(--dark);">
                                 {{ booking.passenger_name }}
                                 {% if booking.is_past_trip %}
                                     <span style="font-size: 11px; color: var(--text-muted); font-weight: 500; margin-left: 6px;">(Past Trip)</span>
@@ -774,34 +599,31 @@
                                     <span style="font-size: 11px; color: var(--text-secondary); font-weight: 500; margin-left: 6px;">({{ booking.trip_label }})</span>
                                 {% endif %}
                             </div>
-                            <div style="font-size: 13px; color: var(--text-secondary);" class="text-truncate">{{ booking.phone_number|default:booking.passenger_email }}</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.phone_number|default:booking.passenger_email }}</div>
                             {% if booking.booking_reference %}
-                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" class="text-truncate">{{ booking.booking_reference }}</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">{{ booking.booking_reference }}</div>
                             {% endif %}
                         </td>
                         {% if is_admin %}
-                        <td data-col="customer" class="hide-mobile">
-                            <div style="font-weight: 500; color: var(--dark); margin-bottom: 3px;" class="text-truncate" title="{{ booking.user.username }}">{{ booking.user.username }}</div>
+                        <td class="hide-mobile">
+                            <div style="font-weight: 500; color: var(--dark);">{{ booking.user.username }}</div>
                             {% if booking.user.profile.company_name %}
-                            <div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 2px;" class="text-truncate" title="{{ booking.user.profile.company_name }}">
+                            <div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 2px;">
                                 <svg style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>{{ booking.user.profile.company_name }}
                             </div>
                             {% endif %}
-                            <div style="font-size: 13px; color: var(--text-secondary);" class="text-truncate" title="{{ booking.user.email|default:'No email' }}">{{ booking.user.email|default:"No email" }}</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.user.email|default:"No email" }}</div>
                         </td>
                         {% endif %}
-                        <td data-col="pickup">
-                            <div style="font-size: 14px; color: var(--dark); margin-bottom: 3px;" class="text-truncate" title="{{ booking.pick_up_address }}">{{ booking.pick_up_address }}</div>
+                        <td>
+                            <div style="font-size: 14px; color: var(--dark);">{{ booking.pick_up_address }}</div>
                             {% if booking.drop_off_address %}
-                            <div style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 4px;">
-                                <span style="flex-shrink: 0;">→</span>
-                                <span class="text-truncate" title="{{ booking.drop_off_address }}">{{ booking.drop_off_address }}</span>
-                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">→ {{ booking.drop_off_address }}</div>
                             {% endif %}
                         </td>
-                        <td data-col="datetime">
+                        <td>
                             <div style="font-weight: 500;">{{ booking.pick_up_date }}</div>
                             <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.pick_up_time }}</div>
                             {% if booking.hours_until_pickup > 0 and booking.hours_until_pickup <= 24 and booking.status in 'Pending,Confirmed' %}
@@ -810,15 +632,33 @@
                             </div>
                             {% endif %}
                         </td>
-                        <td data-col="vehicle" class="hide-mobile">
+                        <td class="hide-mobile">
                             <div>{{ booking.vehicle_type }}</div>
                             <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.get_trip_type_display }}</div>
                         </td>
-                        <td data-col="status">
+                        <td>
                             <span class="badge badge-{{ booking.status|lower }}">{{ booking.get_status_display }}</span>
                         </td>
-                        <td data-col="actions">
-                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                        {% if is_admin %}
+                        <td class="hide-mobile">
+                            {% if booking.assigned_driver %}
+                                <div style="font-weight: 500; color: var(--dark);">{{ booking.assigned_driver.full_name }}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                                    {% if booking.driver_response_status == 'accepted' %}
+                                        <span style="color: #059669;">✓ Accepted</span>
+                                    {% elif booking.driver_response_status == 'rejected' %}
+                                        <span style="color: #dc2626;">✗ Rejected</span>
+                                    {% elif booking.driver_response_status == 'completed' %}
+                                        <span style="color: #0c5460;">✓ Completed</span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: 13px;">Driver Not Assigned</span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        <td>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 {% if booking.is_past_trip %}
                                     {# Past trips: Only show View and Rebook #}
                                     <a href="{% url 'booking_detail' booking.id %}" class="action-link">View</a>
@@ -851,11 +691,7 @@
                                         {% endif %}
                                     {% else %}
                                         {% if booking.status in 'Pending,Confirmed' and booking.hours_until_pickup > 2 %}
-                                            {% if booking.trip_type == 'Round' %}
-                                                <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit Outbound</a>
-                                            {% else %}
-                                                <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit</a>
-                                            {% endif %}
+                                            <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit</a>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
@@ -865,7 +701,7 @@
 
                     {% if booking.trip_type == 'Round' and booking.linked_booking %}
                     <tr class="return-row return-row-{{ booking.id }}" style="display: table-row;">
-                        <td colspan="{% if is_admin %}6{% else %}5{% endif %}" style="padding: 16px 24px;">
+                        <td colspan="{% if is_admin %}7{% else %}6{% endif %}" style="padding: 16px 24px;">
                             <div class="return-trip-content">
                                 <div style="font-weight: 600; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -913,10 +749,6 @@
                                             <a href="{% url 'booking_detail' booking.linked_booking.id %}" class="action-link">View</a>
                                             {% if is_admin %}
                                                 <a href="{% url 'assign_driver' booking.linked_booking.id %}" class="action-link">Assign Driver</a>
-                                            {% else %}
-                                                {% if booking.linked_booking.status in 'Pending,Confirmed' and booking.linked_booking.hours_until_pickup > 2 %}
-                                                    <a href="{% url 'update_booking' booking.linked_booking.id %}" class="action-link">Edit Return</a>
-                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     </div>
