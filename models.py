@@ -116,47 +116,6 @@ class BookingPermission(models.Model):
         return f"{self.user.username} - {'Can' if self.can_edit_confirmed else 'Cannot'} edit confirmed"
 
 
-class CustomerManager(models.Manager):
-    """Custom manager for Customer queries"""
-    
-    def search(self, query):
-        return self.filter(
-            models.Q(passenger_name__icontains=query) |
-            models.Q(phone_number__icontains=query) |
-            models.Q(user__email__icontains=query)
-        )
-    
-    def by_user(self, user):
-        return self.filter(user=user)
-
-
-class Customer(models.Model):
-    """Customer/Passenger information"""
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='customer_profiles'
-    )
-    passenger_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=20)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    objects = CustomerManager()
-    
-    class Meta:
-        app_label = 'bookings'
-        ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['user']),
-            models.Index(fields=['phone_number']),
-            models.Index(fields=['created_at']),
-        ]
-    
-    def __str__(self):
-        return f"{self.passenger_name} ({self.user.username})"
-
-
 class FrequentPassenger(models.Model):
     """Frequently used passenger profiles"""
 

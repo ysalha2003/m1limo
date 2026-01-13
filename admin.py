@@ -7,7 +7,8 @@ from datetime import timedelta
 from models import (
     Booking, BookingStop, SystemSettings, BookingPermission,
     NotificationRecipient, BookingNotification, FrequentPassenger,
-    Notification, CommunicationLog, AdminNote, Driver
+    Notification, CommunicationLog, AdminNote, Driver,
+    BookingHistory, UserProfile, ViewedActivity, ViewedBooking
 )
 from booking_service import BookingService
 import logging
@@ -76,14 +77,15 @@ class BookingAdmin(admin.ModelAdmin):
     search_fields = ('passenger_name', 'phone_number', 'pick_up_address', 'user__username')
     date_hierarchy = 'pick_up_date'
     readonly_fields = (
-        'created_at', 'updated_at', 'driver_response_status',
-        'driver_response_at', 'driver_rejection_reason', 'driver_completed_at'
+        'booking_reference', 'created_at', 'updated_at', 'driver_response_status',
+        'driver_response_at', 'driver_rejection_reason', 'driver_completed_at',
+        'driver_notified_at', 'communication_sent_at'
     )
     inlines = [BookingStopInline, CommunicationLogInline, AdminNoteInline]
     
     fieldsets = (
         ('Customer Information', {
-            'fields': ('user', 'passenger_name', 'phone_number', 'passenger_email')
+            'fields': ('booking_reference', 'user', 'passenger_name', 'phone_number', 'passenger_email')
         }),
         ('Trip Details', {
             'fields': (
@@ -107,14 +109,28 @@ class BookingAdmin(admin.ModelAdmin):
         }),
         ('Status & Admin', {
             'fields': (
-                'status', 'admin_comment', 'cancellation_reason'
+                'status', 'admin_comment', 'cancellation_reason',
+                'customer_communication', 'communication_sent_at'
             )
+        }),
+        ('Round Trip Details', {
+            'fields': (
+                'is_return_trip', 'linked_booking'
+            ),
+            'classes': ('collapse',),
         }),
         ('Driver Assignment', {
             'fields': (
-                'assigned_driver', 'driver_notified_at',
-                'driver_response_status', 'driver_response_at',
+                'assigned_driver', 'share_driver_info', 'driver_admin_note',
+                'driver_notified_at', 'driver_response_status', 'driver_response_at',
                 'driver_rejection_reason', 'driver_completed_at'
+            ),
+            'classes': ('collapse',),
+        }),
+        ('Driver Payment', {
+            'fields': (
+                'driver_payment_amount', 'driver_paid',
+                'driver_paid_at', 'driver_paid_by'
             ),
             'classes': ('collapse',),
         }),
@@ -377,6 +393,88 @@ class AdminNoteAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+@admin.register(BookingHistory)
+class BookingHistoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'booking_link', 'action', 'changed_by', 'changed_at', 'changes_preview')
+    list_filter = ('action', 'changed_by', 'changed_at')
+    search_fields = ('booking__booking_reference', 'booking__passenger_name', 'booking__id', 'change_reason')
+    readonly_fields = ('booking', 'action', 'changed_by', 'changed_at', 'booking_snapshot', 'changes', 'change_reason', 'ip_address')
+    date_hierarchy = 'changed_at'
+    ordering = ('-changed_at',)
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('booking', 'action', 'changed_by', 'changed_at')
+        }),
+        ('Change Details', {
+            'fields': ('change_reason', 'changes', 'ip_address')
+        }),
+        ('Complete Snapshot', {
+            'fields': ('booking_snapshot',),
+            'classes': ('collapse',),
+            'description': 'Complete booking data at this point in time'
+        }),
+    )
+
+    def has_add_permission(self, request):
+        """Prevent manual creation - audit trail only."""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Prevent deletion - audit trail must be preserved."""
+        return False
+
+    def booking_link(self, obj):
+        """Link to the related booking."""
+        from django.urls import reverse
+        from django.utils.html import format_html
+        if obj.booking:
+            url = reverse('admin:bookings_booking_change', args=[obj.booking.id])
+            return format_html('<a href="{}">{} - {}</a>', url, obj.booking.booking_reference, obj.booking.passenger_name)
+        return '-'
+    booking_link.short_description = 'Booking'
+
+    def changes_preview(self, obj):
+        """Show preview of changes."""
+        if obj.changes and isinstance(obj.changes, dict):
+            fields = list(obj.changes.keys())[:3]
+            preview = ', '.join(fields)
+            if len(obj.changes) > 3:
+                preview += f' (+{len(obj.changes) - 3} more)'
+            return preview
+        elif obj.change_reason:
+            return obj.change_reason[:50] + '...' if len(obj.change_reason) > 50 else obj.change_reason
+        return '-'
+    changes_preview.short_description = 'Changes'
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'phone_number', 'company_name', 'receive_booking_confirmations', 'receive_status_updates', 'receive_pickup_reminders')
+    list_filter = ('receive_booking_confirmations', 'receive_status_updates', 'receive_pickup_reminders')
+    search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name', 'phone_number', 'company_name')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('user__username',)
+
+    fieldsets = (
+        ('User Information', {
+            'fields': ('user', 'phone_number', 'company_name')
+        }),
+        ('Notification Preferences', {
+            'fields': (
+                'receive_booking_confirmations',
+                'receive_status_updates',
+                'receive_pickup_reminders'
+            ),
+            'description': 'Email notification preferences for this user'
+        }),
+        ('System Information', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
 @admin.register(Driver)
 class DriverAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'car_type', 'car_number', 'phone_number', 'email', 'is_active')
@@ -400,3 +498,71 @@ class DriverAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(ViewedActivity)
+class ViewedActivityAdmin(admin.ModelAdmin):
+    """Admin interface for debugging activity notifications."""
+    list_display = ('user', 'activity_link', 'viewed_at')
+    list_filter = ('user', 'viewed_at')
+    search_fields = ('user__username', 'activity__booking__passenger_name', 'activity__booking__booking_reference')
+    readonly_fields = ('user', 'activity', 'viewed_at')
+    date_hierarchy = 'viewed_at'
+    ordering = ('-viewed_at',)
+
+    def has_add_permission(self, request):
+        """Prevent manual creation - tracked automatically."""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Allow deletion to reset notification states if needed."""
+        return True
+
+    def activity_link(self, obj):
+        """Link to the activity in BookingHistory."""
+        from django.urls import reverse
+        from django.utils.html import format_html
+        if obj.activity:
+            url = reverse('admin:bookings_bookinghistory_change', args=[obj.activity.id])
+            return format_html(
+                '<a href="{}">Activity #{} - {}</a>',
+                url,
+                obj.activity.id,
+                obj.activity.get_action_display()
+            )
+        return '-'
+    activity_link.short_description = 'Activity'
+
+
+@admin.register(ViewedBooking)
+class ViewedBookingAdmin(admin.ModelAdmin):
+    """Admin interface for debugging user booking notifications."""
+    list_display = ('user', 'booking_link', 'viewed_at')
+    list_filter = ('user', 'viewed_at')
+    search_fields = ('user__username', 'booking__passenger_name', 'booking__booking_reference', 'booking__id')
+    readonly_fields = ('user', 'booking', 'viewed_at')
+    date_hierarchy = 'viewed_at'
+    ordering = ('-viewed_at',)
+
+    def has_add_permission(self, request):
+        """Prevent manual creation - tracked automatically."""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Allow deletion to reset notification states if needed."""
+        return True
+
+    def booking_link(self, obj):
+        """Link to the booking."""
+        from django.urls import reverse
+        from django.utils.html import format_html
+        if obj.booking:
+            url = reverse('admin:bookings_booking_change', args=[obj.booking.id])
+            return format_html(
+                '<a href="{}">{} - {}</a>',
+                url,
+                obj.booking.booking_reference,
+                obj.booking.passenger_name
+            )
+        return '-'
+    booking_link.short_description = 'Booking'
