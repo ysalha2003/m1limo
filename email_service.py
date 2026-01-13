@@ -73,16 +73,46 @@ class EmailService:
                 is_return=is_return
             )
 
-            subject = cls._get_email_subject(booking, notification_type, old_status, is_return)
-            template_name = cls._get_template_name(notification_type)
+            # Map notification type to template type
+            template_type_map = {
+                'new': 'booking_new',
+                'confirmed': 'booking_confirmed',
+                'cancelled': 'booking_cancelled',
+                'status_change': 'booking_status_change',
+                'reminder': 'booking_reminder'
+            }
+            db_template_type = template_type_map.get(notification_type)
+            
+            # Try to load from database first
+            db_template = cls._load_email_template(db_template_type) if db_template_type else None
+            
+            if db_template:
+                try:
+                    # Build context for database template
+                    template_context = cls._build_template_context(booking, notification_type, old_status, is_return)
+                    subject = db_template.render_subject(template_context)
+                    html_message = db_template.render_html(template_context)
+                    plain_message = strip_tags(html_message)
+                    
+                    logger.info(f"Using database template for {notification_type}")
+                    db_template.increment_sent()
+                except Exception as e:
+                    logger.error(f"Database template rendering error: {e}, falling back to file template")
+                    db_template.increment_failed()
+                    db_template = None
+            
+            # Fallback to file templates if database template not available or failed
+            if not db_template:
+                subject = cls._get_email_subject(booking, notification_type, old_status, is_return)
+                template_name = cls._get_template_name(notification_type)
 
-            try:
-                html_message = render_to_string(template_name, context)
-                plain_message = strip_tags(html_message)
-            except Exception as e:
-                logger.error(f"Template rendering error: {e}")
-                html_message = cls._get_fallback_message(booking, notification_type)
-                plain_message = strip_tags(html_message)
+                try:
+                    html_message = render_to_string(template_name, context)
+                    plain_message = strip_tags(html_message)
+                except Exception as e:
+                    logger.error(f"Template rendering error: {e}")
+                    html_message = cls._get_fallback_message(booking, notification_type)
+                    plain_message = strip_tags(html_message)
 
             logger.info(f"Sending {notification_type} email to {recipient_email}")
 
@@ -121,6 +151,57 @@ class EmailService:
         if old_status:
             context['old_status'] = old_status
             context['new_status'] = booking.status
+        
+        return context
+
+    @staticmethod
+    def _build_template_context(
+        booking: Booking,
+        notification_type: str,
+        old_status: Optional[str] = None,
+        is_return: bool = False
+    ) -> dict:
+        """Build context dictionary for database email templates (variable format)."""
+        context = {
+            'booking_reference': booking.booking_reference,
+            'passenger_name': booking.passenger_name,
+            'phone_number': booking.phone_number,
+            'passenger_email': booking.passenger_email or '',
+            'pick_up_date': booking.pick_up_date.strftime('%B %d, %Y') if booking.pick_up_date else '',
+            'pick_up_time': booking.pick_up_time.strftime('%I:%M %p') if booking.pick_up_time else '',
+            'pick_up_address': booking.pick_up_address,
+            'drop_off_address': booking.drop_off_address,
+            'vehicle_type': booking.vehicle_type or '',
+            'trip_type': booking.get_trip_type_display() if hasattr(booking, 'get_trip_type_display') else booking.trip_type,
+            'number_of_passengers': str(booking.number_of_passengers) if booking.number_of_passengers else '',
+            'flight_number': booking.flight_number or '',
+            'notes': booking.notes or '',
+            'status': booking.get_status_display() if hasattr(booking, 'get_status_display') else booking.status,
+            'old_status': old_status or '',
+            'new_status': booking.get_status_display() if hasattr(booking, 'get_status_display') else booking.status,
+            'user_email': booking.user.email if booking.user else '',
+            'user_username': booking.user.username if booking.user else '',
+            'company_name': settings.COMPANY_INFO.get('name', 'M1 Limousine Service'),
+            'support_email': settings.COMPANY_INFO.get('email', 'support@m1limo.com'),
+            'dashboard_url': f"{settings.COMPANY_INFO.get('website', '')}/dashboard" if settings.COMPANY_INFO.get('website') else '',
+        }
+        
+        # Add driver information if available
+        if booking.driver:
+            context['driver_name'] = booking.driver.get_full_name() if hasattr(booking.driver, 'get_full_name') else str(booking.driver)
+            context['driver_phone'] = booking.driver.phone if hasattr(booking.driver, 'phone') else ''
+            context['driver_vehicle'] = f"{booking.driver.vehicle_make} {booking.driver.vehicle_model}" if hasattr(booking.driver, 'vehicle_make') else ''
+        else:
+            context['driver_name'] = ''
+            context['driver_phone'] = ''
+            context['driver_vehicle'] = ''
+            
+        # Add return trip information if it's a round trip
+        if booking.is_round_trip and is_return:
+            context['return_pick_up_date'] = booking.return_date.strftime('%B %d, %Y') if booking.return_date else ''
+            context['return_pick_up_time'] = booking.return_time.strftime('%I:%M %p') if booking.return_time else ''
+            context['return_pick_up_address'] = booking.drop_off_address  # Return starts from drop-off
+            context['return_drop_off_address'] = booking.pick_up_address  # Return ends at pick-up
         
         return context
     
