@@ -464,13 +464,22 @@ class Booking(models.Model):
 
     def can_cancel(self):
         """
-        Determine cancellation eligibility based on 4-hour policy.
+        Determine cancellation eligibility based on policy:
+        - Confirmed bookings: 2-hour policy (full charge within 2 hours)
+        - Pending bookings: 4-hour policy (full charge within 4 hours)
         Returns: (can_cancel: bool, will_charge: bool, hours_until_pickup: float)
         """
         hours_until_pickup = self.hours_until_pickup
 
         can_cancel = hours_until_pickup > 0
-        will_charge = hours_until_pickup <= 4 and hours_until_pickup > 0
+        
+        # Apply different policies based on booking status
+        if self.status == 'Confirmed':
+            # Confirmed bookings: 2-hour policy
+            will_charge = hours_until_pickup <= 2 and hours_until_pickup > 0
+        else:
+            # Pending bookings: 4-hour policy
+            will_charge = hours_until_pickup <= 4 and hours_until_pickup > 0
 
         return (can_cancel, will_charge, hours_until_pickup)
 

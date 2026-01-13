@@ -357,25 +357,10 @@
 <!-- Stats Grid -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px;">
     <!-- Stat Cards with Semantic Colors:
-         - Info (Blue): General information/total counts
          - Warning (Orange): Pending/time-sensitive items
          - Success (Green): Confirmed/successful states
-         - Info (Blue): Completed items
+         - Info (Blue): Upcoming trips
     -->
-    <a href="{% url 'dashboard' %}" class="stat-card {% if not request.GET.status %}active{% endif %}">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div>
-                <p class="stat-label">Total Bookings</p>
-                <p class="stat-value">{{ stats.total_bookings|default:0 }}</p>
-            </div>
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary-light) 0%, #e2e8f0 100%);">
-                <svg style="width: 24px; height: 24px; color: var(--primary); position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
-            </div>
-        </div>
-    </a>
-
     <a href="?status=Pending" class="stat-card {% if request.GET.status == 'Pending' %}active{% endif %}">
         <div style="display: flex; justify-content: space-between; align-items: start;">
             <div>
@@ -404,15 +389,20 @@
         </div>
     </a>
 
-    <a href="?status=Trip_Completed&date=today" class="stat-card {% if request.GET.status == 'Trip_Completed' and request.GET.date == 'today' %}active{% endif %}">
+    <a href="?upcoming=true" class="stat-card {% if request.GET.upcoming == 'true' %}active{% endif %}">
         <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div>
-                <p class="stat-label">Completed Today</p>
-                <p class="stat-value" style="color: var(--info);">{{ stats.completed_today|default:0 }}</p>
+            <div style="flex: 1;">
+                <p class="stat-label">Upcoming Trips ({{ stats.upcoming_count|default:0 }})</p>
+                {% if next_upcoming_trip %}
+                    <p style="color: var(--info); font-size: 14px; font-weight: 600; margin: 4px 0 2px 0;">{{ next_upcoming_trip.pick_up_date|date:"M d, Y" }} at {{ next_upcoming_trip.pick_up_time|time:"g:i A" }}</p>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ next_upcoming_trip.pick_up_location|truncatewords:5 }}</p>
+                {% else %}
+                    <p class="stat-value" style="color: var(--text-secondary);">No upcoming trips</p>
+                {% endif %}
             </div>
             <div class="stat-icon" style="background: linear-gradient(135deg, var(--info-light) 0%, #bfdbfe 100%);">
                 <svg style="width: 24px; height: 24px; color: var(--info); position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                 </svg>
             </div>
         </div>
@@ -506,6 +496,7 @@
                     <option value="Confirmed" {% if request.GET.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
                     <option value="Trip_Completed" {% if request.GET.status == 'Trip_Completed' %}selected{% endif %}>Completed</option>
                     <option value="Cancelled" {% if request.GET.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                    <option value="Cancelled_Full_Charge" {% if request.GET.status == 'Cancelled_Full_Charge' %}selected{% endif %}>Cancelled (Full Charge)</option>
                 </select>
             </div>
 

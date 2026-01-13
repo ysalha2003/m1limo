@@ -438,14 +438,22 @@ class BookingService:
             # Calculate hours until pickup
             hours_until = booking.hours_until_pickup()
 
-            if hours_until < 4:
-                # Within 4 hours → Full charge
-                booking.status = 'Cancelled_Full_Charge'
-                logger.info(f'Cancellation within 4 hours ({hours_until:.1f}h) → Full charge')
+            # Apply policy based on booking status
+            # Confirmed bookings: 2-hour policy
+            # Pending bookings: 4-hour policy
+            if booking.status == 'Confirmed':
+                threshold = 2
             else:
-                # More than 4 hours → Free cancellation
+                threshold = 4
+                
+            if hours_until < threshold:
+                # Within threshold → Full charge
+                booking.status = 'Cancelled_Full_Charge'
+                logger.info(f'Cancellation within {threshold} hours ({hours_until:.1f}h) → Full charge')
+            else:
+                # More than threshold → Free cancellation
                 booking.status = 'Cancelled'
-                logger.info(f'Cancellation > 4 hours ({hours_until:.1f}h) → Free')
+                logger.info(f'Cancellation > {threshold} hours ({hours_until:.1f}h) → Free')
 
             booking.cancellation_reason = reason
         else:

@@ -244,11 +244,19 @@ def dashboard(request):
                 pass
 
     status_filter = request.GET.get('status')
-    if status_filter:
+    upcoming_filter = request.GET.get('upcoming')
+    
+    if upcoming_filter == 'true':
+        # Filter for upcoming trips (Confirmed bookings with future pickup dates)
+        base_queryset = base_queryset.filter(
+            status='Confirmed',
+            pick_up_date__gte=timezone.now().date()
+        )
+    elif status_filter:
         base_queryset = base_queryset.filter(status=status_filter)
     else:
-        # Exclude cancelled bookings when no specific status filter is applied
-        base_queryset = base_queryset.exclude(status__in=['Cancelled', 'Cancelled_Full_Charge'])
+        # Exclude cancelled and completed bookings when no specific status filter is applied
+        base_queryset = base_queryset.exclude(status__in=['Cancelled', 'Cancelled_Full_Charge', 'Trip_Completed'])
 
     # Show all trips individually - each trip is displayed as its own row
     # This includes both legs of round trips as separate entries
@@ -292,7 +300,13 @@ def dashboard(request):
             future_pickups.append(booking)
     today_pickups = future_pickups
     from django.core.paginator import Paginator
-    paginator = Paginator(queryset.order_by('-pick_up_date', '-pick_up_time'), 10)
+    
+    # Sort order: For upcoming trips, show soonest first; otherwise, show most recent first
+    if upcoming_filter == 'true':
+        paginator = Paginator(queryset.order_by('pick_up_date', 'pick_up_time'), 10)
+    else:
+        paginator = Paginator(queryset.order_by('-pick_up_date', '-pick_up_time'), 10)
+    
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
@@ -317,10 +331,18 @@ def dashboard(request):
     if request.user.is_staff:
         from models import BookingHistory
         stats = BookingService.get_dashboard_stats()
-        stats['completed_today'] = Booking.objects.filter(
-            status='Trip_Completed',
-            pick_up_date=today
+        # Calculate upcoming trips (Confirmed bookings with future dates)
+        stats['upcoming_count'] = Booking.objects.filter(
+            status='Confirmed',
+            pick_up_date__gte=today
         ).count()
+        
+        # Get the next upcoming trip
+        next_upcoming = Booking.objects.filter(
+            status='Confirmed',
+            pick_up_date__gte=today
+        ).order_by('pick_up_date', 'pick_up_time').first()
+        context['next_upcoming_trip'] = next_upcoming
         context['stats'] = stats
 
         # Get complete booking history for admins (full audit trail)
@@ -330,6 +352,14 @@ def dashboard(request):
             'changed_by'
         ).order_by('-changed_at')[:50]
     else:
+        # Calculate upcoming trips for user (Confirmed bookings with future dates)
+        next_upcoming = Booking.objects.filter(
+            user=request.user,
+            status='Confirmed',
+            pick_up_date__gte=today
+        ).order_by('pick_up_date', 'pick_up_time').first()
+        context['next_upcoming_trip'] = next_upcoming
+        
         context['stats'] = {
             'total_bookings': Booking.objects.filter(user=request.user).count(),
             'active_bookings': Booking.objects.filter(user=request.user, status__in=['Pending', 'Confirmed']).count(),
@@ -337,6 +367,7 @@ def dashboard(request):
             'confirmed_count': Booking.objects.filter(user=request.user, status='Confirmed').count(),
             'today_trips': Booking.objects.filter(user=request.user, pick_up_date=today).count(),
             'upcoming_trips': Booking.objects.filter(user=request.user, pick_up_date__gte=today).count(),
+            'upcoming_count': Booking.objects.filter(user=request.user, status='Confirmed', pick_up_date__gte=today).count(),
             'completed_trips': Booking.objects.filter(user=request.user, status='Trip_Completed').count(),
             'completed_today': Booking.objects.filter(user=request.user, status='Trip_Completed', pick_up_date=today).count(),
         }

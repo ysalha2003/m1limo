@@ -117,11 +117,11 @@
                 {% with can_cancel_info=booking.can_cancel_formatted %}
                 {% if can_cancel_info.1 %}
                 <p style="color: #78350f; font-size: 13px;">
-                    <strong>Note:</strong> This cancellation is less than 4 hours before pickup. The booking will be marked with full charges.
+                    <strong>Note:</strong> This cancellation is {% if booking.status == 'Confirmed' %}less than 2 hours{% else %}less than 4 hours{% endif %} before pickup. The booking will be marked with full charges.
                 </p>
                 {% else %}
                 <p style="color: #78350f; font-size: 13px;">
-                    <strong>Note:</strong> This cancellation is more than 4 hours before pickup. No charges will apply.
+                    <strong>Note:</strong> This cancellation is {% if booking.status == 'Confirmed' %}more than 2 hours{% else %}more than 4 hours{% endif %} before pickup. No charges will apply.
                 </p>
                 {% endif %}
                 {% endwith %}
@@ -129,7 +129,7 @@
                 {% else %}
                 <p style="color: #92400e; font-weight: 600; margin-bottom: 4px; font-size: 14px;">Cancellation Policy</p>
                 <p style="color: #78350f; font-size: 13px; margin-bottom: 8px;">
-                    Cancellations made less than 4 hours before pickup time will incur full charges.
+                    Cancellations of {% if booking.status == 'Confirmed' %}confirmed bookings made less than 2 hours{% else %}pending bookings made less than 4 hours{% endif %} before pickup time will incur full charges.
                 </p>
                 {% if booking.hours_until_pickup %}
                 <p style="color: #78350f; font-size: 13px;">

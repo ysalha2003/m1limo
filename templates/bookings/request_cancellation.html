@@ -35,12 +35,12 @@
                         <h3 class="font-bold">Cancellation Policy</h3>
                         {% if can_cancel_info.1 %}
                             <p class="text-warning-content">
-                                <strong>Warning:</strong> Your pickup is less than 4 hours away ({{ can_cancel_info.2 }} remaining).
+                                <strong>Warning:</strong> Your pickup is {% if booking.status == 'Confirmed' %}less than 2 hours{% else %}less than 4 hours{% endif %} away ({{ can_cancel_info.2 }} remaining).
                                 Cancelling now will result in <strong>full charges</strong> being applied.
                             </p>
                         {% else %}
                             <p class="text-success-content">
-                                Your pickup is more than 4 hours away ({{ can_cancel_info.2 }} remaining).
+                                Your pickup is {% if booking.status == 'Confirmed' %}more than 2 hours{% else %}more than 4 hours{% endif %} away ({{ can_cancel_info.2 }} remaining).
                                 You can cancel <strong>free of charge</strong>.
                             </p>
                         {% endif %}
