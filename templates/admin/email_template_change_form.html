@@ -1,0 +1,30 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block submit_buttons_bottom %}
+    {{ block.super }}
+    
+    {% if original %}
+    <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h3 style="margin-top: 0;">Template Actions</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{% url 'admin:emailtemplate_preview' original.pk %}" 
+               class="button" 
+               style="background: #3b82f6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;"
+               target="_blank">
+                📋 Preview Template
+            </a>
+            <a href="{% url 'admin:emailtemplate_send_test' original.pk %}" 
+               class="button"
+               style="background: #10b981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;"
+               onclick="return confirm('Send test email to {{ user.email }}?');">
+                📧 Send Test Email
+            </a>
+        </div>
+        <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">
+            <strong>Preview:</strong> Opens in new window with sample data |
+            <strong>Test Email:</strong> Sends to your email ({{ user.email }})
+        </p>
+    </div>
+    {% endif %}
+{% endblock %}

@@ -608,6 +608,142 @@ class EmailTemplateAdmin(admin.ModelAdmin):
     )
 
     actions = ['preview_template', 'send_test_email', 'duplicate_template']
+    
+    change_form_template = 'admin/email_template_change_form.html'
+    
+    def get_urls(self):
+        """Add custom URLs for preview and test email actions."""
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<int:template_id>/preview/',
+                self.admin_site.admin_view(self.preview_template_view),
+                name='emailtemplate_preview',
+            ),
+            path(
+                '<int:template_id>/send_test/',
+                self.admin_site.admin_view(self.send_test_email_view),
+                name='emailtemplate_send_test',
+            ),
+        ]
+        return custom_urls + urls
+    
+    def preview_template_view(self, request, template_id):
+        """View for previewing a single template."""
+        from django.shortcuts import render, get_object_or_404
+        from models import EmailTemplate
+        
+        template = get_object_or_404(EmailTemplate, pk=template_id)
+        
+        # Create sample context data
+        sample_context = {
+            'booking_id': '42',
+            'passenger_name': 'John Smith',
+            'passenger_email': 'john.smith@example.com',
+            'passenger_phone': '+1 (555) 123-4567',
+            'pick_up_date': 'January 20, 2026',
+            'pick_up_time': '2:00 PM',
+            'pick_up_location': 'The Art Institute, 111 S Michigan Ave, Chicago, IL 60603',
+            'drop_off_location': "O'Hare International Airport, Chicago, IL 60666",
+            'passengers': '2',
+            'trip_type': 'one_way',
+            'booking_status': 'confirmed',
+            'old_status': 'pending',
+            'new_status': 'confirmed',
+            'driver_name': 'Michael Johnson',
+            'driver_phone': '+1 (555) 987-6543',
+            'return_pick_up_date': 'January 25, 2026',
+            'return_pick_up_time': '4:00 PM',
+            'return_pick_up_location': "O'Hare International Airport, Chicago, IL 60666",
+            'return_drop_off_location': 'The Art Institute, 111 S Michigan Ave, Chicago, IL 60603',
+            'booking_url': 'http://62.169.19.39:8081/bookings/42/',
+            'cancellation_url': 'http://62.169.19.39:8081/bookings/42/cancel/',
+        }
+        
+        rendered_subject = template.render_subject(sample_context)
+        rendered_html = template.render_html(sample_context)
+        
+        context = {
+            'template': template,
+            'rendered_subject': rendered_subject,
+            'rendered_html': rendered_html,
+            'sample_data': sample_context,
+            'opts': self.model._meta,
+            'title': f'Preview: {template.name}',
+        }
+        
+        return render(request, 'admin/email_template_preview.html', context)
+    
+    def send_test_email_view(self, request, template_id):
+        """View for sending test email."""
+        from django.shortcuts import redirect, get_object_or_404
+        from django.contrib import messages
+        from django.core.mail import EmailMessage
+        from django.conf import settings
+        from models import EmailTemplate
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        template = get_object_or_404(EmailTemplate, pk=template_id)
+        recipient_email = request.user.email
+        
+        if not recipient_email:
+            messages.error(request, 'Your user account has no email address')
+            return redirect('admin:bookings_emailtemplate_change', template_id)
+        
+        # Create sample context
+        sample_context = {
+            'booking_id': 'TEST-001',
+            'passenger_name': 'Test Passenger',
+            'passenger_email': 'test@example.com',
+            'passenger_phone': '+1 (555) 000-0000',
+            'pick_up_date': 'January 20, 2026',
+            'pick_up_time': '2:00 PM',
+            'pick_up_location': 'Test Pickup Location',
+            'drop_off_location': 'Test Drop-off Location',
+            'passengers': '2',
+            'trip_type': 'one_way',
+            'booking_status': 'confirmed',
+            'old_status': 'pending',
+            'new_status': 'confirmed',
+            'driver_name': 'Test Driver',
+            'driver_phone': '+1 (555) 999-9999',
+            'return_pick_up_date': 'January 25, 2026',
+            'return_pick_up_time': '4:00 PM',
+            'return_pick_up_location': 'Test Return Pickup',
+            'return_drop_off_location': 'Test Return Dropoff',
+            'booking_url': 'http://62.169.19.39:8081/bookings/test/',
+            'cancellation_url': 'http://62.169.19.39:8081/bookings/test/cancel/',
+        }
+        
+        try:
+            subject = template.render_subject(sample_context)
+            html_body = template.render_html(sample_context)
+            
+            # Add test notice to subject
+            subject = f"[TEST] {subject}"
+            
+            # Add test notice to HTML
+            test_notice = '<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; margin-bottom: 20px; font-family: Arial, sans-serif;"><strong>🧪 TEST EMAIL</strong> - This is a test of the email template system</div>'
+            html_body = test_notice + html_body
+            
+            email = EmailMessage(
+                subject=subject,
+                body=html_body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[recipient_email],
+            )
+            email.content_subtype = "html"
+            email.send(fail_silently=False)
+            
+            messages.success(request, f'✓ Test email sent successfully to {recipient_email}')
+            
+        except Exception as e:
+            messages.error(request, f'✗ Failed to send test email: {str(e)}')
+            logger.error(f"Test email failed: {e}", exc_info=True)
+        
+        return redirect('admin:bookings_emailtemplate_change', template_id)
 
     def success_rate_display(self, obj):
         """Display success rate with color coding."""
