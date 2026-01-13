@@ -116,6 +116,47 @@
         }
     }
 
+    /* Passenger slider styling */
+    .passenger-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        cursor: pointer;
+        margin: 8px 0;
+    }
+
+    .passenger-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--primary);
+        cursor: pointer;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .passenger-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .passenger-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: var(--primary);
+        cursor: pointer;
+        border-radius: 50%;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .passenger-slider::-moz-range-thumb:hover {
+        transform: scale(1.2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
     .form-section {
         margin-bottom: 32px;
         padding: 24px;
@@ -604,11 +645,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="id_number_of_passengers">Number of Passengers *</label>
-                        {{ form.number_of_passengers }}
+                        <label class="form-label" for="id_number_of_passengers">Number of Passengers * <span id="passengerCount" style="color: var(--primary); font-weight: 700;">1</span></label>
+                        <input type="range" id="passengerSlider" min="1" max="15" value="1" class="passenger-slider" style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, var(--primary) 0%, var(--primary) 6.67%, var(--border) 6.67%, var(--border) 100%); outline: none; -webkit-appearance: none;">
+                        <input type="hidden" id="id_number_of_passengers" name="number_of_passengers" value="1">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                            <span>1</span>
+                            <span>15</span>
+                        </div>
                         {% if form.number_of_passengers.errors %}
                             <div class="form-error">{{ form.number_of_passengers.errors.0 }}</div>
                         {% endif %}
+                        <div id="capacityError" class="form-error" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -634,8 +681,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="id_vehicle_type">Vehicle Type *</label>
-                        {{ form.vehicle_type }}
+                        <label class="form-label" for="id_vehicle_type">Vehicle Type * <span style="font-size: 11px; font-weight: 400; color: var(--text-secondary);" id="vehicleCapacityHint"></span></label>
+                        <select name="vehicle_type" id="id_vehicle_type" class="form-select" required>
+                            <option value="">Select vehicle type</option>
+                            <option value="Sedan">Sedan (up to 2 passengers)</option>
+                            <option value="SUV">SUV (up to 6 passengers)</option>
+                            <option value="Sprinter Van">Sprinter Van (up to 12 passengers)</option>
+                            <option value="Others">Others (specify in notes)</option>
+                        </select>
                         {% if form.vehicle_type.errors %}
                             <div class="form-error">{{ form.vehicle_type.errors.0 }}</div>
                         {% endif %}
@@ -688,7 +741,29 @@
                             <div class="form-error">{{ form.drop_off_address.errors.0 }}</div>
                         {% endif %}
                     </div>
+                </div>
 
+                <!-- Intermediate Stops (for Point and Round trips) -->
+                <div id="stopsSection" style="display: none; margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <label class="form-label" style="margin: 0;">Intermediate Stops (Optional)</label>
+                        <button type="button" onclick="addStop()" class="btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;">+ Add Stop</button>
+                    </div>
+                    <div id="stopsContainer"></div>
+                    <input type="hidden" name="needs_stop" id="needs_stop" value="false">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-header">
+                    <div class="section-icon">
+                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    Schedule
+                </h3>
+                <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label" for="id_pick_up_date">Pick-up Date *</label>
                         {{ form.pick_up_date }}
@@ -704,7 +779,19 @@
                             <div class="form-error">{{ form.pick_up_time.errors.0 }}</div>
                         {% endif %}
                     </div>
+                </div>
+            </div>
 
+            <div class="form-section">
+                <h3 class="section-header">
+                    <div class="section-icon">
+                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                    </div>
+                    Flight & Additional Info
+                </h3>
+                <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label" for="id_flight_number">Flight Number</label>
                         {{ form.flight_number }}
@@ -781,7 +868,29 @@
                             <div class="form-error">{{ form.return_dropoff_address.errors.0 }}</div>
                         {% endif %}
                     </div>
+                </div>
 
+                <!-- Return Trip Intermediate Stops -->
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <label class="form-label" style="margin: 0;">Return Trip Stops (Optional)</label>
+                        <button type="button" onclick="addReturnStop()" class="btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;">+ Add Stop</button>
+                    </div>
+                    <div id="returnStopsContainer"></div>
+                    <input type="hidden" name="needs_return_stop" id="needs_return_stop" value="false">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-header">
+                    <div class="section-icon">
+                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    Return Schedule & Flight Info
+                </h3>
+                <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label" for="id_return_date">Return Date</label>
                         {{ form.return_date }}
@@ -949,6 +1058,16 @@
     let currentStep = 1;
     let isSubmitting = false;
     const totalSteps = 4;
+    let stopCount = 0;
+    let returnStopCount = 0;
+
+    // Vehicle capacity constraints
+    const VEHICLE_CAPACITY = {
+        'Sedan': 2,
+        'SUV': 6,
+        'Sprinter Van': 12,
+        'Others': 999
+    };
 
     document.addEventListener('DOMContentLoaded', function() {
         // Generate unique submission token
@@ -958,11 +1077,232 @@
         initializeTripTypeHandlers();
         initializeFrequentPassengerSelect();
         initializeFormSubmission();
+        initializePassengerSlider();
+        initializeVehicleValidation();
+        initializeInstantValidation();
 
         // Update form on page load (if returning with errors)
         updateFormFields();
         updateProgress();
     });
+
+    // Passenger slider functionality
+    function initializePassengerSlider() {
+        const slider = document.getElementById('passengerSlider');
+        const hiddenInput = document.getElementById('id_number_of_passengers');
+        const countDisplay = document.getElementById('passengerCount');
+
+        if (slider && hiddenInput && countDisplay) {
+            slider.addEventListener('input', function() {
+                const value = this.value;
+                hiddenInput.value = value;
+                countDisplay.textContent = value;
+                
+                // Update slider gradient
+                const percentage = ((value - 1) / (15 - 1)) * 100;
+                this.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percentage}%, var(--border) ${percentage}%, var(--border) 100%)`;
+                
+                // Validate against vehicle capacity
+                validateVehicleCapacity();
+            });
+        }
+    }
+
+    // Instant vehicle capacity validation
+    function initializeVehicleValidation() {
+        const vehicleSelect = document.getElementById('id_vehicle_type');
+        const passengerSlider = document.getElementById('passengerSlider');
+
+        if (vehicleSelect) {
+            vehicleSelect.addEventListener('change', function() {
+                validateVehicleCapacity();
+                updateVehicleCapacityHint();
+            });
+        }
+
+        updateVehicleCapacityHint();
+    }
+
+    function validateVehicleCapacity() {
+        const vehicleType = document.getElementById('id_vehicle_type').value;
+        const passengerCount = parseInt(document.getElementById('passengerSlider').value);
+        const errorDiv = document.getElementById('capacityError');
+        
+        if (vehicleType && vehicleType !== 'Others' && VEHICLE_CAPACITY[vehicleType]) {
+            const maxCapacity = VEHICLE_CAPACITY[vehicleType];
+            if (passengerCount > maxCapacity) {
+                errorDiv.textContent = `⚠️ ${vehicleType} can accommodate maximum ${maxCapacity} passengers. Please select a larger vehicle or reduce passenger count.`;
+                errorDiv.style.display = 'block';
+                errorDiv.style.background = '#fee2e2';
+                errorDiv.style.color = '#991b1b';
+                errorDiv.style.padding = '10px';
+                errorDiv.style.borderRadius = '6px';
+                errorDiv.style.marginTop = '8px';
+                errorDiv.style.border = '1px solid #fca5a5';
+                return false;
+            } else {
+                errorDiv.style.display = 'none';
+                return true;
+            }
+        }
+        errorDiv.style.display = 'none';
+        return true;
+    }
+
+    function updateVehicleCapacityHint() {
+        const vehicleType = document.getElementById('id_vehicle_type').value;
+        const hintSpan = document.getElementById('vehicleCapacityHint');
+        
+        if (vehicleType && VEHICLE_CAPACITY[vehicleType] && vehicleType !== 'Others') {
+            hintSpan.textContent = `(max ${VEHICLE_CAPACITY[vehicleType]} passengers)`;
+            hintSpan.style.color = 'var(--success)';
+        } else {
+            hintSpan.textContent = '';
+        }
+    }
+
+    // Stops management
+    function addStop() {
+        stopCount++;
+        const container = document.getElementById('stopsContainer');
+        const stopDiv = document.createElement('div');
+        stopDiv.className = 'form-group';
+        stopDiv.id = `stop_${stopCount}`;
+        stopDiv.style.cssText = 'margin-bottom: 12px; display: flex; gap: 8px; align-items: start;';
+        
+        stopDiv.innerHTML = `
+            <div style="flex: 1;">
+                <label class="form-label" for="stop_address_${stopCount}">Stop ${stopCount}</label>
+                <input type="text" name="stop_address_${stopCount}" id="stop_address_${stopCount}" 
+                       class="form-input" placeholder="Enter stop address" style="margin: 0;">
+            </div>
+            <button type="button" onclick="removeStop(${stopCount})" 
+                    style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; margin-top: 28px; font-size: 14px;">
+                ✕
+            </button>
+        `;
+        
+        container.appendChild(stopDiv);
+        document.getElementById('needs_stop').value = 'true';
+    }
+
+    function removeStop(stopId) {
+        const stopDiv = document.getElementById(`stop_${stopId}`);
+        if (stopDiv) {
+            stopDiv.remove();
+        }
+        
+        // Check if any stops remain
+        const container = document.getElementById('stopsContainer');
+        if (container.children.length === 0) {
+            document.getElementById('needs_stop').value = 'false';
+        }
+    }
+
+    function addReturnStop() {
+        returnStopCount++;
+        const container = document.getElementById('returnStopsContainer');
+        const stopDiv = document.createElement('div');
+        stopDiv.className = 'form-group';
+        stopDiv.id = `return_stop_${returnStopCount}`;
+        stopDiv.style.cssText = 'margin-bottom: 12px; display: flex; gap: 8px; align-items: start;';
+        
+        stopDiv.innerHTML = `
+            <div style="flex: 1;">
+                <label class="form-label" for="return_stop_address_${returnStopCount}">Return Stop ${returnStopCount}</label>
+                <input type="text" name="return_stop_address_${returnStopCount}" id="return_stop_address_${returnStopCount}" 
+                       class="form-input" placeholder="Enter return stop address" style="margin: 0;">
+            </div>
+            <button type="button" onclick="removeReturnStop(${returnStopCount})" 
+                    style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; margin-top: 28px; font-size: 14px;">
+                ✕
+            </button>
+        `;
+        
+        container.appendChild(stopDiv);
+        document.getElementById('needs_return_stop').value = 'true';
+    }
+
+    function removeReturnStop(stopId) {
+        const stopDiv = document.getElementById(`return_stop_${stopId}`);
+        if (stopDiv) {
+            stopDiv.remove();
+        }
+        
+        // Check if any stops remain
+        const container = document.getElementById('returnStopsContainer');
+        if (container.children.length === 0) {
+            document.getElementById('needs_return_stop').value = 'false';
+        }
+    }
+
+    // Instant validation for all fields
+    function initializeInstantValidation() {
+        // Passenger name validation
+        const nameField = document.getElementById('id_passenger_name');
+        if (nameField) {
+            nameField.addEventListener('blur', function() {
+                validateField(this, 'Passenger name is required', (val) => val.trim().length > 0);
+            });
+        }
+
+        // Contact validation
+        const contactField = document.getElementById('id_passenger_contact');
+        if (contactField) {
+            contactField.addEventListener('blur', function() {
+                validateField(this, 'Phone number or email is required', (val) => val.trim().length > 0);
+            });
+        }
+
+        // Date validation (not in the past)
+        const dateField = document.getElementById('id_pick_up_date');
+        if (dateField) {
+            dateField.addEventListener('change', function() {
+                const today = new Date().toISOString().split('T')[0];
+                validateField(this, 'Date cannot be in the past', (val) => val >= today);
+            });
+        }
+
+        // Address validation
+        const pickupField = document.getElementById('id_pick_up_address');
+        if (pickupField) {
+            pickupField.addEventListener('blur', function() {
+                validateField(this, 'Pickup address is required', (val) => val.trim().length > 0);
+            });
+        }
+
+        const dropoffField = document.getElementById('id_drop_off_address');
+        if (dropoffField) {
+            dropoffField.addEventListener('blur', function() {
+                const tripType = document.getElementById('id_trip_type').value;
+                if (tripType === 'Point' || tripType === 'Round') {
+                    validateField(this, 'Drop-off address is required', (val) => val.trim().length > 0);
+                }
+            });
+        }
+    }
+
+    function validateField(field, errorMsg, validationFn) {
+        const value = field.value;
+        const isValid = validationFn(value);
+        
+        // Remove existing error if present
+        const existingError = field.parentElement.querySelector('.instant-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        if (!isValid && value.trim() !== '') {
+            field.style.borderColor = '#dc2626';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'instant-error';
+            errorDiv.textContent = errorMsg;
+            errorDiv.style.cssText = 'color: #dc2626; font-size: 13px; margin-top: 4px;';
+            field.parentElement.appendChild(errorDiv);
+        } else {
+            field.style.borderColor = '';
+        }
+    }
 
     // Generate unique token for duplicate prevention
     function generateToken() {
@@ -985,13 +1325,22 @@
         const tripType = document.getElementById('id_trip_type').value;
         const hoursBookedGroup = document.getElementById('hoursBookedGroup');
         const dropoffGroup = document.getElementById('dropoffGroup');
+        const stopsSection = document.getElementById('stopsSection');
 
         if (tripType === 'Hourly') {
             hoursBookedGroup.style.display = 'block';
             dropoffGroup.style.display = 'none';
+            stopsSection.style.display = 'none';
         } else {
             hoursBookedGroup.style.display = 'none';
             dropoffGroup.style.display = 'block';
+            
+            // Show stops for Point and Round trips
+            if (tripType === 'Point' || tripType === 'Round') {
+                stopsSection.style.display = 'block';
+            } else {
+                stopsSection.style.display = 'none';
+            }
         }
     }
 
@@ -1123,6 +1472,14 @@
 
     // Validation
     function validateCurrentStep() {
+        // Special validation for step 1 - check vehicle capacity
+        if (currentStep === 1) {
+            if (!validateVehicleCapacity()) {
+                showErrorNotification('Please select a vehicle that can accommodate your passenger count, or reduce the number of passengers.');
+                return false;
+            }
+        }
+
         const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
         const requiredFields = currentStepEl.querySelectorAll('[required]');
         let isValid = true;
@@ -1137,17 +1494,28 @@
         });
 
         if (!isValid) {
-            // Show error message at top of page instead of alert
-            const errorDiv = document.createElement('div');
-            errorDiv.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #fee2e2; color: #991b1b; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 9999; border-left: 4px solid #dc2626;';
-            errorDiv.textContent = 'Please fill in all required fields';
-            document.body.appendChild(errorDiv);
-
-            // Auto-remove after 5 seconds
-            setTimeout(() => errorDiv.remove(), 5000);
+            showErrorNotification('Please fill in all required fields');
         }
 
         return isValid;
+    }
+
+    function showErrorNotification(message) {
+        // Remove existing error if present
+        const existing = document.querySelector('.step-error-notification');
+        if (existing) {
+            existing.remove();
+        }
+
+        // Show error message at top of page
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'step-error-notification';
+        errorDiv.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #fee2e2; color: #991b1b; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 9999; border-left: 4px solid #dc2626; max-width: 500px;';
+        errorDiv.textContent = message;
+        document.body.appendChild(errorDiv);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => errorDiv.remove(), 5000);
     }
 
     // Auto-populate return trip addresses (REVERSED)

@@ -175,6 +175,10 @@ class BookingForm(BaseModelForm):
         if trip_type == 'Hourly':
             if not hours_booked or hours_booked < 3:
                 self.add_error('hours_booked', 'Hourly service requires minimum 3 hours')
+            # Auto-clear drop-off address for hourly bookings
+            if cleaned_data.get('drop_off_address'):
+                cleaned_data['drop_off_address'] = None
+                self.instance.drop_off_address = None
 
         # Validate point-to-point requirements
         if trip_type == 'Point' and not drop_off_address:

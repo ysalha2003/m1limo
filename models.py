@@ -541,16 +541,15 @@ class Booking(models.Model):
                 })
 
     def validate_hourly_booking(self):
-        """Enforce 3-hour minimum and reject drop-off address for hourly service"""
+        """Enforce 3-hour minimum for hourly service. Drop-off address automatically cleared."""
         if self.trip_type == 'Hourly':
             if not self.hours_booked or self.hours_booked < 3:
                 raise ValidationError({
                     'hours_booked': 'Hourly service requires minimum 3 hours.'
                 })
+            # Auto-clear drop_off_address for hourly service instead of raising error
             if self.drop_off_address:
-                raise ValidationError({
-                    'drop_off_address': 'Hourly service does not use drop-off address (service returns to pickup location).'
-                })
+                self.drop_off_address = None
 
     def validate_point_to_point(self):
         """Require drop-off address for point-to-point trips"""
