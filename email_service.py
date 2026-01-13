@@ -243,17 +243,46 @@ class EmailService:
                 'company_info': settings.COMPANY_INFO,
             }
 
-            subject = cls._get_round_trip_subject(first_trip, return_trip, notification_type)
+            # Map notification type to template type
+            template_type_map = {
+                'new': 'round_trip_new',
+                'confirmed': 'round_trip_confirmed',
+                'cancelled': 'round_trip_cancelled',
+                'status_change': 'round_trip_status_change'
+            }
+            db_template_type = template_type_map.get(notification_type)
+            
+            # Try to load from database first
+            db_template = cls._load_email_template(db_template_type) if db_template_type else None
+            
+            if db_template:
+                try:
+                    # Build context for database template
+                    template_context = cls._build_round_trip_template_context(first_trip, return_trip, notification_type)
+                    subject = db_template.render_subject(template_context)
+                    html_message = db_template.render_html(template_context)
+                    plain_message = strip_tags(html_message)
+                    
+                    logger.info(f"Using database template for round-trip {notification_type}")
+                    db_template.increment_sent()
+                except Exception as e:
+                    logger.error(f"Database template rendering error for round-trip: {e}, falling back to file template")
+                    db_template.increment_failed()
+                    db_template = None
+            
+            # Fallback to file templates if database template not available or failed
+            if not db_template:
+                subject = cls._get_round_trip_subject(first_trip, return_trip, notification_type)
 
-            template_name = 'emails/round_trip_notification.html'
+                template_name = 'emails/round_trip_notification.html'
 
-            try:
-                html_message = render_to_string(template_name, context)
-                plain_message = strip_tags(html_message)
-            except Exception as e:
-                logger.error(f"Round trip template rendering error: {e}")
-                html_message = cls._get_fallback_round_trip_message(first_trip, return_trip, notification_type)
-                plain_message = strip_tags(html_message)
+                try:
+                    html_message = render_to_string(template_name, context)
+                    plain_message = strip_tags(html_message)
+                except Exception as e:
+                    logger.error(f"Round trip template rendering error: {e}")
+                    html_message = cls._get_fallback_round_trip_message(first_trip, return_trip, notification_type)
+                    plain_message = strip_tags(html_message)
 
             logger.info(f"Sending round-trip {notification_type} email to {recipient_email}")
 
