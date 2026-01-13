@@ -1284,23 +1284,21 @@ class EmailTemplate(models.Model):
         return common_vars
 
     def render_subject(self, context):
-        """Render subject line with context variables"""
+        """Render subject line with context variables using Django template engine"""
+        from django.template import Template, Context
         try:
-            return self.subject_template.format(**context)
-        except KeyError as e:
-            logger.warning(f"Missing variable in subject template: {e}")
-            return self.subject_template
+            template = Template(self.subject_template)
+            return template.render(Context(context))
         except Exception as e:
             logger.error(f"Error rendering subject: {e}")
             return self.subject_template
 
     def render_html(self, context):
-        """Render HTML body with context variables"""
+        """Render HTML body with context variables using Django template engine"""
+        from django.template import Template, Context
         try:
-            return self.html_template.format(**context)
-        except KeyError as e:
-            logger.warning(f"Missing variable in HTML template: {e}")
-            return self.html_template
+            template = Template(self.html_template)
+            return template.render(Context(context))
         except Exception as e:
             logger.error(f"Error rendering HTML: {e}")
             return self.html_template

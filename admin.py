@@ -861,19 +861,48 @@ class EmailTemplateAdmin(admin.ModelAdmin):
             self.message_user(request, 'Your user account has no email address', level='error')
             return
         
+        # Create mock objects for round trip templates
+        from datetime import datetime
+        from types import SimpleNamespace
+        
+        mock_first_trip = SimpleNamespace(
+            pick_up_date=datetime(2026, 1, 20),
+            pick_up_time='2:00 PM',
+            pick_up_location='Test Pickup Location',
+            drop_off_location='Test Drop-off Location'
+        )
+        
+        mock_return_trip = SimpleNamespace(
+            pick_up_date=datetime(2026, 1, 25),
+            pick_up_time='4:00 PM',
+            pick_up_location='Test Return Pickup',
+            drop_off_location='Test Return Dropoff'
+        )
+        
+        mock_company_info = SimpleNamespace(
+            logo_url=None,
+            phone='+1 (555) 000-0000',
+            email='support@m1limo.com',
+            dashboard_url='http://62.169.19.39:8081/dashboard'
+        )
+        
         # Create sample context
         sample_context = {
             'booking_reference': 'M1-TEST-001',
+            'booking_id': 'TEST-001',
             'passenger_name': 'Test Passenger',
             'phone_number': '+1 (555) 000-0000',
             'passenger_email': 'test@example.com',
             'pick_up_date': 'January 20, 2026',
             'pick_up_time': '2:00 PM',
+            'pick_up_location': 'Test Pickup Location',
             'pick_up_address': 'Test Pickup Location',
+            'drop_off_location': 'Test Drop-off Location',
             'drop_off_address': 'Test Drop-off Location',
             'vehicle_type': 'Sedan',
             'trip_type': 'Point-to-Point',
             'number_of_passengers': '2',
+            'passengers': 2,
             'flight_number': 'TEST123',
             'notes': 'This is a test email',
             'status': 'Confirmed',
@@ -884,14 +913,24 @@ class EmailTemplateAdmin(admin.ModelAdmin):
             'company_name': 'M1 Limousine Service',
             'support_email': 'support@m1limo.com',
             'dashboard_url': 'http://62.169.19.39:8081/dashboard',
+            'booking_url': 'http://62.169.19.39:8081/dashboard',
             'driver_name': 'Test Driver',
             'driver_phone': '+1 (555) 999-9999',
             'driver_vehicle': 'Test Vehicle',
             'driver_portal_url': 'http://62.169.19.39:8081/driver/test',
+            'driver_rejection_reason': 'Test rejection reason',
+            'driver_completed_at': 'January 20, 2026 5:30 PM',
             'return_pick_up_date': 'January 25, 2026',
             'return_pick_up_time': '4:00 PM',
+            'return_pick_up_location': 'Test Return Pickup',
             'return_pick_up_address': 'Test Return Pickup',
+            'return_drop_off_location': 'Test Return Dropoff',
             'return_drop_off_address': 'Test Return Dropoff',
+            # Round trip specific
+            'notification_type': 'confirmed',
+            'first_trip': mock_first_trip,
+            'return_trip': mock_return_trip,
+            'company_info': mock_company_info,
         }
         
         try:
