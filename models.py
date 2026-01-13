@@ -956,7 +956,7 @@ class Driver(models.Model):
     full_name = models.CharField(max_length=100, help_text="Driver's full name")
     phone_number = models.CharField(max_length=20, help_text="Driver's phone number")
     email = models.EmailField(help_text="Driver's email address for trip assignments")
-    car_number = models.CharField(max_length=50, help_text="License plate or car identification number")
+    car_number = models.CharField(max_length=50, verbose_name="Plate Number", help_text="License plate or car identification number")
     car_type = models.CharField(max_length=50, help_text="Vehicle type (e.g., Sedan, SUV, Van)")
     is_active = models.BooleanField(default=True, help_text="Whether driver is currently available")
     notes = models.TextField(blank=True, help_text="Internal notes about this driver")
