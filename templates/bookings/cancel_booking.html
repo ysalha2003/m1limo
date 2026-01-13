@@ -155,7 +155,7 @@
                     <input type="radio" name="cancel_type" value="entire" checked style="margin-top: 4px;">
                     <div>
                         <div style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Cancel Entire Round Trip Booking</div>
-                        <div style="font-size: 13px; color: #64748b;">Cancel both the first trip and return trip (recommended)</div>
+                        <div style="font-size: 13px; color: #64748b;">Cancel both trips: #{{ booking.id }} and #{{ linked_booking.id }} (recommended)</div>
                     </div>
                 </div>
             </label>
@@ -164,8 +164,8 @@
                 <div style="display: flex; align-items: start; gap: 12px;">
                     <input type="radio" name="cancel_type" value="single" style="margin-top: 4px;">
                     <div>
-                        <div style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Cancel Only {{ booking.trip_label|default:"This Trip" }}</div>
-                        <div style="font-size: 13px; color: #64748b;">Keep the other trip active</div>
+                        <div style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Cancel Only Trip #{{ booking.id }} ({{ booking.trip_label|default:"This Trip" }})</div>
+                        <div style="font-size: 13px; color: #64748b;">Keep Trip #{{ linked_booking.id }} ({{ linked_booking.trip_label|default:"Other Trip" }}) active</div>
                     </div>
                 </div>
             </label>
