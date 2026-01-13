@@ -89,6 +89,34 @@
         letter-spacing: -0.01em;
     }
 
+    /* PART 3: CSS for cancelled/past trips */
+    .trip-cancelled {
+        opacity: 0.5;
+        background-color: rgba(0, 0, 0, 0.02);
+        color: var(--text-muted);
+        position: relative;
+    }
+
+    .trip-cancelled::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(to bottom, transparent, #6b7280, transparent);
+    }
+
+    .trip-cancelled .badge {
+        opacity: 0.8;
+    }
+
+    .trip-past {
+        opacity: 0.5;
+        background-color: rgba(0, 0, 0, 0.02);
+        color: var(--text-muted);
+    }
+
     .today-pickups-card {
         background: linear-gradient(135deg, rgba(30, 41, 59, 0.04) 0%, rgba(51, 65, 85, 0.04) 100%);
         border: 1.5px solid rgba(30, 41, 59, 0.15);
@@ -563,7 +591,6 @@
                         <th>Date & Time</th>
                         <th class="hide-mobile">Vehicle</th>
                         <th>Status</th>
-                        {% if is_admin %}<th class="hide-mobile">Driver</th>{% endif %}
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -639,24 +666,6 @@
                         <td>
                             <span class="badge badge-{{ booking.status|lower }}">{{ booking.get_status_display }}</span>
                         </td>
-                        {% if is_admin %}
-                        <td class="hide-mobile">
-                            {% if booking.assigned_driver %}
-                                <div style="font-weight: 500; color: var(--dark);">{{ booking.assigned_driver.full_name }}</div>
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
-                                    {% if booking.driver_response_status == 'accepted' %}
-                                        <span style="color: #059669;">✓ Accepted</span>
-                                    {% elif booking.driver_response_status == 'rejected' %}
-                                        <span style="color: #dc2626;">✗ Rejected</span>
-                                    {% elif booking.driver_response_status == 'completed' %}
-                                        <span style="color: #0c5460;">✓ Completed</span>
-                                    {% endif %}
-                                </div>
-                            {% else %}
-                                <span style="color: var(--text-muted); font-size: 13px;">Driver Not Assigned</span>
-                            {% endif %}
-                        </td>
-                        {% endif %}
                         <td>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 {% if booking.is_past_trip %}
@@ -691,7 +700,11 @@
                                         {% endif %}
                                     {% else %}
                                         {% if booking.status in 'Pending,Confirmed' and booking.hours_until_pickup > 2 %}
-                                            <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit</a>
+                                            {% if booking.trip_type == 'Round' %}
+                                                <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit Outbound</a>
+                                            {% else %}
+                                                <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit</a>
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
@@ -701,7 +714,7 @@
 
                     {% if booking.trip_type == 'Round' and booking.linked_booking %}
                     <tr class="return-row return-row-{{ booking.id }}" style="display: table-row;">
-                        <td colspan="{% if is_admin %}7{% else %}6{% endif %}" style="padding: 16px 24px;">
+                        <td colspan="{% if is_admin %}6{% else %}5{% endif %}" style="padding: 16px 24px;">
                             <div class="return-trip-content">
                                 <div style="font-weight: 600; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -749,6 +762,10 @@
                                             <a href="{% url 'booking_detail' booking.linked_booking.id %}" class="action-link">View</a>
                                             {% if is_admin %}
                                                 <a href="{% url 'assign_driver' booking.linked_booking.id %}" class="action-link">Assign Driver</a>
+                                            {% else %}
+                                                {% if booking.linked_booking.status in 'Pending,Confirmed' and booking.linked_booking.hours_until_pickup > 2 %}
+                                                    <a href="{% url 'update_booking' booking.linked_booking.id %}" class="action-link">Edit Return</a>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     </div>
