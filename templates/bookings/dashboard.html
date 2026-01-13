@@ -389,7 +389,11 @@
         </div>
     </a>
 
-    <a href="?upcoming=true" class="stat-card {% if request.GET.upcoming == 'true' %}active{% endif %}" style="overflow: visible;">
+    {% if next_upcoming_trip %}
+    <a href="{% url 'booking_detail' next_upcoming_trip.id %}" class="stat-card" style="overflow: visible;">
+    {% else %}
+    <a href="#" class="stat-card" style="overflow: visible; cursor: default;">
+    {% endif %}
         <div style="display: flex; flex-direction: column; height: 100%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <p class="stat-label" style="margin: 0;">Upcoming Trip</p>
@@ -410,7 +414,15 @@
                     {% with time_remaining=next_upcoming_trip|format_time_until_pickup %}
                         {% if time_remaining %}
                             <div style="display: inline-block; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em;">
-                                {% if time_remaining.weeks > 0 %}{{ time_remaining.weeks }} WEEK{{ time_remaining.weeks|pluralize }} {% endif %}{% if time_remaining.days > 0 %}{{ time_remaining.days }} DAY{{ time_remaining.days|pluralize }} {% endif %}{{ time_remaining.hours }} HOUR{{ time_remaining.hours|pluralize }}
+                                {% if time_remaining.weeks > 0 %}
+                                    {{ time_remaining.weeks }} WEEK{{ time_remaining.weeks|pluralize }} {% if time_remaining.days > 0 %}{{ time_remaining.days }} DAY{{ time_remaining.days|pluralize }} {% endif %}{% if time_remaining.hours > 0 %}{{ time_remaining.hours }} HOUR{{ time_remaining.hours|pluralize }}{% endif %}
+                                {% elif time_remaining.days > 0 and time_remaining.hours == 0 %}
+                                    {{ time_remaining.total_hours }} HOUR{{ time_remaining.total_hours|pluralize }}
+                                {% elif time_remaining.days > 0 %}
+                                    {{ time_remaining.days }} DAY{{ time_remaining.days|pluralize }} {{ time_remaining.hours }} HOUR{{ time_remaining.hours|pluralize }}
+                                {% else %}
+                                    {{ time_remaining.hours }} HOUR{{ time_remaining.hours|pluralize }}
+                                {% endif %}
                             </div>
                             {% if time_remaining.total_hours <= 6 %}
                                 <p style="color: #dc2626; font-size: 12px; font-weight: 600; margin: 6px 0 0 0; font-style: italic;">Almost time! 🚗</p>
