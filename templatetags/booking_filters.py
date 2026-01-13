@@ -127,3 +127,47 @@ def hours_until_pickup(booking):
         return None
     except Exception:
         return None
+
+
+@register.filter
+def format_time_until_pickup(booking):
+    """
+    Format time until pickup as weeks, days, hours
+    Returns dict with weeks, days, hours, and total_hours
+    """
+    if not booking or not booking.pick_up_date or not booking.pick_up_time:
+        return None
+    
+    try:
+        # Combine date and time into a datetime object
+        pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+        
+        # Make it timezone aware if needed
+        if timezone.is_naive(pickup_datetime):
+            pickup_datetime = timezone.make_aware(pickup_datetime)
+        
+        # Get current time
+        now = timezone.now()
+        
+        # Calculate difference
+        time_diff = pickup_datetime - now
+        
+        # Only return positive values (future pickups)
+        if time_diff.total_seconds() > 0:
+            total_hours = int(time_diff.total_seconds() / 3600)
+            
+            weeks = total_hours // 168  # 168 hours in a week
+            remaining_hours = total_hours % 168
+            days = remaining_hours // 24
+            hours = remaining_hours % 24
+            
+            return {
+                'weeks': weeks,
+                'days': days,
+                'hours': hours,
+                'total_hours': total_hours
+            }
+        
+        return None
+    except Exception:
+        return None
