@@ -330,12 +330,15 @@ def dashboard(request):
 
     if request.user.is_staff:
         from models import BookingHistory
-        stats = BookingService.get_dashboard_stats()
-        # Calculate upcoming trips (Confirmed bookings with future dates)
-        stats['upcoming_count'] = Booking.objects.filter(
-            status='Confirmed',
-            pick_up_date__gte=today
-        ).count()
+        # Calculate stats directly with fresh queries to ensure accurate counts
+        stats = {
+            'pending_count': Booking.objects.filter(status='Pending').count(),
+            'confirmed_count': Booking.objects.filter(status='Confirmed').count(),
+            'upcoming_count': Booking.objects.filter(
+                status='Confirmed',
+                pick_up_date__gte=today
+            ).count(),
+        }
         
         # Get the next upcoming trip
         next_upcoming = Booking.objects.filter(
