@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.conf import settings
 from datetime import timedelta
 from models import (
     Booking, BookingStop, SystemSettings, BookingPermission,

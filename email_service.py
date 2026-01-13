@@ -15,6 +15,23 @@ class EmailService:
     """Handles email sending operations."""
 
     @classmethod
+    def _load_email_template(cls, template_type: str) -> Optional['EmailTemplate']:
+        """
+        Load email template from database.
+        Returns None if template not found or not active.
+        """
+        try:
+            from models import EmailTemplate
+            template = EmailTemplate.objects.filter(
+                template_type=template_type,
+                is_active=True
+            ).first()
+            return template
+        except Exception as e:
+            logger.warning(f"Could not load email template {template_type} from database: {e}")
+            return None
+
+    @classmethod
     def send_booking_notification(
         cls,
         booking: Booking,
