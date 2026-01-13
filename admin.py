@@ -567,3 +567,259 @@ class ViewedBookingAdmin(admin.ModelAdmin):
             )
         return '-'
     booking_link.short_description = 'Booking'
+
+
+@admin.register(EmailTemplate)
+class EmailTemplateAdmin(admin.ModelAdmin):
+    """Admin interface for managing email templates."""
+    list_display = ('name', 'template_type', 'is_active', 'success_rate_display', 'total_sent', 'last_sent_at', 'updated_at')
+    list_filter = ('is_active', 'template_type', 'send_to_user', 'send_to_admin')
+    search_fields = ('name', 'description', 'subject_template')
+    readonly_fields = ('created_at', 'updated_at', 'created_by', 'updated_by', 'total_sent', 'total_failed', 'last_sent_at', 'success_rate', 'variable_documentation')
+    ordering = ('template_type',)
+
+    fieldsets = (
+        ('Template Information', {
+            'fields': ('template_type', 'name', 'description', 'is_active')
+        }),
+        ('Email Content', {
+            'fields': ('subject_template', 'html_template'),
+            'description': 'Use {variable_name} for dynamic content. See Available Variables section below.'
+        }),
+        ('Recipients Configuration', {
+            'fields': ('send_to_user', 'send_to_admin', 'send_to_passenger'),
+            'classes': ('collapse',)
+        }),
+        ('Available Variables', {
+            'fields': ('variable_documentation',),
+            'classes': ('collapse',),
+            'description': 'Click to expand and view all available variables for this template type'
+        }),
+        ('Statistics', {
+            'fields': ('total_sent', 'total_failed', 'success_rate', 'last_sent_at'),
+            'classes': ('collapse',)
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at', 'created_by', 'updated_by'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    actions = ['preview_template', 'send_test_email', 'duplicate_template']
+
+    def success_rate_display(self, obj):
+        """Display success rate with color coding."""
+        rate = obj.success_rate
+        if rate >= 95:
+            color = 'green'
+        elif rate >= 80:
+            color = 'orange'
+        else:
+            color = 'red'
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{} %</span>',
+            color,
+            rate
+        )
+    success_rate_display.short_description = 'Success Rate'
+
+    def variable_documentation(self, obj):
+        """Display available variables as formatted HTML."""
+        if not obj.id:
+            return format_html('<p style="color: #666;">Save template first to see available variables</p>')
+        
+        variables = obj.get_available_variables()
+        html_parts = ['<div style="font-family: monospace; line-height: 1.8;">']
+        html_parts.append('<table style="width: 100%; border-collapse: collapse;">')
+        html_parts.append('<thead><tr style="background: #f0f0f0;"><th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Variable</th><th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Description</th></tr></thead>')
+        html_parts.append('<tbody>')
+        
+        for var_name, description in sorted(variables.items()):
+            html_parts.append(f'<tr><td style="padding: 8px; border: 1px solid #ddd; background: #fafafa;"><code>{{{var_name}}}</code></td><td style="padding: 8px; border: 1px solid #ddd;">{description}</td></tr>')
+        
+        html_parts.append('</tbody></table></div>')
+        html_parts.append('<p style="margin-top: 12px; color: #666;"><strong>Usage Example:</strong> <code>Trip Confirmed: {passenger_name} - {pick_up_date}</code></p>')
+        
+        return format_html(''.join(html_parts))
+    variable_documentation.short_description = 'Available Template Variables'
+
+    def save_model(self, request, obj, form, change):
+        """Track who created/updated the template."""
+        if not obj.pk:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
+
+    @admin.action(description='Preview template with sample data')
+    def preview_template(self, request, queryset):
+        """Preview selected templates with sample data."""
+        from django.shortcuts import render
+        
+        if queryset.count() != 1:
+            self.message_user(request, 'Please select exactly one template to preview', level='warning')
+            return
+        
+        template = queryset.first()
+        
+        # Create sample context data
+        sample_context = {
+            'booking_reference': 'M1-260113-A5',
+            'passenger_name': 'John Smith',
+            'phone_number': '+1 (555) 123-4567',
+            'passenger_email': 'john.smith@example.com',
+            'pick_up_date': 'January 20, 2026',
+            'pick_up_time': '2:00 PM',
+            'pick_up_address': 'The Art Institute, 111 S Michigan Ave, Chicago, IL 60603',
+            'drop_off_address': "O'Hare International Airport, Chicago, IL 60666",
+            'vehicle_type': 'Sedan',
+            'trip_type': 'Point-to-Point',
+            'number_of_passengers': '2',
+            'flight_number': 'UA1234',
+            'notes': 'Please arrive 10 minutes early',
+            'status': 'Confirmed',
+            'old_status': 'Pending',
+            'new_status': 'Confirmed',
+            'user_email': 'customer@example.com',
+            'user_username': 'jsmith',
+            'company_name': 'M1 Limousine Service',
+            'support_email': 'support@m1limo.com',
+            'dashboard_url': 'http://62.169.19.39:8081/dashboard',
+            'driver_name': 'Michael Johnson',
+            'driver_phone': '+1 (555) 987-6543',
+            'driver_vehicle': 'Black Sedan - ABC 123',
+            'driver_portal_url': 'http://62.169.19.39:8081/driver/trip/123/abc',
+            'return_pick_up_date': 'January 25, 2026',
+            'return_pick_up_time': '4:00 PM',
+            'return_pick_up_address': "O'Hare International Airport, Chicago, IL 60666",
+            'return_drop_off_address': 'The Art Institute, 111 S Michigan Ave, Chicago, IL 60603',
+        }
+        
+        rendered_subject = template.render_subject(sample_context)
+        rendered_html = template.render_html(sample_context)
+        
+        context = {
+            'template': template,
+            'rendered_subject': rendered_subject,
+            'rendered_html': rendered_html,
+            'sample_data': sample_context,
+        }
+        
+        return render(request, 'admin/email_template_preview.html', context)
+
+    @admin.action(description='Send test email to yourself')
+    def send_test_email(self, request, queryset):
+        """Send test email using selected template."""
+        from django.contrib import messages as django_messages
+        from django.core.mail import EmailMessage
+        
+        if queryset.count() != 1:
+            self.message_user(request, 'Please select exactly one template to test', level='warning')
+            return
+        
+        template = queryset.first()
+        recipient_email = request.user.email
+        
+        if not recipient_email:
+            self.message_user(request, 'Your user account has no email address', level='error')
+            return
+        
+        # Create sample context
+        sample_context = {
+            'booking_reference': 'M1-TEST-001',
+            'passenger_name': 'Test Passenger',
+            'phone_number': '+1 (555) 000-0000',
+            'passenger_email': 'test@example.com',
+            'pick_up_date': 'January 20, 2026',
+            'pick_up_time': '2:00 PM',
+            'pick_up_address': 'Test Pickup Location',
+            'drop_off_address': 'Test Drop-off Location',
+            'vehicle_type': 'Sedan',
+            'trip_type': 'Point-to-Point',
+            'number_of_passengers': '2',
+            'flight_number': 'TEST123',
+            'notes': 'This is a test email',
+            'status': 'Confirmed',
+            'old_status': 'Pending',
+            'new_status': 'Confirmed',
+            'user_email': recipient_email,
+            'user_username': request.user.username,
+            'company_name': 'M1 Limousine Service',
+            'support_email': 'support@m1limo.com',
+            'dashboard_url': 'http://62.169.19.39:8081/dashboard',
+            'driver_name': 'Test Driver',
+            'driver_phone': '+1 (555) 999-9999',
+            'driver_vehicle': 'Test Vehicle',
+            'driver_portal_url': 'http://62.169.19.39:8081/driver/test',
+            'return_pick_up_date': 'January 25, 2026',
+            'return_pick_up_time': '4:00 PM',
+            'return_pick_up_address': 'Test Return Pickup',
+            'return_drop_off_address': 'Test Return Dropoff',
+        }
+        
+        try:
+            subject = template.render_subject(sample_context)
+            html_body = template.render_html(sample_context)
+            
+            # Add test notice to subject
+            subject = f"[TEST] {subject}"
+            
+            # Add test notice to HTML
+            test_notice = '<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; margin-bottom: 20px;"><strong>🧪 TEST EMAIL</strong> - This is a test of the email template system</div>'
+            html_body = test_notice + html_body
+            
+            email = EmailMessage(
+                subject=subject,
+                body=html_body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[recipient_email],
+            )
+            email.content_subtype = "html"
+            email.send(fail_silently=False)
+            
+            self.message_user(
+                request,
+                f'Test email sent successfully to {recipient_email}',
+                level='success'
+            )
+            
+        except Exception as e:
+            self.message_user(
+                request,
+                f'Failed to send test email: {str(e)}',
+                level='error'
+            )
+            logger.error(f"Test email failed: {e}", exc_info=True)
+
+    @admin.action(description='Duplicate selected template')
+    def duplicate_template(self, request, queryset):
+        """Create a copy of selected template."""
+        if queryset.count() != 1:
+            self.message_user(request, 'Please select exactly one template to duplicate', level='warning')
+            return
+        
+        template = queryset.first()
+        
+        # Create copy
+        template.pk = None
+        template.name = f"{template.name} (Copy)"
+        template.template_type = None  # Must be set manually to avoid unique constraint
+        template.is_active = False  # Start inactive
+        template.total_sent = 0
+        template.total_failed = 0
+        template.last_sent_at = None
+        template.created_by = request.user
+        template.updated_by = request.user
+        
+        try:
+            template.save()
+            self.message_user(
+                request,
+                f'Template duplicated successfully. Please set a unique template type.',
+                level='success'
+            )
+        except Exception as e:
+            self.message_user(
+                request,
+                f'Failed to duplicate template: {str(e)}',
+                level='error'
+            )
