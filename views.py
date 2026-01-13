@@ -12,7 +12,7 @@ from django.contrib.auth import login, logout
 from django.db import transaction
 import logging
 
-from models import Booking, FrequentPassenger
+from models import Booking, FrequentPassenger, BookingHistory
 from booking_forms import (
     BookingForm, AdminBookingForm, BookingSearchForm,
     CancellationRequestForm, FrequentPassengerForm,
@@ -358,7 +358,6 @@ def dashboard(request):
     }
 
     if request.user.is_staff:
-        from models import BookingHistory
         # Calculate stats directly with fresh queries to ensure accurate counts
         stats = {
             'pending_count': Booking.objects.filter(status='Pending').count(),
