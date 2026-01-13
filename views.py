@@ -259,8 +259,8 @@ def dashboard(request):
         base_queryset = base_queryset.exclude(status__in=['Cancelled', 'Cancelled_Full_Charge', 'Trip_Completed'])
 
     # Show all trips individually - each trip is displayed as its own row
-    # This includes both legs of round trips as separate entries
-    queryset = base_queryset
+    # Hide return trips since they're shown within the outbound trip's expandable section
+    queryset = base_queryset.filter(is_return_trip=False)
 
     # Optimize queries to prevent N+1 problem with select_related and prefetch_related
     queryset = queryset.select_related(
