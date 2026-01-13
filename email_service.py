@@ -205,6 +205,44 @@ class EmailService:
         
         return context
     
+    @staticmethod
+    def _build_round_trip_template_context(
+        first_trip: Booking,
+        return_trip: Booking,
+        notification_type: str
+    ) -> dict:
+        """Build context dictionary for database round-trip email templates."""
+        context = {
+            'booking_reference': first_trip.booking_reference,
+            'passenger_name': first_trip.passenger_name,
+            'phone_number': first_trip.phone_number,
+            'passenger_email': first_trip.passenger_email or '',
+            # First trip details
+            'pick_up_date': first_trip.pick_up_date.strftime('%B %d, %Y') if first_trip.pick_up_date else '',
+            'pick_up_time': first_trip.pick_up_time.strftime('%I:%M %p') if first_trip.pick_up_time else '',
+            'pick_up_address': first_trip.pick_up_address,
+            'drop_off_address': first_trip.drop_off_address,
+            # Return trip details
+            'return_pick_up_date': return_trip.pick_up_date.strftime('%B %d, %Y') if return_trip.pick_up_date else '',
+            'return_pick_up_time': return_trip.pick_up_time.strftime('%I:%M %p') if return_trip.pick_up_time else '',
+            'return_pick_up_address': return_trip.pick_up_address,
+            'return_drop_off_address': return_trip.drop_off_address,
+            # Shared details
+            'vehicle_type': first_trip.vehicle_type or '',
+            'trip_type': 'Round Trip',
+            'number_of_passengers': str(first_trip.number_of_passengers) if first_trip.number_of_passengers else '',
+            'flight_number': first_trip.flight_number or '',
+            'notes': first_trip.notes or '',
+            'status': first_trip.get_status_display() if hasattr(first_trip, 'get_status_display') else first_trip.status,
+            'user_email': first_trip.user.email if first_trip.user else '',
+            'user_username': first_trip.user.username if first_trip.user else '',
+            'company_name': settings.COMPANY_INFO.get('name', 'M1 Limousine Service'),
+            'support_email': settings.COMPANY_INFO.get('email', 'support@m1limo.com'),
+            'dashboard_url': f"{settings.COMPANY_INFO.get('website', '')}/dashboard" if settings.COMPANY_INFO.get('website') else '',
+        }
+        
+        return context
+    
     @classmethod
     def send_round_trip_notification(
         cls,
