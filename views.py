@@ -258,9 +258,10 @@ def dashboard(request):
         # Exclude cancelled and completed bookings when no specific status filter is applied
         base_queryset = base_queryset.exclude(status__in=['Cancelled', 'Cancelled_Full_Charge', 'Trip_Completed'])
 
-    # Show all trips individually - each trip is displayed as its own row
-    # Hide return trips since they're shown within the outbound trip's expandable section
-    queryset = base_queryset.filter(is_return_trip=False)
+    # Show all trips individually
+    # For round trips: Only hide return trips if their linked outbound trip is also visible
+    # This prevents orphaned return trips from being hidden
+    queryset = base_queryset
 
     # Optimize queries to prevent N+1 problem with select_related and prefetch_related
     queryset = queryset.select_related(
@@ -316,8 +317,19 @@ def dashboard(request):
 
     # Add unviewed status to each booking for notification indicators
     bookings_list = list(page_obj.object_list)
+    
+    # Filter out return trips whose outbound trip is also in the list
+    # This prevents duplication while keeping orphaned return trips visible
+    outbound_ids = {b.id for b in bookings_list if not b.is_return_trip}
+    filtered_bookings = []
     for booking in bookings_list:
+        if booking.is_return_trip and booking.linked_booking_id in outbound_ids:
+            # Skip this return trip since its outbound will show it in expandable section
+            continue
         booking.has_unviewed_changes = booking.has_unviewed_changes(request.user)
+        filtered_bookings.append(booking)
+    
+    bookings_list = filtered_bookings
 
     context = {
         'bookings': bookings_list,
