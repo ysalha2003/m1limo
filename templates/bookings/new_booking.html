@@ -637,10 +637,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="id_passenger_contact">Passenger Phone Number or Email *</label>
-                        {{ form.passenger_contact }}
-                        {% if form.passenger_contact.errors %}
-                            <div class="form-error">{{ form.passenger_contact.errors.0 }}</div>
+                        <label class="form-label" for="id_phone_number">Passenger Phone Number *</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                            <div class="form-error">{{ form.phone_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_passenger_email">Passenger Email *</label>
+                        {{ form.passenger_email }}
+                        {% if form.passenger_email.errors %}
+                            <div class="form-error">{{ form.passenger_email.errors.0 }}</div>
                         {% endif %}
                     </div>
 
@@ -988,6 +996,10 @@
                             <span class="review-value" id="review_phone_number">-</span>
                         </div>
                         <div class="review-item">
+                            <span class="review-label">Email</span>
+                            <span class="review-value" id="review_email">-</span>
+                        </div>
+                        <div class="review-item">
                             <span class="review-label">Number of Passengers</span>
                             <span class="review-value" id="review_number_of_passengers">-</span>
                         </div>
@@ -998,8 +1010,12 @@
                             <input type="text" id="edit_passenger_name" class="form-input" onchange="updateReviewField('passenger_name', this.value)">
                         </div>
                         <div class="form-group" style="margin-bottom: 12px;">
-                            <label class="form-label">Contact</label>
-                            <input type="text" id="edit_passenger_contact" class="form-input" onchange="updateReviewField('passenger_contact', this.value)">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" id="edit_phone_number" class="form-input" onchange="updateReviewField('phone_number', this.value)">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="edit_passenger_email" class="form-input" onchange="updateReviewField('passenger_email', this.value)">
                         </div>
                         <div class="form-group" style="margin-bottom: 12px;">
                             <label class="form-label">Passengers: <span id="edit_passenger_count">1</span></label>
@@ -1355,11 +1371,22 @@
             });
         }
 
-        // Contact validation
-        const contactField = document.getElementById('id_passenger_contact');
-        if (contactField) {
-            contactField.addEventListener('blur', function() {
-                validateField(this, 'Phone number or email is required', (val) => val.trim().length > 0);
+        // Phone number validation
+        const phoneField = document.getElementById('id_phone_number');
+        if (phoneField) {
+            phoneField.addEventListener('blur', function() {
+                const phoneRegex = /^\+?\d{10,15}$/;
+                const cleaned = this.value.replace(/[\s\-\(\)\.]+/g, '');
+                validateField(this, 'Valid phone number is required (10-15 digits)', (val) => phoneRegex.test(cleaned));
+            });
+        }
+
+        // Email validation
+        const emailField = document.getElementById('id_passenger_email');
+        if (emailField) {
+            emailField.addEventListener('blur', function() {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                validateField(this, 'Valid email address is required', (val) => emailRegex.test(val.trim()));
             });
         }
 
@@ -1476,20 +1503,15 @@
                 const selectedOption = this.options[this.selectedIndex];
                 if (selectedOption.value) {
                     const nameField = document.getElementById('id_passenger_name');
-                    const contactField = document.getElementById('id_passenger_contact');
+                    const phoneField = document.getElementById('id_phone_number');
+                    const emailField = document.getElementById('id_passenger_email');
                     const addressField = document.getElementById('id_pick_up_address');
                     const vehicleField = document.getElementById('id_vehicle_type');
 
                     // Populate all fields with passenger data
                     if (nameField) nameField.value = selectedOption.getAttribute('data-name') || '';
-
-                    // Use email if available, otherwise phone (hybrid contact field)
-                    if (contactField) {
-                        const email = selectedOption.getAttribute('data-email');
-                        const phone = selectedOption.getAttribute('data-phone');
-                        contactField.value = email || phone || '';
-                    }
-
+                    if (phoneField) phoneField.value = selectedOption.getAttribute('data-phone') || '';
+                    if (emailField) emailField.value = selectedOption.getAttribute('data-email') || '';
                     if (addressField) addressField.value = selectedOption.getAttribute('data-address') || '';
                     if (vehicleField) vehicleField.value = selectedOption.getAttribute('data-vehicle') || '';
                 }
@@ -1657,7 +1679,9 @@
         document.getElementById('review_passenger_name').textContent =
             document.getElementById('id_passenger_name').value || '-';
         document.getElementById('review_phone_number').textContent =
-            document.getElementById('id_passenger_contact').value || '-';
+            document.getElementById('id_phone_number').value || '-';
+        document.getElementById('review_email').textContent =
+            document.getElementById('id_passenger_email').value || '-';
         document.getElementById('review_number_of_passengers').textContent =
             document.getElementById('id_number_of_passengers').value || '-';
 
@@ -1857,7 +1881,8 @@
             // Switching to edit mode - populate edit fields
             if (section === 'passenger') {
                 document.getElementById('edit_passenger_name').value = document.getElementById('id_passenger_name').value;
-                document.getElementById('edit_passenger_contact').value = document.getElementById('id_passenger_contact').value;
+                document.getElementById('edit_phone_number').value = document.getElementById('id_phone_number').value;
+                document.getElementById('edit_passenger_email').value = document.getElementById('id_passenger_email').value;
                 document.getElementById('edit_passenger_slider').value = document.getElementById('id_number_of_passengers').value;
                 document.getElementById('edit_passenger_count').textContent = document.getElementById('id_number_of_passengers').value;
             } else if (section === 'pickup') {

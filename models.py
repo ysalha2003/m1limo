@@ -257,8 +257,8 @@ class Booking(models.Model):
     )
 
     passenger_name = models.CharField(max_length=255, help_text="Full name of passenger")
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
-    passenger_email = models.EmailField(blank=True, null=True, help_text="Passenger email for communication")
+    phone_number = models.CharField(max_length=20, null=False, blank=False, help_text="Passenger phone number for contact")
+    passenger_email = models.EmailField(null=False, blank=False, help_text="Passenger email for communication and notifications")
 
     pick_up_address = models.CharField(max_length=255)
     drop_off_address = models.CharField(max_length=255, blank=True, null=True)
@@ -519,9 +519,8 @@ class Booking(models.Model):
 
     def clean(self):
         """Run all model-level validation checks"""
-        if not self.passenger_email and not self.phone_number:
-            raise ValidationError('At least one contact method (email or phone) is required.')
-
+        # Both phone and email are now required at field level (not blank, not null)
+        
         # CRITICAL FIX #5: Validate past date bookings
         # Skip validation for existing bookings being marked as completed or cancelled
         is_new = self._state.adding

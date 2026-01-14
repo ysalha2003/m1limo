@@ -430,7 +430,7 @@ def new_booking(request):
                     if field in form.cleaned_data and field != 'user'
                 }
 
-                # Add phone_number and passenger_email from cleaned_data (set by passenger_contact field)
+                # phone_number and passenger_email are now required fields in the form
                 if 'phone_number' in form.cleaned_data:
                     booking_data['phone_number'] = form.cleaned_data['phone_number']
                 if 'passenger_email' in form.cleaned_data:
@@ -501,11 +501,10 @@ def new_booking(request):
             try:
                 passenger = FrequentPassenger.objects.get(id=passenger_id, user=request.user)
                 # Pre-populate form with passenger details
-                # Use passenger_contact hybrid field (email takes priority if available)
-                contact = passenger.email if passenger.email else passenger.phone_number
                 initial_data = {
                     'passenger_name': passenger.name,
-                    'passenger_contact': contact,
+                    'phone_number': passenger.phone_number if passenger.phone_number else '',
+                    'passenger_email': passenger.email if passenger.email else '',
                     'pick_up_address': passenger.address if passenger.address else '',
                     'vehicle_type': passenger.preferred_vehicle_type if passenger.preferred_vehicle_type else '',
                 }
@@ -677,7 +676,7 @@ def update_booking(request, booking_id):
                 if original_trip_type == 'Round':
                     booking_data['trip_type'] = 'Round'
 
-                # Add phone_number and passenger_email from passenger_contact hybrid field
+                # phone_number and passenger_email are now required fields in the form
                 if 'phone_number' in form.cleaned_data:
                     booking_data['phone_number'] = form.cleaned_data['phone_number']
                 if 'passenger_email' in form.cleaned_data:
@@ -788,12 +787,12 @@ def rebook_booking(request, booking_id):
                 booking_data = {
                     field: form.cleaned_data[field]
                     for field in form.Meta.fields
-                    if field in form.cleaned_data and field not in ['user', 'booking_for_user', 'passenger_contact',
+                    if field in form.cleaned_data and field not in ['user', 'booking_for_user',
                                                                       'is_airport_trip', 'needs_stop', 'is_return_airport_trip',
                                                                       'needs_return_stop', 'notification_recipients']
                 }
 
-                # Add phone_number and passenger_email from cleaned_data (set by passenger_contact field)
+                # phone_number and passenger_email are now required fields in the form
                 if 'phone_number' in form.cleaned_data:
                     booking_data['phone_number'] = form.cleaned_data['phone_number']
                 if 'passenger_email' in form.cleaned_data:
@@ -864,11 +863,11 @@ def rebook_booking(request, booking_id):
             'notes': original_booking.notes,
         }
 
-        # Set passenger contact (phone or email)
+        # Set passenger contact fields
         if original_booking.phone_number:
-            initial_data['passenger_contact'] = original_booking.phone_number
-        elif original_booking.passenger_email:
-            initial_data['passenger_contact'] = original_booking.passenger_email
+            initial_data['phone_number'] = original_booking.phone_number
+        if original_booking.passenger_email:
+            initial_data['passenger_email'] = original_booking.passenger_email
 
         # For hourly trips
         if original_booking.trip_type == 'Hourly':

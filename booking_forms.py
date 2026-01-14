@@ -35,16 +35,29 @@ class BookingForm(BaseModelForm):
         widget=forms.Select(attrs={'class': 'form-select'})
     )
 
-    # Hybrid field for phone number OR email input
-    passenger_contact = forms.CharField(
-        required=False,
-        label="Passenger Phone Number or Email",
+    # Separate required fields for phone and email
+    phone_number = forms.CharField(
+        required=True,
+        label="Passenger Phone Number *",
+        max_length=20,
         widget=forms.TextInput(attrs={
-            'placeholder': 'Enter phone number or email',
+            'type': 'tel',
+            'placeholder': 'Enter phone number',
+            'class': 'form-input',
+            'maxlength': '20'
+        }),
+        help_text="Required: Contact phone number"
+    )
+    
+    passenger_email = forms.EmailField(
+        required=True,
+        label="Passenger Email *",
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Enter email address',
             'class': 'form-input',
             'maxlength': '100'
         }),
-        help_text="Enter either a phone number or email address"
+        help_text="Required: Email for booking confirmations and updates"
     )
 
     # Additional fields for trip configuration
@@ -54,21 +67,16 @@ class BookingForm(BaseModelForm):
     needs_return_stop = forms.BooleanField(required=False, label="Need intermediate stops on return?")
 
     def __init__(self, *args, **kwargs):
-        """Initialize form and pre-populate passenger_contact from existing data"""
+        """Initialize form"""
         super().__init__(*args, **kwargs)
-
-        # When editing an existing booking, populate passenger_contact with existing phone or email
-        if self.instance and self.instance.pk:
-            if self.instance.passenger_email:
-                self.fields['passenger_contact'].initial = self.instance.passenger_email
-            elif self.instance.phone_number:
-                self.fields['passenger_contact'].initial = self.instance.phone_number
+        # phone_number and passenger_email are now direct model fields, no special handling needed
 
     class Meta:
         model = Booking
         fields = [
             'passenger_name',
-            # phone_number and passenger_email are handled via passenger_contact hybrid field
+            'phone_number',
+            'passenger_email',
             'number_of_passengers',
             'vehicle_type',
             'trip_type',
@@ -88,8 +96,7 @@ class BookingForm(BaseModelForm):
         ]
         widgets = {
             'passenger_name': forms.TextInput(attrs={'placeholder': 'Enter passenger name'}),
-            'phone_number': forms.TextInput(attrs={'type': 'tel', 'placeholder': 'Phone number (Phone or Email required)'}),
-            'passenger_email': forms.EmailInput(attrs={'placeholder': 'Email (Phone or email required)'}),
+            # phone_number and passenger_email defined as form fields above, not in Meta widgets
             'number_of_passengers': forms.NumberInput(attrs={'min': '1', 'placeholder': 'Number of passengers'}),
             'pick_up_address': forms.TextInput(attrs={'placeholder': 'Enter pick-up address'}),
             'drop_off_address': forms.TextInput(attrs={'placeholder': 'Enter drop-off address'}),
@@ -106,62 +113,31 @@ class BookingForm(BaseModelForm):
             'return_special_requests': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Return journey requests'}),
         }
     
-    def clean_passenger_contact(self) -> str:
+    def clean_phone_number(self) -> str:
         """
-        Validate and route passenger contact input to appropriate field.
-        Accepts either phone number or email and routes to correct database column.
+        Validate phone number format.
         """
-        contact = self.cleaned_data.get('passenger_contact', '').strip()
-
-        if not contact:
-            return contact
-
-        # Try to validate as email first
-        try:
-            validate_email(contact)
-            # Valid email - will be routed to passenger_email in clean()
-            return contact
-        except ValidationError:
-            # Not an email, validate as phone number
-            # Remove common phone number separators
-            phone_cleaned = re.sub(r'[\s\-\(\)\.]+', '', contact)
-
-            # Basic phone number validation (digits and optional + prefix)
-            if not re.match(r'^\+?\d{10,15}$', phone_cleaned):
-                raise ValidationError(
-                    'Please enter a valid phone number or email address. '
-                    'Phone numbers should contain 10-15 digits.'
-                )
-
-            # Valid phone - will be routed to phone_number in clean()
-            return contact
+        phone = self.cleaned_data.get('phone_number', '').strip()
+        
+        if not phone:
+            raise ValidationError('Phone number is required.')
+        
+        # Remove common phone number separators for validation
+        phone_cleaned = re.sub(r'[\s\-\(\)\.]+', '', phone)
+        
+        # Basic phone number validation (digits and optional + prefix)
+        if not re.match(r'^\+?\d{10,15}$', phone_cleaned):
+            raise ValidationError(
+                'Please enter a valid phone number with 10-15 digits.'
+            )
+        
+        return phone
 
     def clean(self) -> Dict[str, Any]:
-        """Validate booking data and route hybrid contact field"""
-        # Don't call super().clean() yet - we need to set contact fields first
-        cleaned_data = dict(self.cleaned_data)
-
-        # Route passenger_contact to appropriate field
-        passenger_contact = cleaned_data.get('passenger_contact', '').strip()
-        if passenger_contact:
-            try:
-                validate_email(passenger_contact)
-                # It's an email
-                self.instance.passenger_email = passenger_contact
-                self.instance.phone_number = None
-                cleaned_data['passenger_email'] = passenger_contact
-                cleaned_data['phone_number'] = None
-            except ValidationError:
-                # It's a phone number
-                self.instance.phone_number = passenger_contact
-                self.instance.passenger_email = None
-                cleaned_data['phone_number'] = passenger_contact
-                cleaned_data['passenger_email'] = None
-        else:
-            # No contact provided - will trigger error
-            self.add_error('passenger_contact', 'Contact information (phone or email) is required.')
-            return cleaned_data
-
+        """Validate booking data"""
+        cleaned_data = super().clean()
+        
+        # Both phone and email are required - validated at field level
         trip_type = cleaned_data.get('trip_type')
         vehicle_type = cleaned_data.get('vehicle_type')
         hours_booked = cleaned_data.get('hours_booked')
