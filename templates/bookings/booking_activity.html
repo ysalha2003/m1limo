@@ -135,6 +135,157 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 1024px) {
+        .activity-header {
+            padding: 24px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+        }
+
+        .stats-grid {
+            gap: 16px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .activity-header {
+            padding: 20px;
+        }
+
+        .activity-header h1 {
+            font-size: 24px !important;
+        }
+
+        .stats-grid {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: rgba(248, 250, 252, 1);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            font-size: 11px;
+        }
+
+        .filters-card {
+            padding: 16px;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .filters-card h3 {
+            font-size: 14px !important;
+        }
+
+        .filter-input {
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+            padding: 16px;
+            gap: 8px;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* Stack table cells vertically on mobile */
+        .activity-table-container table {
+            min-width: 100% !important;
+        }
+
+        .activity-table-container td {
+            display: block;
+            padding: 8px 16px !important;
+            border-bottom: none;
+        }
+
+        .activity-table-container tr {
+            display: block;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .activity-table-container thead {
+            display: none;
+        }
+
+        .activity-table-container tbody {
+            display: block;
+        }
+
+        .activity-table-container td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .activity-table-container td:first-child {
+            background: rgba(248, 250, 252, 1);
+            font-weight: 600;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .activity-header {
+            padding: 16px;
+        }
+
+        .activity-header h1 {
+            font-size: 20px !important;
+        }
+
+        .stat-value {
+            font-size: 20px;
+        }
+
+        .filters-card {
+            padding: 12px;
+        }
+
+        .activity-table-container td {
+            padding: 6px 12px !important;
+            font-size: 13px;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -226,7 +377,7 @@
                 <tbody>
                     {% for history in booking_history %}
                     <tr style="border-bottom: 1px solid var(--border-light);">
-                        <td style="padding: 16px;">
+                        <td style="padding: 16px;" data-label="Timestamp">
                             <div style="display: flex; flex-direction: column; gap: 2px;">
                                 <span style="font-weight: 600; color: var(--dark); font-size: 13px;">
                                     {{ history.changed_at|date:"M d, Y" }}
@@ -236,7 +387,7 @@
                                 </span>
                             </div>
                         </td>
-                        <td style="padding: 16px;">
+                        <td style="padding: 16px;" data-label="Reservation">
                             <div style="display: flex; flex-direction: column; gap: 2px;">
                                 <a href="{% url 'reservation_detail' history.booking.id %}" style="color: var(--primary); font-weight: 600; text-decoration: none; font-size: 13px;">
                                     #{{ history.booking.id }}
@@ -251,7 +402,7 @@
                                 {% endif %}
                             </div>
                         </td>
-                        <td style="padding: 16px;">
+                        <td style="padding: 16px;" data-label="Action">
                             {% if history.action == 'created' %}
                                 <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border-color: rgba(16, 185, 129, 0.2);">
                                     Created
@@ -286,7 +437,7 @@
                                 </span>
                             {% endif %}
                         </td>
-                        <td style="padding: 16px;">
+                        <td style="padding: 16px;" data-label="Changed By">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 {% if history.action == 'driver_assigned' or history.action == 'driver_rejected' or history.action == 'driver_completed' %}
                                     {% if history.changed_by %}
@@ -323,7 +474,7 @@
                                 {% endif %}
                             </div>
                         </td>
-                        <td style="padding: 16px;">
+                        <td style="padding: 16px;" data-label="Details">
                             {% if history.changes %}
                             <div style="display: flex; flex-direction: column; gap: 8px;">
                                 {% for field in history.get_changed_fields %}

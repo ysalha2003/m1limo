@@ -1603,6 +1603,9 @@
             {% if user.is_authenticated %}
                 <a href="{% url 'dashboard' %}" class="mobile-menu-link">Dashboard</a>
                 <a href="{% url 'new_reservation' %}" class="mobile-menu-link">New Reservation</a>
+                {% if user.is_staff %}
+                    <a href="{% url 'reservation_activity' %}" class="mobile-menu-link">Activity Log</a>
+                {% endif %}
                 {% if not user.is_staff %}
                 <a href="{% url 'frequent_passengers' %}" class="mobile-menu-link">Frequent Passengers</a>
                 {% endif %}

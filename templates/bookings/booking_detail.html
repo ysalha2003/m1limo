@@ -23,10 +23,79 @@
 
         .booking-header-actions > div:last-child {
             width: 100%;
+            margin-top: 16px;
         }
 
         .booking-header-actions .btn {
             width: 100%;
+        }
+
+        /* Status banner mobile */
+        .status-banner-content {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+        }
+
+        .status-banner-content > div:last-child {
+            text-align: left !important;
+            width: 100%;
+        }
+
+        /* Trip details grid mobile */
+        .trip-details-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* Linked booking grid mobile */
+        .linked-booking-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* Reduce font sizes on mobile */
+        h1 {
+            font-size: 20px !important;
+        }
+
+        .card-title {
+            font-size: 18px !important;
+        }
+
+        /* Edit menu positioning on mobile */
+        #editMenu {
+            position: fixed !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            top: auto !important;
+            bottom: 20px !important;
+            width: calc(100% - 40px) !important;
+            max-width: 400px !important;
+        }
+
+        /* Button groups spacing */
+        .button-group {
+            flex-direction: column !important;
+            gap: 8px !important;
+        }
+
+        .button-group .btn {
+            width: 100% !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        /* Extra small screens */
+        .card {
+            padding: 16px !important;
+        }
+
+        h1 {
+            font-size: 18px !important;
+        }
+
+        .badge {
+            font-size: 11px !important;
+            padding: 4px 10px !important;
         }
     }
 </style>
@@ -90,7 +159,7 @@
 
 <!-- Status Banner -->
 <div class="card" style="margin-bottom: 24px; {% if booking.status == 'Confirmed' %}background: linear-gradient(135deg, #d1fae5, #ecfdf5);{% elif booking.status == 'Pending' %}background: linear-gradient(135deg, #fef3c7, #fff7ed);{% elif booking.status == 'Trip_Completed' %}background: linear-gradient(135deg, #dbeafe, #eff6ff);{% else %}background: linear-gradient(135deg, #fee2e2, #fef2f2);{% endif %}">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
+    <div class="status-banner-content" style="display: flex; align-items: center; justify-content: space-between;">
         <div>
             <span class="badge badge-{{ booking.status|lower }}" style="font-size: 12px; padding: 6px 14px;">
                 {{ booking.get_status_display }}
@@ -131,7 +200,7 @@
                 </div>
 
                 <!-- Trip Details -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="trip-details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div>
                         <p style="font-size: 13px; color: #64748b; margin-bottom: 4px; font-weight: 600;">PICKUP DATE & TIME</p>
                         <p style="font-weight: 600; color: var(--dark);">{{ booking.pick_up_date|date:"M d, Y" }}</p>
@@ -325,7 +394,7 @@
             </div>
 
             <div style="background: var(--light); padding: 16px; border-radius: 8px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
+                <div class="linked-booking-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
                     <div>
                         <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Date & Time</p>
                         <p style="font-weight: 600;">{{ linked_booking.pick_up_date|date:"M d, Y" }} at {{ linked_booking.pick_up_time|time:"g:i A" }}</p>
@@ -335,11 +404,10 @@
                         <span class="badge badge-{{ linked_booking.status|lower }}">{{ linked_booking.get_status_display }}</span>
                     </div>
                 </div>
-                <div style="margin-bottom: 12px;">
-                    <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Route</p>
+                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Route</p>
                     <p style="font-weight: 500;">{{ linked_booking.pick_up_address }} → {{ linked_booking.drop_off_address }}</p>
                 </div>
-                <div style="display: flex; gap: 12px;">
+                <div class="button-group" style="display: flex; gap: 12px;">
                     <a href="{% url 'reservation_detail' linked_booking.id %}" style="color: var(--primary); text-decoration: none; font-weight: 500; font-size: 14px;">View Full Details →</a>
                 </div>
             </div>
