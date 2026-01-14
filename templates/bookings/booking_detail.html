@@ -40,9 +40,10 @@
             Back to Dashboard
         </a>
         <h1 style="font-size: 24px; font-weight: 700; color: var(--dark); margin: 0;">Reservation Details</h1>
-        {% if booking.trip_label %}
-        <p style="color: #64748b; margin-top: 4px;">{{ booking.trip_label }} Trip</p>
-        {% endif %}
+        <p style="color: #64748b; margin-top: 4px;">
+            {% if booking.trip_label %}{{ booking.trip_label }} - {% endif %}Trip #{{ booking.id }}
+            {% if booking.booking_reference %} • {{ booking.booking_reference }}{% endif %}
+        </p>
     </div>
     <div style="display: flex; gap: 12px;">
         {% if booking.status != 'Cancelled' and booking.status != 'Cancelled_Full_Charge' %}
@@ -197,13 +198,13 @@
                 </div>
 
                 <!-- Additional Details -->
-                {% if booking.flight_number or booking.hours_booked or booking.notes %}
+                {% if booking.flight_number or booking.notes or booking.trip_type == 'Hourly' %}
                 <div>
                     <p style="font-size: 13px; color: #64748b; margin-bottom: 8px; font-weight: 600;">ADDITIONAL DETAILS</p>
                     {% if booking.flight_number %}
                     <p style="margin-bottom: 8px;"><strong>Flight Number:</strong> {{ booking.flight_number }}</p>
                     {% endif %}
-                    {% if booking.hours_booked %}
+                    {% if booking.hours_booked and booking.trip_type == 'Hourly' %}
                     <p style="margin-bottom: 8px;"><strong>Hours Booked:</strong> {{ booking.hours_booked }} hours</p>
                     {% endif %}
                     {% if booking.notes %}
@@ -319,7 +320,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
                     </div>
-                    <h2 class="card-title" style="margin: 0;">Linked {{ linked_booking.trip_label }} Trip</h2>
+                    <h2 class="card-title" style="margin: 0;">{{ linked_booking.trip_label }} (Trip #{{ linked_booking.id }}) - {{ linked_booking.pick_up_date|date:"M d, Y" }}</h2>
                 </div>
             </div>
 
@@ -351,7 +352,7 @@
     <div>
         <!-- Booking Info -->
         <div class="card" style="margin-bottom: 24px;">
-            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--dark);">Booking Information</h3>
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--dark);">Reservation Information</h3>
             <div style="display: grid; gap: 12px;">
                 {% if booking.booking_reference %}
                 <div>
@@ -366,10 +367,12 @@
                 <div>
                     <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Created</p>
                     <p style="font-weight: 500; color: var(--dark);">{{ booking.created_at|date:"M d, Y g:i A" }}</p>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 2px;">{{ booking.created_at|timesince }} ago</p>
                 </div>
                 <div>
                     <p style="font-size: 13px; color: #64748b; margin-bottom: 4px;">Last Updated</p>
                     <p style="font-weight: 500; color: var(--dark);">{{ booking.updated_at|date:"M d, Y g:i A" }}</p>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 2px;">{{ booking.updated_at|timesince }} ago</p>
                 </div>
                 {% if is_admin %}
                 <div>
