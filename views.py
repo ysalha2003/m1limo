@@ -509,7 +509,7 @@ def new_booking(request):
                     created_by=request.user
                 )
 
-                return redirect('booking_confirmation', booking_id=booking.id)
+                return redirect('reservation_confirmation', booking_id=booking.id)
                 
             except ValidationError as e:
                 logger.error(f"Validation error creating booking: {e}")
@@ -873,7 +873,7 @@ def rebook_booking(request, booking_id):
                     created_by=request.user
                 )
                 messages.success(request, f"Booking #{new_booking.id} created successfully based on previous trip!")
-                return redirect('booking_confirmation', booking_id=new_booking.id)
+                return redirect('reservation_confirmation', booking_id=new_booking.id)
             except Exception as e:
                 logger.error(f"Error rebooking trip: {e}")
                 messages.error(request, str(e))

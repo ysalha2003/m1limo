@@ -590,7 +590,7 @@
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
         <h2 style="font-size: 18px; font-weight: 700; margin: 0; color: var(--dark);">
-            {% if is_admin %}All Bookings{% else %}Your Bookings{% endif %}
+            {% if is_admin %}All Reservations{% else %}Your Reservations{% endif %}
         </h2>
         <a href="{% url 'new_reservation' %}" class="btn btn-primary">+ New Reservation</a>
     </div>
@@ -600,7 +600,7 @@
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
             <div class="form-group" style="margin: 0;">
                 <label class="form-label">Search</label>
-                <input type="text" name="search" class="form-input" placeholder="Booking ID, Name, Phone, or Reference Number" value="{{ request.GET.search }}" style="margin: 0;">
+                <input type="text" name="search" class="form-input" placeholder="Reservation ID, Name, Phone, or Reference Number" value="{{ request.GET.search }}" style="margin: 0;">
             </div>
 
             <div class="form-group" style="margin: 0;">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M1 Limousine - Booking Update</title>
+    <title>M1 Limousine - Reservation Update</title>
     <style>
         body {
             font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -126,13 +126,13 @@
             </div>
             <h1>
                 {% if notification_type == 'new' %}
-                    Booking Requested
+                    Reservation Requested
                 {% elif notification_type == 'confirmed' %}
-                    Booking Confirmed
+                    Reservation Confirmed
                 {% elif notification_type == 'cancelled' %}
-                    Booking Cancelled
+                    Reservation Cancelled
                 {% else %}
-                    Booking Updated
+                    Reservation Updated
                 {% endif %}
             </h1>
             <p>M1 Limousine Service</p>
@@ -150,7 +150,7 @@
         </div>
 
         <div class="content">
-            <p class="booking-ref">Booking Reference: <strong>#{{ booking.id }}</strong></p>
+            <p class="booking-ref">Reservation Reference: <strong>#{{ booking.id }}</strong></p>
 
             <div class="date-time">
                 {{ booking.pick_up_date|date:"M j, Y" }} at {{ booking.pick_up_time }}
@@ -158,13 +158,13 @@
 
             <p class="message">
                 {% if notification_type == 'new' %}
-                    Your trip request has been received. We'll confirm your booking shortly.
+                    Your trip request has been received. We'll confirm your reservation shortly.
                 {% elif notification_type == 'confirmed' %}
                     Your trip is confirmed. We look forward to serving you!
                 {% elif notification_type == 'cancelled' %}
                     Your trip has been cancelled.
                 {% else %}
-                    Your booking status has been updated.
+                    Your reservation status has been updated.
                 {% endif %}
             </p>
 

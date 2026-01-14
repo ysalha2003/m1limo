@@ -1,6 +1,6 @@
 ﻿{% extends "base.html" %}
 
-{% block title %}Booking Confirmed - M1 Limousine Service{% endblock %}
+{% block title %}Reservation Confirmed - M1 Limousine Service{% endblock %}
 
 {% block content %}
 
@@ -14,22 +14,22 @@
         </div>
         <h1 style="font-size: 32px; font-weight: 700; color: var(--dark); margin-bottom: 12px;">
             {% if booking.status == 'Confirmed' %}
-            Booking Confirmed!
+            Reservation Confirmed!
             {% else %}
-            Booking Request Submitted!
+            Reservation Request Submitted!
             {% endif %}
         </h1>
         <p style="font-size: 16px; color: #64748b; margin-bottom: 24px;">
             {% if booking.status == 'Confirmed' %}
             Your reservation has been confirmed. We'll send you a reminder before your pickup.
             {% else %}
-            We've received your booking request and will confirm it shortly.
+            We've received your reservation request and will confirm it shortly.
             {% endif %}
         </p>
 
         {% if booking.booking_reference %}
         <div style="background: linear-gradient(135deg, #fef3c7, #fff7ed); padding: 20px; border-radius: 12px; border: 2px solid var(--primary); margin-bottom: 32px;">
-            <p style="font-size: 13px; color: #92400e; margin-bottom: 8px; font-weight: 600;">YOUR BOOKING REFERENCE</p>
+            <p style="font-size: 13px; color: #92400e; margin-bottom: 8px; font-weight: 600;">YOUR RESERVATION REFERENCE</p>
             <p style="font-size: 32px; font-weight: 700; color: var(--primary); letter-spacing: 2px;">{{ booking.booking_reference }}</p>
             <p style="font-size: 13px; color: #92400e; margin-top: 8px;">Save this number for future reference</p>
         </div>
@@ -139,7 +139,7 @@
                 </div>
                 <div>
                     <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Awaiting Confirmation</p>
-                    <p style="color: #475569; font-size: 14px;">Our team will review and confirm your booking shortly.</p>
+                    <p style="color: #475569; font-size: 14px;">Our team will review and confirm your reservation shortly.</p>
                 </div>
             </div>
             <div style="display: flex; gap: 12px;">
@@ -148,7 +148,7 @@
                 </div>
                 <div style="flex: 1;">
                     <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Email Notification</p>
-                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">You'll receive an email once your booking is confirmed.</p>
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">You'll receive an email once your reservation is confirmed.</p>
                     {% if notification_recipients %}
                     <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #3b82f6;">
                         <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Will be sent to:</p>
@@ -187,7 +187,7 @@
                 </div>
                 <div style="flex: 1;">
                     <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Confirmation Email Sent</p>
-                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">Check your email for booking details and confirmation.</p>
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">Check your email for reservation details and confirmation.</p>
                     {% if notification_recipients %}
                     <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #10b981;">
                         <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Sent to:</p>

@@ -604,12 +604,11 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 style="font-size: 16px; font-weight: 600; margin: 0;">Create Booking for Customer</h3>
+                        <h3 style="font-size: 16px; font-weight: 600; margin: 0;">Select a Customer to Create Reservation (Optional)</h3>
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" for="id_booking_for_user" style="color: white; opacity: 0.95;">{{ form.booking_for_user.label }}</label>
                     {{ form.booking_for_user }}
                     {% if form.booking_for_user.errors %}
                         <div class="form-error" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3);">{{ form.booking_for_user.errors.0 }}</div>

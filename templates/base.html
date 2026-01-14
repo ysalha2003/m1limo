@@ -1440,7 +1440,7 @@
 
                         <div class="activity-dropdown" id="bookingsDropdown">
                             <div class="activity-header">
-                                <h3>My Bookings</h3>
+                                <h3>My Reservations</h3>
                                 <a href="{% url 'dashboard' %}" class="view-all-link">View All</a>
                             </div>
 
@@ -1501,7 +1501,7 @@
                                         <svg style="width: 32px; height: 32px; color: var(--color-gray-400);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                         </svg>
-                                        <p>No bookings yet</p>
+                                        <p>No reservations yet</p>
                                         <a href="{% url 'new_reservation' %}" class="btn btn-primary" style="margin-top: 12px; font-size: 12px; padding: 8px 16px;">Create Reservation</a>
                                     </div>
                                 {% endif %}
@@ -1524,7 +1524,7 @@
 
                             <div class="activity-dropdown" id="activityDropdown">
                                 <div class="activity-header">
-                                    <h3>Recent Booking Activity</h3>
+                                    <h3>Recent Reservation Activity</h3>
                                     <a href="{% url 'dashboard' %}#activity" class="view-all-link">View All</a>
                                 </div>
 
@@ -1553,7 +1553,7 @@
                                             </div>
                                             <div class="activity-content">
                                                 <div class="activity-text">
-                                                    <strong>Booking #{{ activity.booking.id }}</strong>
+                                                    <strong>Reservation #{{ activity.booking.id }}</strong>
                                                     <span class="activity-action-text">
                                                         {% if activity.action == 'created' %}created
                                                         {% elif activity.action == 'status_changed' %}status changed

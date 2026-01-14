@@ -12,11 +12,11 @@
         </div>
 
         <h1 class="card-title" style="margin-bottom: 12px;">
-            {% if is_round_trip %}Cancel Booking{% else %}Cancel Trip{% endif %}
+            {% if is_round_trip %}Cancel Reservation{% else %}Cancel Trip{% endif %}
         </h1>
         <p style="color: #64748b; margin-bottom: 32px;">
             {% if is_round_trip %}
-                Choose whether to cancel the entire round trip booking or just this specific trip.
+                Choose whether to cancel the entire round trip reservation or just this specific trip.
             {% else %}
                 Are you sure you want to cancel this trip? This action cannot be undone.
             {% endif %}
@@ -108,7 +108,7 @@
                 {% if is_admin %}
                 <p style="color: #92400e; font-weight: 600; margin-bottom: 4px; font-size: 14px;">Admin Cancellation Notice</p>
                 <p style="color: #78350f; font-size: 13px; margin-bottom: 8px;">
-                    You are cancelling this booking as an administrator. The customer will be notified of this cancellation.
+                    You are cancelling this reservation as an administrator. The customer will be notified of this cancellation.
                 </p>
                 {% if booking.hours_until_pickup %}
                 <p style="color: #78350f; font-size: 13px; margin-bottom: 4px;">
@@ -117,7 +117,7 @@
                 {% with can_cancel_info=booking.can_cancel_formatted %}
                 {% if can_cancel_info.1 %}
                 <p style="color: #78350f; font-size: 13px;">
-                    <strong>Note:</strong> This cancellation is {% if booking.status == 'Confirmed' %}less than 2 hours{% else %}less than 4 hours{% endif %} before pickup. The booking will be marked with full charges.
+                    <strong>Note:</strong> This cancellation is {% if booking.status == 'Confirmed' %}less than 2 hours{% else %}less than 4 hours{% endif %} before pickup. The reservation will be marked with full charges.
                 </p>
                 {% else %}
                 <p style="color: #78350f; font-size: 13px;">
@@ -129,7 +129,7 @@
                 {% else %}
                 <p style="color: #92400e; font-weight: 600; margin-bottom: 4px; font-size: 14px;">Cancellation Policy</p>
                 <p style="color: #78350f; font-size: 13px; margin-bottom: 8px;">
-                    Cancellations of {% if booking.status == 'Confirmed' %}confirmed bookings made less than 2 hours{% else %}pending bookings made less than 4 hours{% endif %} before pickup time will incur full charges.
+                    Cancellations of {% if booking.status == 'Confirmed' %}confirmed reservations made less than 2 hours{% else %}pending reservations made less than 4 hours{% endif %} before pickup time will incur full charges.
                 </p>
                 {% if booking.hours_until_pickup %}
                 <p style="color: #78350f; font-size: 13px;">
@@ -154,7 +154,7 @@
                 <div style="display: flex; align-items: start; gap: 12px;">
                     <input type="radio" name="cancel_type" value="entire" checked style="margin-top: 4px;">
                     <div>
-                        <div style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Cancel Entire Round Trip Booking</div>
+                        <div style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Cancel Entire Round Trip Reservation</div>
                         <div style="font-size: 13px; color: #64748b;">Cancel both trips: #{{ booking.id }} and #{{ linked_booking.id }} (recommended)</div>
                     </div>
                 </div>
