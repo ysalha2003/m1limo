@@ -6,6 +6,7 @@ import views
 urlpatterns = [
     # Custom admin views (must come before Django admin to avoid conflicts)
     path('admin/past-confirmed-trips/', views.past_confirmed_trips, name='past_confirmed_trips'),
+    path('admin/confirm-trip-action/<int:booking_id>/<str:action>/', views.confirm_trip_action, name='confirm_trip_action'),
     
     # Django admin
     path('admin/', admin.site.urls),

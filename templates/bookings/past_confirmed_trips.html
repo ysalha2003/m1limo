@@ -289,25 +289,19 @@
             </div>
 
             <div class="action-buttons">
-                <form method="post" action="{% url 'booking_actions' booking.id 'complete' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-action btn-complete" onclick="return confirm('Mark this trip as completed?')">
-                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        Mark as Completed
-                    </button>
-                </form>
+                <a href="{% url 'confirm_trip_action' booking.id 'complete' %}?next=past_confirmed_trips" class="btn-action btn-complete">
+                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Mark as Completed
+                </a>
                 
-                <form method="post" action="{% url 'booking_actions' booking.id 'no_show' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-action btn-no-show" onclick="return confirm('Mark this trip as customer no-show?')">
-                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                        Customer No-Show
-                    </button>
-                </form>
+                <a href="{% url 'confirm_trip_action' booking.id 'no_show' %}?next=past_confirmed_trips" class="btn-action btn-no-show">
+                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Customer No-Show
+                </a>
 
                 <a href="{% url 'booking_detail' booking.id %}" class="btn-action btn-view">
                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">

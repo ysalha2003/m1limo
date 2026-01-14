@@ -1073,6 +1073,12 @@ def booking_actions(request, booking_id, action):
             else:
                 BookingService.update_booking_status(booking, 'Trip_Completed', changed_by=request.user)
                 messages.success(request, "Trip marked as completed.")
+        elif action == 'no_show':
+            BookingService.update_booking_status(booking, 'Customer_No_Show', changed_by=request.user)
+            messages.success(request, "Trip marked as customer no-show.")
+        elif action == 'cancel':
+            BookingService.update_booking_status(booking, 'Cancelled', changed_by=request.user)
+            messages.success(request, "Trip marked as cancelled.")
         elif action == 'resend_notification':
             notification_type = request.GET.get('type', 'new')
             NotificationService.resend_notification(booking, notification_type)
@@ -1085,6 +1091,10 @@ def booking_actions(request, booking_id, action):
         logger.error(f"Error performing action {action}: {e}")
         messages.error(request, str(e))
 
+    # Return to referring page if from past_confirmed_trips
+    next_url = request.GET.get('next')
+    if next_url == 'past_confirmed_trips':
+        return redirect('past_confirmed_trips')
     return redirect('dashboard')
 
 
@@ -1993,5 +2003,73 @@ def past_confirmed_trips(request):
     }
     
     return render(request, 'bookings/past_confirmed_trips.html', context)
+
+
+@staff_member_required
+def confirm_trip_action(request, booking_id, action):
+    """
+    Page-based confirmation for trip status changes from past_confirmed_trips page.
+    Shows confirmation page on GET, processes action on POST.
+    """
+    booking = get_object_or_404(Booking, id=booking_id)
+    next_url = request.GET.get('next', 'dashboard')
+    
+    # Define action details for confirmation page
+    action_details = {
+        'complete': {
+            'title': 'Mark Trip as Completed',
+            'description': 'Mark this trip as successfully completed.',
+            'icon': '✅',
+            'btn_class': 'success',
+            'status': 'Trip_Completed',
+            'message': 'Trip marked as completed successfully.'
+        },
+        'no_show': {
+            'title': 'Mark as Customer No-Show',
+            'description': 'Mark this trip as customer no-show. The customer did not appear at the pickup location.',
+            'icon': '❌',
+            'btn_class': 'danger',
+            'status': 'Customer_No_Show',
+            'message': 'Trip marked as customer no-show.'
+        },
+        'cancel': {
+            'title': 'Cancel Trip',
+            'description': 'Cancel this trip permanently.',
+            'icon': '🚫',
+            'btn_class': 'danger',
+            'status': 'Cancelled',
+            'message': 'Trip cancelled successfully.'
+        }
+    }
+    
+    if action not in action_details:
+        messages.error(request, "Invalid action.")
+        return redirect('past_confirmed_trips' if next_url == 'past_confirmed_trips' else 'dashboard')
+    
+    details = action_details[action]
+    
+    if request.method == 'POST':
+        # User confirmed the action
+        try:
+            BookingService.update_booking_status(booking, details['status'], changed_by=request.user)
+            messages.success(request, details['message'])
+        except Exception as e:
+            logger.error(f"Error updating booking {booking_id} to {details['status']}: {e}")
+            messages.error(request, f"Error: {str(e)}")
+        
+        # Redirect back to referring page
+        if next_url == 'past_confirmed_trips':
+            return redirect('past_confirmed_trips')
+        return redirect('dashboard')
+    
+    # GET request - show confirmation page
+    context = {
+        'booking': booking,
+        'action': action,
+        'action_details': details,
+        'next_url': next_url,
+    }
+    
+    return render(request, 'bookings/confirm_trip_action.html', context)
 
 
