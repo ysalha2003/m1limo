@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Booking Confirmed - M1 Limousine Service{% endblock %}
 
@@ -225,9 +225,9 @@
 
     <!-- Action Buttons -->
     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-        <a href="{% url 'booking_detail' booking.id %}" class="btn btn-primary" style="flex: 1 1 auto; min-width: 200px;">View Full Details</a>
+        <a href="{% url 'reservation_detail' booking.id %}" class="btn btn-primary" style="flex: 1 1 auto; min-width: 200px;">View Full Details</a>
         <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="flex: 1 1 auto; min-width: 200px;">Go to Dashboard</a>
-        <a href="{% url 'new_booking' %}" class="btn btn-secondary" style="flex: 1 1 auto; min-width: 200px;">Book Another Trip</a>
+        <a href="{% url 'new_reservation' %}" class="btn btn-secondary" style="flex: 1 1 auto; min-width: 200px;">Book Another Reservation</a>
     </div>
 </div>
 

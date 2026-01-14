@@ -399,12 +399,6 @@ def dashboard(request):
             status='Pending'
         ).filter(past_filter).count()
 
-        # Get complete booking history for admins (full audit trail)
-        context['booking_history'] = BookingHistory.objects.select_related(
-            'booking',
-            'booking__user',
-            'changed_by'
-        ).order_by('-changed_at')[:50]
     else:
         # Calculate upcoming trips for user (Confirmed bookings with future datetime)
         from django.db.models import Q
@@ -2193,3 +2187,61 @@ def confirm_pending_action(request, booking_id, action):
     }
     
     return render(request, 'bookings/confirm_pending_action.html', context)
+
+@staff_member_required
+def booking_activity(request):
+    """
+    Admin view for complete booking audit trail.
+    Shows all booking changes with filtering and pagination.
+    """
+    from django.core.paginator import Paginator
+    
+    # Get all booking history
+    history_qs = BookingHistory.objects.select_related(
+        'booking',
+        'booking__user',
+        'changed_by'
+    ).order_by('-changed_at')
+    
+    # Optional filtering by action type
+    action_filter = request.GET.get('action')
+    if action_filter and action_filter != 'all':
+        history_qs = history_qs.filter(action=action_filter)
+    
+    # Optional filtering by date range
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    if date_from:
+        from datetime import datetime
+        try:
+            date_from_obj = datetime.strptime(date_from, '%Y-%m-%d').date()
+            history_qs = history_qs.filter(changed_at__date__gte=date_from_obj)
+        except ValueError:
+            pass
+    if date_to:
+        from datetime import datetime
+        try:
+            date_to_obj = datetime.strptime(date_to, '%Y-%m-%d').date()
+            history_qs = history_qs.filter(changed_at__date__lte=date_to_obj)
+        except ValueError:
+            pass
+    
+    # Pagination
+    paginator = Paginator(history_qs, 50)  # 50 per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    # Get unique action types for filter dropdown, sorted alphabetically
+    action_types = sorted(set(BookingHistory.objects.values_list('action', flat=True)))
+    
+    context = {
+        'page_obj': page_obj,
+        'booking_history': page_obj.object_list,
+        'action_filter': action_filter,
+        'action_types': action_types,
+        'date_from': date_from,
+        'date_to': date_to,
+        'total_count': history_qs.count(),
+    }
+    
+    return render(request, 'bookings/booking_activity.html', context)

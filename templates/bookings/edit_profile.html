@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load humanize %}
 
 {% block title %}Account Settings - M1 Limousine Service{% endblock %}
@@ -357,7 +357,7 @@
                                         <span class="badge badge-{{ booking.status|lower }}">{{ booking.get_status_display }}</span>
                                     </div>
                                     <div style="padding-top: 12px; border-top: 1px solid var(--border-light);">
-                                        <a href="{% url 'booking_detail' booking.id %}" class="action-link">View Details →</a>
+                                        <a href="{% url 'reservation_detail' booking.id %}" class="action-link">View Details →</a>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -385,7 +385,7 @@
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <span class="badge badge-{{ booking.status|lower }}" style="font-size: 11px; padding: 4px 10px;">{{ booking.get_status_display }}</span>
-                                        <a href="{% url 'booking_detail' booking.id %}" class="action-link" style="font-size: 12px; white-space: nowrap;">View</a>
+                                        <a href="{% url 'reservation_detail' booking.id %}" class="action-link" style="font-size: 12px; white-space: nowrap;">View</a>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -409,7 +409,7 @@
                                     </svg>
                                 </div>
                                 <p style="color: var(--text-secondary); margin-bottom: 16px;">No booking history yet</p>
-                                <a href="{% url 'new_booking' %}" class="btn btn-primary">Create Your First Booking</a>
+                                <a href="{% url 'new_reservation' %}" class="btn btn-primary">Create Your First Reservation</a>
                             </div>
                             {% endif %}
                         </div>

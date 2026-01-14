@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}{{ driver.full_name }}'s Assignments{% endblock %}
 
@@ -167,7 +167,7 @@
                 <tbody>
                     {% for trip in trips %}
                     <tr>
-                        <td><a href="{% url 'booking_detail' trip.id %}" class="trip-number">#{{ trip.id }}</a></td>
+                        <td><a href="{% url 'reservation_detail' trip.id %}" class="trip-number">#{{ trip.id }}</a></td>
                         <td>
                             <div style="font-weight: 600; color: var(--dark);">{{ trip.pick_up_date|date:"M d, Y" }}</div>
                             <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">{{ trip.pick_up_time|time:"g:i A" }}</div>
@@ -201,7 +201,7 @@
                         </td>
                         <td>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <a href="{% url 'booking_detail' trip.id %}" class="btn btn-secondary" style="font-size: 13px; padding: 6px 14px;">View</a>
+                                <a href="{% url 'reservation_detail' trip.id %}" class="btn btn-secondary" style="font-size: 13px; padding: 6px 14px;">View</a>
                                 {% if trip.driver_response_status == 'completed' and trip.driver_payment_amount and not trip.driver_paid %}
                                     <a href="{% url 'mark_driver_paid' trip.id %}" class="btn btn-primary" style="font-size: 13px; padding: 6px 14px; white-space: nowrap;">Mark Paid</a>
                                 {% endif %}

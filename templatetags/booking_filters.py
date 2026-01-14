@@ -130,6 +130,16 @@ def hours_until_pickup(booking):
 
 
 @register.filter
+def format_action_name(value):
+    """
+    Format action names to be human-readable
+    Converts 'Driver_Assigned' to 'Driver Assigned'
+    """
+    if not value:
+        return value
+    return value.replace('_', ' ').title()
+
+@register.filter
 def format_time_until_pickup(booking):
     """
     Format time until pickup as weeks, days, hours

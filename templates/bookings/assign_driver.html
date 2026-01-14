@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Manage Driver Assignment - M1 Limousine Service{% endblock %}
 
@@ -246,7 +246,7 @@
 {% block content %}
 <div class="assignment-layout">
     <!-- Back Navigation -->
-    <a href="{% url 'booking_detail' booking.id %}" class="back-link">
+    <a href="{% url 'reservation_detail' booking.id %}" class="back-link">
         <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>

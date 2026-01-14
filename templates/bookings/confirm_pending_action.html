@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}{{ action_details.title }} - Confirm Action{% endblock %}
 
@@ -235,7 +235,7 @@
                 Yes, Confirm
             </button>
             
-            <a href="{% if next_url == 'past_pending_trips' %}{% url 'past_pending_trips' %}{% else %}{% url 'dashboard' %}{% endif %}" class="btn-confirm btn-confirm-no">
+            <a href="{% if next_url == 'past_pending_trips' %}{% url 'past_pending_reservations' %}{% else %}{% url 'dashboard' %}{% endif %}" class="btn-confirm btn-confirm-no">
                 <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -245,7 +245,7 @@
     </form>
 
     <p style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-secondary);">
-        Need more information? <a href="{% url 'booking_detail' booking.id %}" style="color: var(--primary); font-weight: 600;">View full trip details</a>
+        Need more information? <a href="{% url 'reservation_detail' booking.id %}" style="color: var(--primary); font-weight: 600;">View full trip details</a>
     </p>
 </div>
 {% endblock %}

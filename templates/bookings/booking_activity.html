@@ -1,0 +1,422 @@
+﻿{% extends "base.html" %}
+{% load booking_filters %}
+
+{% block title %}Reservation Activity Log - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filters-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(4, 8, 20, 0.08);
+        border: 1px solid var(--border);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--dark);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-input {
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .activity-header {
+        background: white;
+        border-radius: 12px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(4, 8, 20, 0.08);
+        border: 1px solid var(--border);
+    }
+
+    .stats-grid {
+        display: flex;
+        gap: 24px;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-light);
+    }
+
+    .stat-card {
+        flex: 1;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 8px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .activity-table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(4, 8, 20, 0.08);
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        padding: 24px;
+        background: #f8fafc;
+        border-top: 1px solid var(--border-light);
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: var(--dark);
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .pagination a {
+        background: white;
+        border: 1px solid var(--border);
+    }
+
+    .pagination a:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .pagination .current {
+        background: var(--primary);
+        color: white;
+        border: 1px solid var(--primary);
+    }
+
+    .pagination .disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1400px; margin: 0 auto;">
+    <div class="activity-header">
+        <div style="text-align: center; margin-bottom: 8px;">
+            <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 8px 0; color: var(--dark);">Reservation Activity Log</h1>
+            <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">Complete audit trail of all reservation changes and updates</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_count|default:0 }}</div>
+                <div class="stat-label">Total Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ page_obj.paginator.num_pages|default:0 }}</div>
+                <div class="stat-label">Pages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ page_obj.object_list|length }}</div>
+                <div class="stat-label">Current Page</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-card">
+        <h3 style="font-size: 16px; font-weight: 700; margin: 0 0 16px 0; color: var(--dark);">
+            <svg style="width: 18px; height: 18px; vertical-align: middle; margin-right: 6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+            </svg>
+            Filters
+        </h3>
+        <form method="get" action="{% url 'reservation_activity' %}" id="filterForm">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Action Type</label>
+                    <select name="action" class="filter-input" onchange="document.getElementById('filterForm').submit();">
+                        <option value="all" {% if not action_filter or action_filter == 'all' %}selected{% endif %}>All Actions</option>
+                        {% for action in action_types %}
+                        <option value="{{ action }}" {% if action_filter == action %}selected{% endif %}>
+                            {{ action|format_action_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">From Date</label>
+                    <input type="date" name="date_from" value="{{ date_from }}" class="filter-input">
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">To Date</label>
+                    <input type="date" name="date_to" value="{{ date_to }}" class="filter-input">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button type="submit" class="btn btn-primary">
+                    <svg style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Apply Filters
+                </button>
+                <a href="{% url 'reservation_activity' %}" class="btn btn-secondary">
+                    Clear Filters
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Activity Table -->
+    <div class="activity-table-container">
+        {% if booking_history %}
+        <div style="overflow-x: auto;">
+            <table class="booking-table" style="margin: 0; min-width: 1200px;">
+                <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                    <tr>
+                        <th style="padding: 16px;">Timestamp</th>
+                        <th style="padding: 16px;">Booking</th>
+                        <th style="padding: 16px;">Action</th>
+                        <th style="padding: 16px;">Changed By</th>
+                        <th style="padding: 16px;">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for history in booking_history %}
+                    <tr style="border-bottom: 1px solid var(--border-light);">
+                        <td style="padding: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <span style="font-weight: 600; color: var(--dark); font-size: 13px;">
+                                    {{ history.changed_at|date:"M d, Y" }}
+                                </span>
+                                <span style="color: var(--text-secondary); font-size: 12px;">
+                                    {{ history.changed_at|time:"g:i A" }}
+                                </span>
+                            </div>
+                        </td>
+                        <td style="padding: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <a href="{% url 'reservation_detail' history.booking.id %}" style="color: var(--primary); font-weight: 600; text-decoration: none; font-size: 13px;">
+                                    #{{ history.booking.id }}
+                                </a>
+                                <span style="color: var(--text-secondary); font-size: 12px;">
+                                    {{ history.booking.passenger_name }}
+                                </span>
+                                {% if history.booking.user %}
+                                <span style="color: var(--text-secondary); font-size: 11px;">
+                                    User: {{ history.booking.user.username }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 16px;">
+                            {% if history.action == 'created' %}
+                                <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border-color: rgba(16, 185, 129, 0.2);">
+                                    Created
+                                </span>
+                            {% elif history.action == 'status_changed' %}
+                                <span class="status-badge" style="background: rgba(59, 130, 246, 0.1); color: #2563eb; border-color: rgba(59, 130, 246, 0.2);">
+                                    Status Changed
+                                </span>
+                            {% elif history.action == 'updated' %}
+                                <span class="status-badge" style="background: rgba(245, 158, 11, 0.1); color: #d97706; border-color: rgba(245, 158, 11, 0.2);">
+                                    Updated
+                                </span>
+                            {% elif history.action == 'cancelled' %}
+                                <span class="status-badge" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border-color: rgba(239, 68, 68, 0.2);">
+                                    Cancelled
+                                </span>
+                            {% elif history.action == 'driver_assigned' %}
+                                <span class="status-badge" style="background: rgba(99, 102, 241, 0.1); color: #4f46e5; border-color: rgba(99, 102, 241, 0.2);">
+                                    Driver Assigned
+                                </span>
+                            {% elif history.action == 'driver_rejected' %}
+                                <span class="status-badge" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border-color: rgba(239, 68, 68, 0.2);">
+                                    Driver Rejected
+                                </span>
+                            {% elif history.action == 'driver_completed' %}
+                                <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border-color: rgba(16, 185, 129, 0.2);">
+                                    Trip Completed
+                                </span>
+                            {% else %}
+                                <span class="status-badge" style="background: rgba(107, 114, 128, 0.1); color: #4b5563; border-color: rgba(107, 114, 128, 0.2);">
+                                    {{ history.action|format_action_name }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 16px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                {% if history.action == 'driver_assigned' or history.action == 'driver_rejected' or history.action == 'driver_completed' %}
+                                    {% if history.changed_by %}
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6d6d6d 0%, #949394 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">
+                                            {{ history.changed_by.username.0|upper }}
+                                        </div>
+                                        <span style="font-weight: 500; color: var(--dark); font-size: 13px;">
+                                            {{ history.changed_by.username }}
+                                        </span>
+                                    {% else %}
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">
+                                            D
+                                        </div>
+                                        <span style="font-weight: 500; color: var(--dark); font-size: 13px;">
+                                            Driver
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                    {% if history.changed_by %}
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6d6d6d 0%, #949394 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">
+                                            {{ history.changed_by.username.0|upper }}
+                                        </div>
+                                        <span style="font-weight: 500; color: var(--dark); font-size: 13px;">
+                                            {{ history.changed_by.username }}
+                                        </span>
+                                    {% else %}
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">
+                                            S
+                                        </div>
+                                        <span style="font-weight: 500; color: var(--dark); font-size: 13px;">
+                                            System
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 16px;">
+                            {% if history.changes %}
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                {% for field in history.get_changed_fields %}
+                                {% with change_data=history|get_field_change:field %}
+                                <div style="background: rgba(248, 250, 252, 1); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(226, 232, 240, 1);">
+                                    <div style="font-weight: 600; color: #2563eb; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        {{ field|format_field_name }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; flex-wrap: wrap;">
+                                        <span style="color: #dc2626; background: rgba(220, 38, 38, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; word-break: break-word;">
+                                            {{ change_data.old|default:"(empty)" }}
+                                        </span>
+                                        <svg style="width: 12px; height: 12px; color: var(--text-secondary); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                        </svg>
+                                        <span style="color: #059669; background: rgba(5, 150, 105, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; word-break: break-word;">
+                                            {{ change_data.new|default:"(empty)" }}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% endwith %}
+                                {% endfor %}
+                            </div>
+                            {% elif history.change_reason %}
+                            <div style="background: rgba(248, 250, 252, 1); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(226, 232, 240, 1);">
+                                <span style="color: var(--dark); font-size: 12px;">{{ history.change_reason }}</span>
+                            </div>
+                            {% else %}
+                            <span style="color: var(--text-secondary); font-size: 12px;">Initial creation</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                    « First
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                    ‹ Previous
+                </a>
+            {% else %}
+                <span class="disabled">« First</span>
+                <span class="disabled">‹ Previous</span>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                    Next ›
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                    Last »
+                </a>
+            {% else %}
+                <span class="disabled">Next ›</span>
+                <span class="disabled">Last »</span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div style="padding: 60px 20px; text-align: center;">
+            <svg style="width: 64px; height: 64px; color: var(--text-secondary); margin-bottom: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 style="font-size: 18px; font-weight: 600; color: var(--dark); margin-bottom: 8px;">
+                No Activity Records Found
+            </h3>
+            <p style="color: var(--text-secondary); font-size: 14px; margin: 0;">
+                {% if action_filter or date_from or date_to %}
+                    No activity matches your current filters. Try adjusting the filters or clearing them.
+                {% else %}
+                    No booking activity has been recorded yet.
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 32px; text-align: center;">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

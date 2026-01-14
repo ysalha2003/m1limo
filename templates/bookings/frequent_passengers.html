@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Frequent Passengers - M1 Limousine Service{% endblock %}
 
@@ -129,7 +129,7 @@
                         </div>
 
                         <div style="display: flex; gap: 8px; margin-left: 16px;">
-                            <a href="{% url 'new_booking' %}?passenger={{ passenger.id }}"
+                            <a href="{% url 'new_reservation' %}?passenger={{ passenger.id }}"
                                class="btn btn-primary"
                                style="padding: 8px 16px; font-size: 13px; white-space: nowrap;">
                                 Book Now

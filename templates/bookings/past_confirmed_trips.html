@@ -1,15 +1,15 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
-{% block title %}Past Confirmed Trips - Admin Review{% endblock %}
+{% block title %}Past Confirmed Reservations - Admin Review{% endblock %}
 
 {% block extra_css %}
 <style>
     .alert-warning-header {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 2px solid #f59e0b;
+        background: linear-gradient(135deg, var(--color-warning-light) 0%, #fde68a 100%);
+        border: 2px solid var(--color-warning);
         border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 24px;
+        padding: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
         box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);
     }
 
@@ -22,9 +22,9 @@
     }
 
     .overdue-critical {
-        background: #fee2e2;
+        background: var(--color-error-light);
         color: #991b1b;
-        border: 1px solid #ef4444;
+        border: 1px solid var(--color-error);
     }
 
     .overdue-high {
@@ -34,9 +34,9 @@
     }
 
     .overdue-medium {
-        background: #fef3c7;
+        background: var(--color-warning-light);
         color: #92400e;
-        border: 1px solid #f59e0b;
+        border: 1px solid var(--color-warning);
     }
 
     .trip-card {
@@ -54,7 +54,7 @@
     }
 
     .trip-card.critical {
-        border-left: 4px solid #ef4444;
+        border-left: 4px solid var(--color-error);
     }
 
     .trip-card.high {
@@ -62,7 +62,7 @@
     }
 
     .trip-card.medium {
-        border-left: 4px solid #f59e0b;
+        border-left: 4px solid var(--color-warning);
     }
 
     .trip-header {
@@ -196,10 +196,10 @@
 <div class="container" style="max-width: 1200px; margin: 0 auto;">
     <div style="margin-bottom: 32px;">
         <h1 style="font-size: 28px; font-weight: 700; color: var(--dark); margin-bottom: 8px;">
-            ⚠️ Past Confirmed Trips - Require Action
+            ⚠️ Past Confirmed Reservations - Require Action
         </h1>
         <p style="color: var(--text-secondary); font-size: 15px;">
-            These confirmed trips have passed their pickup time and need manual review. 
+            These confirmed reservations have passed their pickup time and need manual review. 
             Mark them as completed, no-show, or cancelled.
         </p>
     </div>
@@ -207,7 +207,7 @@
     {% if total_count > 0 %}
         <div class="alert-warning-header">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <svg style="width: 24px; height: 24px; color: #f59e0b; flex-shrink: 0;" fill="currentColor" viewBox="0 0 20 20">
+                <svg style="width: 24px; height: 24px; color: var(--color-warning); flex-shrink: 0;" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                 </svg>
                 <div style="flex: 1;">
@@ -215,7 +215,7 @@
                         Action Required
                     </h3>
                     <p style="color: #78350f; font-size: 14px; margin: 0;">
-                        <strong>{{ total_count }}</strong> confirmed trip{{ total_count|pluralize }} with past pickup times found. 
+                        <strong>{{ total_count }}</strong> confirmed reservation{{ total_count|pluralize }} with past pickup times found. 
                         Please review and update their status to maintain accurate records.
                     </p>
                 </div>
@@ -225,7 +225,7 @@
         <div class="stats-row">
             <div class="stat-box">
                 <div class="stat-value">{{ total_count }}</div>
-                <div class="stat-label">Trip{{ total_count|pluralize }} Needing Review</div>
+                <div class="stat-label">Reservation{{ total_count|pluralize }} Needing Review</div>
             </div>
         </div>
 
@@ -234,7 +234,7 @@
             <div class="trip-header">
                 <div>
                     <h3 style="font-size: 18px; font-weight: 700; color: var(--dark); margin: 0 0 8px 0;">
-                        Booking #{{ booking.id }} - {{ booking.passenger_name }}
+                        Reservation #{{ booking.id }} - {{ booking.passenger_name }}
                     </h3>
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <span class="badge badge-confirmed">Confirmed</span>
@@ -289,21 +289,21 @@
             </div>
 
             <div class="action-buttons">
-                <a href="{% url 'confirm_trip_action' booking.id 'complete' %}?next=past_confirmed_trips" class="btn-action btn-complete">
+                <a href="{% url 'confirm_reservation_action' booking.id 'complete' %}?next=past_confirmed_trips" class="btn-action btn-complete">
                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
                     Mark as Completed
                 </a>
                 
-                <a href="{% url 'confirm_trip_action' booking.id 'no_show' %}?next=past_confirmed_trips" class="btn-action btn-no-show">
+                <a href="{% url 'confirm_reservation_action' booking.id 'no_show' %}?next=past_confirmed_trips" class="btn-action btn-no-show">
                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                     Customer No-Show
                 </a>
 
-                <a href="{% url 'booking_detail' booking.id %}" class="btn-action btn-view">
+                <a href="{% url 'reservation_detail' booking.id %}" class="btn-action btn-view">
                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -314,10 +314,10 @@
         </div>
         {% endfor %}
 
-        <div style="margin-top: 24px; padding: 16px; background: var(--info-light); border-radius: 8px; border-left: 4px solid var(--info);">
+        <div style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: var(--info-light); border-radius: 8px; border-left: 4px solid var(--info);">
             <p style="color: #1e40af; font-size: 14px; margin: 0;">
-                <strong>💡 Tip:</strong> Trips are automatically filtered from "Upcoming" once their pickup time passes. 
-                Use this page to clean up past confirmed bookings and maintain accurate trip records.
+                <strong>💡 Tip:</strong> Reservations are automatically filtered from "Upcoming" once their pickup time passes. 
+                Use this page to clean up past confirmed reservations and maintain accurate records.
             </p>
         </div>
 
@@ -330,7 +330,7 @@
                 All Clear! 🎉
             </h3>
             <p style="color: var(--text-secondary); font-size: 15px; margin: 0;">
-                No confirmed trips with past pickup times found. All trips have been properly updated.
+                No confirmed reservations with past pickup times found. All reservations have been properly updated.
             </p>
         </div>
     {% endif %}

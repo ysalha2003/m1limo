@@ -5,10 +5,11 @@ import views
 
 urlpatterns = [
     # Custom admin views (must come before Django admin to avoid conflicts)
-    path('admin/past-confirmed-trips/', views.past_confirmed_trips, name='past_confirmed_trips'),
-    path('admin/confirm-trip-action/<int:booking_id>/<str:action>/', views.confirm_trip_action, name='confirm_trip_action'),
-    path('admin/past-pending-trips/', views.past_pending_trips, name='past_pending_trips'),
+    path('admin/past-confirmed-reservations/', views.past_confirmed_trips, name='past_confirmed_reservations'),
+    path('admin/confirm-reservation-action/<int:booking_id>/<str:action>/', views.confirm_trip_action, name='confirm_reservation_action'),
+    path('admin/past-pending-reservations/', views.past_pending_trips, name='past_pending_reservations'),
     path('admin/confirm-pending-action/<int:booking_id>/<str:action>/', views.confirm_pending_action, name='confirm_pending_action'),
+    path('admin/reservation-activity/', views.booking_activity, name='reservation_activity'),
     
     # Django admin
     path('admin/', admin.site.urls),
@@ -40,22 +41,22 @@ urlpatterns = [
          auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'),
          name='password_reset_complete'),
     
-    # Booking management
-    path('booking/new/', views.new_booking, name='new_booking'),
-    path('booking/<int:booking_id>/', views.booking_detail, name='booking_detail'),
+    # Reservation management
+    path('reservation/new/', views.new_booking, name='new_reservation'),
+    path('reservation/<int:booking_id>/', views.booking_detail, name='reservation_detail'),
     path('activity/<int:activity_id>/', views.view_activity, name='view_activity'),
-    path('my-booking/<int:booking_id>/', views.view_user_booking, name='view_user_booking'),
-    path('booking/<int:booking_id>/confirmation/', views.booking_confirmation, name='booking_confirmation'),
-    path('booking/<int:booking_id>/update/', views.update_booking, name='update_booking'),
-    path('booking/<int:booking_id>/update-round-trip/', views.update_round_trip, name='update_round_trip'),
-    path('booking/<int:booking_id>/rebook/', views.rebook_booking, name='rebook_booking'),
-    path('booking/<int:booking_id>/cancel/', views.cancel_booking, name='cancel_booking'),
-    path('booking/<int:booking_id>/delete/', views.delete_booking, name='delete_booking'),  # Backwards compat
-    path('booking/<int:booking_id>/request-cancellation/',
+    path('my-reservation/<int:booking_id>/', views.view_user_booking, name='view_user_reservation'),
+    path('reservation/<int:booking_id>/confirmation/', views.booking_confirmation, name='reservation_confirmation'),
+    path('reservation/<int:booking_id>/update/', views.update_booking, name='update_reservation'),
+    path('reservation/<int:booking_id>/update-round-trip/', views.update_round_trip, name='update_round_trip'),
+    path('reservation/<int:booking_id>/rebook/', views.rebook_booking, name='rebook_reservation'),
+    path('reservation/<int:booking_id>/cancel/', views.cancel_booking, name='cancel_reservation'),
+    path('reservation/<int:booking_id>/delete/', views.delete_booking, name='delete_reservation'),  # Backwards compat
+    path('reservation/<int:booking_id>/request-cancellation/',
          views.request_cancellation, name='request_cancellation'),
-    path('booking/<int:booking_id>/actions/<str:action>/',
-         views.booking_actions, name='booking_actions'),
-    path('booking/<int:booking_id>/assign-driver/',
+    path('reservation/<int:booking_id>/actions/<str:action>/',
+         views.booking_actions, name='reservation_actions'),
+    path('reservation/<int:booking_id>/assign-driver/',
          views.assign_driver, name='assign_driver'),
 
     # User management
@@ -72,8 +73,8 @@ urlpatterns = [
     path('driver/trips/<str:driver_email>/<str:token>/', views.driver_trips_list, name='driver_trips_list'),
 
     # Driver management (admin only)
-    path('booking/<int:booking_id>/resend-driver-notification/', views.resend_driver_notification, name='resend_driver_notification'),
-    path('booking/<int:booking_id>/mark-driver-paid/', views.mark_driver_paid, name='mark_driver_paid'),
+    path('reservation/<int:booking_id>/resend-driver-notification/', views.resend_driver_notification, name='resend_driver_notification'),
+    path('reservation/<int:booking_id>/mark-driver-paid/', views.mark_driver_paid, name='mark_driver_paid'),
     path('driver-assignments/<int:driver_id>/', views.driver_list_by_driver, name='driver_list_by_driver'),
 
     # Admin utilities

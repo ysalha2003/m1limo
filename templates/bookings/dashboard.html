@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load booking_filters %}
 
 {% block title %}Dashboard - M1 Limousine Service{% endblock %}
@@ -351,11 +351,11 @@
 {% block content %}
 <div class="welcome-banner">
     <h1>{% if is_admin %}Admin Dashboard{% else %}My Dashboard{% endif %}</h1>
-    <p>{% if is_admin %}Manage all bookings and operations{% else %}View and manage your bookings{% endif %}</p>
+    <p>{% if is_admin %}Manage all reservations and operations{% else %}View and manage your reservations{% endif %}</p>
 </div>
 
 {% if is_admin and past_confirmed_count > 0 %}
-<!-- Past Confirmed Trips Alert Banner -->
+<!-- Past Confirmed Reservations Alert Banner -->
 <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);">
     <div style="display: flex; align-items: start; gap: 16px;">
         <div style="flex-shrink: 0; width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -365,17 +365,17 @@
         </div>
         <div style="flex: 1;">
             <h3 style="color: #92400e; font-size: 18px; font-weight: 700; margin: 0 0 8px 0;">
-                ⚠️ {{ past_confirmed_count }} Confirmed Trip{{ past_confirmed_count|pluralize }} Require{{ past_confirmed_count|pluralize:"s," }} Action
+                ⚠️ {{ past_confirmed_count }} Confirmed Reservation{{ past_confirmed_count|pluralize }} Require{{ past_confirmed_count|pluralize:"s," }} Action
             </h3>
             <p style="color: #78350f; font-size: 15px; margin: 0 0 16px 0; line-height: 1.5;">
-                These trips have passed their pickup time and are still marked as "Confirmed". 
+                These reservations have passed their pickup time and are still marked as "Confirmed". 
                 Please review and update their status to Trip Completed, Customer No-Show, or Cancelled.
             </p>
-            <a href="{% url 'past_confirmed_trips' %}" class="btn" style="background: #f59e0b; color: white; font-weight: 600; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);">
+            <a href="{% url 'past_confirmed_reservations' %}" class="btn" style="background: #f59e0b; color: white; font-weight: 600; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);">
                 <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
-                Review {{ past_confirmed_count }} Trip{{ past_confirmed_count|pluralize }}
+                Review {{ past_confirmed_count }} Reservation{{ past_confirmed_count|pluralize }}
             </a>
         </div>
     </div>
@@ -383,7 +383,7 @@
 {% endif %}
 
 {% if is_admin and past_pending_count > 0 %}
-<!-- Past Pending Trips Alert Banner -->
+<!-- Past Pending Reservations Alert Banner -->
 <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);">
     <div style="display: flex; align-items: start; gap: 16px;">
         <div style="flex-shrink: 0; width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -393,13 +393,13 @@
         </div>
         <div style="flex: 1;">
             <h3 style="color: #1e3a8a; font-size: 18px; font-weight: 700; margin: 0 0 8px 0;">
-                🕒 {{ past_pending_count }} Pending Request{{ past_pending_count|pluralize }} Need Review
+                🕒 {{ past_pending_count }} Pending Reservation Request{{ past_pending_count|pluralize }} Need Review
             </h3>
             <p style="color: #1e40af; font-size: 15px; margin: 0 0 16px 0; line-height: 1.5;">
-                These trip requests were never confirmed and have passed their pickup time. 
+                These reservation requests were never confirmed and have passed their pickup time. 
                 Please review and decide: confirm anyway, cancel, or mark as "Trip Not Covered".
             </p>
-            <a href="{% url 'past_pending_trips' %}" class="btn" style="background: #3b82f6; color: white; font-weight: 600; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);">
+            <a href="{% url 'past_pending_reservations' %}" class="btn" style="background: #3b82f6; color: white; font-weight: 600; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);">
                 <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
@@ -415,7 +415,7 @@
     <!-- Stat Cards with Semantic Colors:
          - Warning (Orange): Pending/time-sensitive items
          - Success (Green): Confirmed/successful states
-         - Info (Blue): Upcoming trips
+         - Info (Blue): Upcoming reservations
     -->
     <a href="?status=Pending" class="stat-card {% if request.GET.status == 'Pending' %}active{% endif %}">
         <div style="display: flex; justify-content: space-between; align-items: start;">
@@ -446,13 +446,13 @@
     </a>
 
     {% if next_upcoming_trip %}
-    <a href="{% url 'booking_detail' next_upcoming_trip.id %}" class="stat-card" style="overflow: visible;">
+    <a href="{% url 'reservation_detail' next_upcoming_trip.id %}" class="stat-card" style="overflow: visible;">
     {% else %}
     <a href="#" class="stat-card" style="overflow: visible; cursor: default;">
     {% endif %}
         <div style="display: flex; flex-direction: column; height: 100%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <p class="stat-label" style="margin: 0;">Upcoming Trip</p>
+                <p class="stat-label" style="margin: 0;">Next Reservation</p>
                 <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); width: 40px; height: 40px;">
                     <svg style="width: 22px; height: 22px; color: white; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
@@ -522,7 +522,7 @@
                     <svg style="width: 48px; height: 48px; color: #d1d5db; margin-bottom: 8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    <p class="stat-value" style="color: #9ca3af; font-size: 14px; margin: 0;">No upcoming trips</p>
+                    <p class="stat-value" style="color: #9ca3af; font-size: 14px; margin: 0;">No upcoming reservations</p>
                 </div>
             {% endif %}
         </div>
@@ -573,12 +573,12 @@
             <div class="pickup-actions">
                 {% if is_admin and booking.status == 'Confirmed' %}
                     {% if booking.hours_until_pickup <= 0 %}
-                        <a href="{% url 'booking_actions' booking.id 'complete' %}" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">✓ Complete</a>
+                        <a href="{% url 'reservation_actions' booking.id 'complete' %}" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">✓ Complete</a>
                     {% else %}
                         <span class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px; opacity: 0.5; cursor: not-allowed; pointer-events: none;" title="Cannot complete until after pickup time ({{ booking.time_until_pickup_formatted }} remaining)">✓ Complete</span>
                     {% endif %}
                 {% endif %}
-                <a href="{% url 'booking_detail' booking.id %}" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">View</a>
+                <a href="{% url 'reservation_detail' booking.id %}" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">View</a>
             </div>
         </div>
         {% endfor %}
@@ -592,7 +592,7 @@
         <h2 style="font-size: 18px; font-weight: 700; margin: 0; color: var(--dark);">
             {% if is_admin %}All Bookings{% else %}Your Bookings{% endif %}
         </h2>
-        <a href="{% url 'new_booking' %}" class="btn btn-primary">+ New Booking</a>
+        <a href="{% url 'new_reservation' %}" class="btn btn-primary">+ New Reservation</a>
     </div>
 
     <!-- Search & Filter -->
@@ -781,8 +781,8 @@
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 {% if booking.is_past_trip %}
                                     {# Past trips: Only show View and Rebook #}
-                                    <a href="{% url 'booking_detail' booking.id %}" class="action-link">View</a>
-                                    <a href="{% url 'rebook_booking' booking.id %}" class="action-link" style="color: var(--primary); font-weight: 600;">
+                                    <a href="{% url 'reservation_detail' booking.id %}" class="action-link">View</a>
+                                    <a href="{% url 'rebook_reservation' booking.id %}" class="action-link" style="color: var(--primary); font-weight: 600;">
                                         <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                         </svg>
@@ -798,20 +798,20 @@
                                             Show Return
                                         </button>
                                     {% endif %}
-                                    <a href="{% url 'booking_detail' booking.id %}" class="action-link">View</a>
+                                    <a href="{% url 'reservation_detail' booking.id %}" class="action-link">View</a>
                                     {% if is_admin %}
                                         {% if booking.status == 'Pending' %}
-                                            <a href="{% url 'booking_actions' booking.id 'confirm' %}" class="action-link" style="color: var(--success);">✓ Approve</a>
+                                            <a href="{% url 'reservation_actions' booking.id 'confirm' %}" class="action-link" style="color: var(--success);">✓ Approve</a>
                                         {% elif booking.status == 'Confirmed' %}
                                             {% if booking.hours_until_pickup <= 0 %}
-                                                <a href="{% url 'booking_actions' booking.id 'complete' %}" class="action-link" style="color: var(--primary);">✓ Complete</a>
+                                                <a href="{% url 'reservation_actions' booking.id 'complete' %}" class="action-link" style="color: var(--primary);">✓ Complete</a>
                                             {% else %}
                                                 <span class="action-link" style="color: var(--text-muted); opacity: 0.5; cursor: not-allowed; pointer-events: none;" title="Cannot complete until after pickup time ({{ booking.time_until_pickup_formatted }} remaining)">✓ Complete</span>
                                             {% endif %}
                                         {% endif %}
                                     {% else %}
                                         {% if booking.status in 'Pending,Confirmed' and booking.hours_until_pickup > 2 %}
-                                            <a href="{% url 'update_booking' booking.id %}" class="action-link">Edit</a>
+                                            <a href="{% url 'update_reservation' booking.id %}" class="action-link">Edit</a>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
@@ -866,7 +866,7 @@
                                     <div>
                                         <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">ACTIONS</div>
                                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                            <a href="{% url 'booking_detail' booking.linked_booking.id %}" class="action-link">View</a>
+                                            <a href="{% url 'reservation_detail' booking.linked_booking.id %}" class="action-link">View</a>
                                             {% if is_admin %}
                                                 <a href="{% url 'assign_driver' booking.linked_booking.id %}" class="action-link">Assign Driver</a>
                                             {% endif %}
@@ -904,166 +904,6 @@
             </div>
             <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--dark);">No bookings yet</h3>
         </div>
-    {% endif %}
-
-    {% if is_admin and booking_history %}
-    <div id="activity" style="margin-top: 40px; background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); overflow: hidden; scroll-margin-top: 80px;">
-        <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-bottom: 1px solid var(--border-light);">
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: var(--radius-lg);">
-                    <svg style="width: 24px; height: 24px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h2 style="font-size: 18px; font-weight: 700; margin: 0; color: white;">Recent Booking Activity</h2>
-                    <p style="font-size: 13px; color: rgba(255,255,255,0.8); margin: 4px 0 0 0;">Complete audit trail of all booking changes</p>
-                </div>
-            </div>
-        </div>
-
-        <div style="max-height: 600px; overflow-y: auto;">
-            <table class="booking-table" style="margin: 0;">
-                <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
-                    <tr>
-                        <th style="padding: 16px;">Timestamp</th>
-                        <th style="padding: 16px;">Booking</th>
-                        <th style="padding: 16px;">Action</th>
-                        <th style="padding: 16px;">Changed By</th>
-                        <th style="padding: 16px;">Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for history in booking_history %}
-                    <tr style="border-bottom: 1px solid var(--border-light);">
-                        <td style="padding: 16px;">
-                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                <span style="font-weight: 600; color: var(--dark); font-size: 13px;">
-                                    {{ history.changed_at|date:"M d, Y" }}
-                                </span>
-                                <span style="color: var(--text-secondary); font-size: 12px;">
-                                    {{ history.changed_at|time:"g:i A" }}
-                                </span>
-                            </div>
-                        </td>
-                        <td style="padding: 16px;">
-                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                <a href="{% url 'booking_detail' history.booking.id %}" style="color: var(--primary); font-weight: 600; text-decoration: none; font-size: 13px;">
-                                    #{{ history.booking.id }}
-                                </a>
-                                <span style="color: var(--text-secondary); font-size: 12px;">
-                                    {{ history.booking.passenger_name }}
-                                </span>
-                                {% if history.booking.user %}
-                                <span style="color: var(--text-secondary); font-size: 11px;">
-                                    User: {{ history.booking.user.username }}
-                                </span>
-                                {% endif %}
-                            </div>
-                        </td>
-                        <td style="padding: 16px;">
-                            {% if history.action == 'created' %}
-                                <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border-color: rgba(16, 185, 129, 0.2);">
-                                    Created
-                                </span>
-                            {% elif history.action == 'status_changed' %}
-                                <span class="status-badge" style="background: rgba(59, 130, 246, 0.1); color: #2563eb; border-color: rgba(59, 130, 246, 0.2);">
-                                    Status Changed
-                                </span>
-                            {% elif history.action == 'updated' %}
-                                <span class="status-badge" style="background: rgba(245, 158, 11, 0.1); color: #d97706; border-color: rgba(245, 158, 11, 0.2);">
-                                    Updated
-                                </span>
-                            {% elif history.action == 'cancelled' %}
-                                <span class="status-badge" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border-color: rgba(239, 68, 68, 0.2);">
-                                    Cancelled
-                                </span>
-                            {% elif history.action == 'driver_assigned' %}
-                                <span class="status-badge" style="background: rgba(99, 102, 241, 0.1); color: #4f46e5; border-color: rgba(99, 102, 241, 0.2);">
-                                    Driver Assigned
-                                </span>
-                            {% elif history.action == 'driver_rejected' %}
-                                <span class="status-badge" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border-color: rgba(239, 68, 68, 0.2);">
-                                    Driver Rejected
-                                </span>
-                            {% elif history.action == 'driver_completed' %}
-                                <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border-color: rgba(16, 185, 129, 0.2);">
-                                    Trip Completed
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td style="padding: 16px;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                {% if history.action == 'driver_assigned' or history.action == 'driver_rejected' or history.action == 'driver_completed' %}
-                                    {% if history.changed_by %}
-                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6d6d6d 0%, #949394 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">
-                                            {{ history.changed_by.username.0|upper }}
-                                        </div>
-                                        <span style="font-weight: 500; color: var(--dark); font-size: 13px;">
-                                            {{ history.changed_by.username }}
-                                        </span>
-                                    {% else %}
-                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">
-                                            
-                                        </div>
-                                        <span style="font-weight: 500; color: var(--dark); font-size: 13px;">
-                                            Driver
-                                        </span>
-                                    {% endif %}
-                                {% else %}
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #6d6d6d 0%, #949394 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">
-                                        {{ history.changed_by.username.0|upper }}
-                                    </div>
-                                    <span style="font-weight: 500; color: var(--dark); font-size: 13px;">
-                                        {{ history.changed_by.username|default:"System" }}
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </td>
-                        <td style="padding: 16px;">
-                            {% if history.changes %}
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                {% for field in history.get_changed_fields %}
-                                {% with change_data=history|get_field_change:field %}
-                                <div style="background: rgba(248, 250, 252, 1); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(226, 232, 240, 1);">
-                                    <div style="font-weight: 600; color: #2563eb; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        {{ field|format_field_name }}
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; flex-wrap: wrap;">
-                                        <span style="color: #dc2626; background: rgba(220, 38, 38, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; word-break: break-word;">
-                                            {{ change_data.old|default:"(empty)" }}
-                                        </span>
-                                        <svg style="width: 12px; height: 12px; color: var(--text-secondary); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                        </svg>
-                                        <span style="color: #059669; background: rgba(5, 150, 105, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; word-break: break-word;">
-                                            {{ change_data.new|default:"(empty)" }}
-                                        </span>
-                                    </div>
-                                </div>
-                                {% endwith %}
-                                {% endfor %}
-                            </div>
-                            {% elif history.change_reason %}
-                            <div style="background: rgba(248, 250, 252, 1); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(226, 232, 240, 1);">
-                                <span style="color: var(--dark); font-size: 12px;">{{ history.change_reason }}</span>
-                            </div>
-                            {% else %}
-                            <span style="color: var(--text-secondary); font-size: 12px;">Initial creation</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div style="padding: 16px; background: #f8fafc; border-top: 1px solid var(--border-light); text-align: center;">
-            <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
-                Showing last 50 booking changes. View individual bookings for complete history.
-            </p>
-        </div>
-    </div>
     {% endif %}
 </div>
 {% endblock %}

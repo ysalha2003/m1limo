@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}New Booking - M1 Limousine Service{% endblock %}
+{% block title %}New Reservation - M1 Limousine Service{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -478,10 +478,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
         </div>
-        <h1 class="card-title">{% if is_rebook %}Rebook Trip{% else %}New Booking Request{% endif %}</h1>
+        <h1 class="card-title">{% if is_rebook %}Rebook Reservation{% else %}New Reservation Request{% endif %}</h1>
         <p style="color: var(--text-secondary); margin-top: 8px; font-size: 15px;">
             {% if is_rebook %}
-                Creating a new booking based on your previous trip. Update dates, times, and details as needed.
+                Creating a new reservation based on your previous trip. Update dates, times, and details as needed.
             {% else %}
                 Complete the steps below to reserve your transportation
             {% endif %}

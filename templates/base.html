@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1056,13 +1056,14 @@
         /* Semantic Badge Colors - Modern 2025 Palette:
          * - Green: Confirmed/Success states
          * - Blue: Completed/Informational states
-         * - Dark Black: Pending (replaces yellow/orange/purple)
+         * - Amber: Pending (awaiting action)
          * - Red: Cancelled/Error states
+         * - Gray: No-Show/Neutral states
          */
 
         /* Success/Confirmed - Modern Green */
         .badge-confirmed {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            background: linear-gradient(135deg, var(--color-success-light) 0%, #a7f3d0 100%);
             color: #065f46;
             border-color: rgba(16, 185, 129, 0.2);
         }
@@ -1070,24 +1071,33 @@
         /* Info/Completed - Modern Blue */
         .badge-completed,
         .badge-trip_completed {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: linear-gradient(135deg, var(--color-info-light) 0%, #bfdbfe 100%);
             color: #1e40af;
             border-color: rgba(59, 130, 246, 0.2);
         }
 
-        /* Pending - Orange/Amber for Awaiting Action */
+        /* Pending - Amber for Awaiting Action */
         .badge-pending {
-            background: linear-gradient(135deg, var(--pending-light) 0%, #fde68a 100%);
+            background: linear-gradient(135deg, var(--color-warning-light) 0%, #fde68a 100%);
             color: #92400e;
             border-color: rgba(245, 158, 11, 0.3);
         }
 
         /* Error/Cancelled - Modern Red */
         .badge-cancelled,
+        .badge-cancelled_full_charge,
         .badge-rejected {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            background: linear-gradient(135deg, var(--color-error-light) 0%, #fecaca 100%);
             color: #991b1b;
             border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* No-Show/Neutral - Gray */
+        .badge-customer_no_show,
+        .badge-trip_not_covered {
+            background: linear-gradient(135deg, var(--color-gray-200) 0%, var(--color-gray-300) 100%);
+            color: var(--color-gray-700);
+            border-color: rgba(100, 116, 139, 0.2);
         }
 
         /* =================================
@@ -1408,7 +1418,10 @@
             <div class="nav-links">
                 {% if user.is_authenticated %}
                     <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
-                    <a href="{% url 'new_booking' %}" class="nav-link">New Booking</a>
+                    <a href="{% url 'new_reservation' %}" class="nav-link">New Reservation</a>
+                    {% if user.is_staff %}
+                    <a href="{% url 'reservation_activity' %}" class="nav-link">Activity Log</a>
+                    {% endif %}
                     {% if not user.is_staff %}
                     <a href="{% url 'frequent_passengers' %}" class="nav-link">Frequent Passengers</a>
                     {% endif %}
@@ -1437,7 +1450,7 @@
                                         Upcoming Trips ({{ user_upcoming_bookings|length }})
                                     </div>
                                     {% for booking in user_upcoming_bookings %}
-                                    <a href="{% url 'view_user_booking' booking.id %}" class="activity-item" style="text-decoration: none; color: inherit;">
+                                    <a href="{% url 'view_user_reservation' booking.id %}" class="activity-item" style="text-decoration: none; color: inherit;">
                                         <div class="activity-icon" style="background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-dark) 100%);">
                                             <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -1464,7 +1477,7 @@
                                         Recent History
                                     </div>
                                     {% for booking in user_recent_bookings|slice:":3" %}
-                                    <a href="{% url 'view_user_booking' booking.id %}" class="activity-item" style="text-decoration: none; color: inherit; {% if booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}opacity: 0.5;{% endif %}">
+                                    <a href="{% url 'view_user_reservation' booking.id %}" class="activity-item" style="text-decoration: none; color: inherit; {% if booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}opacity: 0.5;{% endif %}">
                                         <div class="activity-icon activity-{{ booking.status|lower }}">
                                             <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -1489,7 +1502,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                         </svg>
                                         <p>No bookings yet</p>
-                                        <a href="{% url 'new_booking' %}" class="btn btn-primary" style="margin-top: 12px; font-size: 12px; padding: 8px 16px;">Create Booking</a>
+                                        <a href="{% url 'new_reservation' %}" class="btn btn-primary" style="margin-top: 12px; font-size: 12px; padding: 8px 16px;">Create Reservation</a>
                                     </div>
                                 {% endif %}
                             </div>
@@ -1589,7 +1602,7 @@
         <div class="mobile-menu-links">
             {% if user.is_authenticated %}
                 <a href="{% url 'dashboard' %}" class="mobile-menu-link">Dashboard</a>
-                <a href="{% url 'new_booking' %}" class="mobile-menu-link">New Booking</a>
+                <a href="{% url 'new_reservation' %}" class="mobile-menu-link">New Reservation</a>
                 {% if not user.is_staff %}
                 <a href="{% url 'frequent_passengers' %}" class="mobile-menu-link">Frequent Passengers</a>
                 {% endif %}
@@ -1659,7 +1672,7 @@
                             <a href="{% url 'dashboard' %}" style="color: #94a3b8; text-decoration: none; font-size: 14px; transition: color 0.2s;">Dashboard</a>
                         </li>
                         <li style="margin-bottom: 12px;">
-                            <a href="{% url 'new_booking' %}" style="color: #94a3b8; text-decoration: none; font-size: 14px; transition: color 0.2s;">New Booking</a>
+                            <a href="{% url 'new_reservation' %}" style="color: #94a3b8; text-decoration: none; font-size: 14px; transition: color 0.2s;">New Reservation</a>
                         </li>
                         {% else %}
                         <li style="margin-bottom: 12px;">

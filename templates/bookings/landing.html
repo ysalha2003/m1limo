@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}M1 Limousine - Chicago's Premier Executive Transportation Service{% endblock %}
 
@@ -625,7 +625,7 @@
         <p>Professional chauffeurs, luxury vehicles, and unmatched reliability. Experience executive transportation reimagined for modern business professionals.</p>
         <div class="hero-buttons">
             {% if user.is_authenticated %}
-                <a href="{% url 'new_booking' %}" class="btn btn-primary">Book Now</a>
+                <a href="{% url 'new_reservation' %}" class="btn btn-primary">Book Now</a>
                 <a href="{% url 'dashboard' %}" class="btn btn-secondary">View Dashboard</a>
             {% else %}
                 <a href="{% url 'signup' %}" class="btn btn-primary">Get Started</a>
@@ -722,7 +722,7 @@
                 <li>Luggage assistance</li>
                 <li>O'Hare & Midway coverage</li>
             </ul>
-            <a href="{% if user.is_authenticated %}{% url 'new_booking' %}{% else %}{% url 'signup' %}{% endif %}" class="btn btn-primary">Book Airport Transfer</a>
+            <a href="{% if user.is_authenticated %}{% url 'new_reservation' %}{% else %}{% url 'signup' %}{% endif %}" class="btn btn-primary">Book Airport Transfer</a>
         </div>
 
         <div class="service-card">
@@ -734,7 +734,7 @@
                 <li>Corporate account management</li>
                 <li>Flexible billing options</li>
             </ul>
-            <a href="{% if user.is_authenticated %}{% url 'new_booking' %}{% else %}{% url 'signup' %}{% endif %}" class="btn btn-primary">Corporate Booking</a>
+            <a href="{% if user.is_authenticated %}{% url 'new_reservation' %}{% else %}{% url 'signup' %}{% endif %}" class="btn btn-primary">Corporate Booking</a>
         </div>
 
         <div class="service-card">
@@ -746,7 +746,7 @@
                 <li>Custom itineraries</li>
                 <li>Sprinter van service</li>
             </ul>
-            <a href="{% if user.is_authenticated %}{% url 'new_booking' %}{% else %}{% url 'signup' %}{% endif %}" class="btn btn-primary">Plan Your Event</a>
+            <a href="{% if user.is_authenticated %}{% url 'new_reservation' %}{% else %}{% url 'signup' %}{% endif %}" class="btn btn-primary">Plan Your Event</a>
         </div>
     </div>
 </section>
@@ -758,7 +758,7 @@
         <p>Join Chicago's business professionals who trust M1 Limousine for their executive transportation needs.</p>
         <div class="cta-buttons">
             {% if user.is_authenticated %}
-                <a href="{% url 'new_booking' %}" class="btn btn-primary">Create Booking</a>
+                <a href="{% url 'new_reservation' %}" class="btn btn-primary">Create Reservation</a>
                 <a href="{% url 'dashboard' %}" class="btn btn-secondary">My Dashboard</a>
             {% else %}
                 <a href="{% url 'signup' %}" class="btn btn-primary">Create Account</a>
