@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action_details.title }} - Confirm Action{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirm-card {
+        max-width: 600px;
+        margin: 60px auto;
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(4, 8, 20, 0.15);
+        border: 2px solid var(--border);
+    }
+
+    .confirm-header {
+        text-align: center;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 2px solid var(--border-light);
+    }
+
+    .confirm-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+
+    .confirm-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 8px;
+    }
+
+    .confirm-description {
+        font-size: 15px;
+        color: var(--text-secondary);
+    }
+
+    .booking-info {
+        background: var(--light);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 32px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: var(--dark);
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .warning-box {
+        background: #fef3c7;
+        border: 2px solid #f59e0b;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 32px;
+        display: flex;
+        gap: 12px;
+    }
+
+    .warning-box svg {
+        width: 20px;
+        height: 20px;
+        color: #f59e0b;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .warning-text {
+        color: #92400e;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .btn-confirm {
+        padding: 12px 32px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-confirm-yes.success {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-confirm-yes.success:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-confirm-yes.danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-confirm-yes.danger:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-confirm-yes.secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-confirm-yes.secondary:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-confirm-no {
+        background: var(--light);
+        color: var(--dark);
+        border: 2px solid var(--border);
+    }
+
+    .btn-confirm-no:hover {
+        background: var(--border-light);
+        border-color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="confirm-card">
+    <div class="confirm-header">
+        <div class="confirm-icon">{{ action_details.icon }}</div>
+        <h1 class="confirm-title">{{ action_details.title }}</h1>
+        <p class="confirm-description">{{ action_details.description }}</p>
+    </div>
+
+    <div class="booking-info">
+        <h3 style="font-size: 14px; font-weight: 700; color: var(--dark); margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+            Trip Request Details
+        </h3>
+        
+        <div class="info-row">
+            <span class="info-label">Booking ID:</span>
+            <span class="info-value">#{{ booking.id }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Customer:</span>
+            <span class="info-value">{{ booking.passenger_name }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Requested Pickup:</span>
+            <span class="info-value">{{ booking.pick_up_date|date:"M d, Y" }} at {{ booking.pick_up_time|time:"g:i A" }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Vehicle Type:</span>
+            <span class="info-value">{{ booking.vehicle_type }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Current Status:</span>
+            <span class="info-value">
+                <span class="badge badge-pending">{{ booking.get_status_display }}</span>
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Created:</span>
+            <span class="info-value">{{ booking.created_at|date:"M d, Y g:i A" }}</span>
+        </div>
+        
+        <div class="info-row" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+            <span class="info-label">Pickup Location:</span>
+            <span class="info-value" style="max-width: 60%; word-break: break-word;">{{ booking.pick_up_address }}</span>
+        </div>
+        
+        {% if booking.drop_off_address %}
+        <div class="info-row">
+            <span class="info-label">Drop-off Location:</span>
+            <span class="info-value" style="max-width: 60%; word-break: break-word;">{{ booking.drop_off_address }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="warning-box">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div class="warning-text">
+            <strong>Note:</strong> This pending trip request was never confirmed and has already passed its pickup time. 
+            Please verify the trip details and customer information before taking action.
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <button type="submit" class="btn-confirm btn-confirm-yes {{ action_details.btn_class }}">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Yes, Confirm
+            </button>
+            
+            <a href="{% if next_url == 'past_pending_trips' %}{% url 'past_pending_trips' %}{% else %}{% url 'dashboard' %}{% endif %}" class="btn-confirm btn-confirm-no">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Cancel
+            </a>
+        </div>
+    </form>
+
+    <p style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-secondary);">
+        Need more information? <a href="{% url 'booking_detail' booking.id %}" style="color: var(--primary); font-weight: 600;">View full trip details</a>
+    </p>
+</div>
+{% endblock %}

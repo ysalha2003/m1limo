@@ -382,6 +382,34 @@
 </div>
 {% endif %}
 
+{% if is_admin and past_pending_count > 0 %}
+<!-- Past Pending Trips Alert Banner -->
+<div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);">
+    <div style="display: flex; align-items: start; gap: 16px;">
+        <div style="flex-shrink: 0; width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <svg style="width: 28px; height: 28px; color: #3b82f6;" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <div style="flex: 1;">
+            <h3 style="color: #1e3a8a; font-size: 18px; font-weight: 700; margin: 0 0 8px 0;">
+                🕒 {{ past_pending_count }} Pending Request{{ past_pending_count|pluralize }} Need Review
+            </h3>
+            <p style="color: #1e40af; font-size: 15px; margin: 0 0 16px 0; line-height: 1.5;">
+                These trip requests were never confirmed and have passed their pickup time. 
+                Please review and decide: confirm anyway, cancel, or mark as "Trip Not Covered".
+            </p>
+            <a href="{% url 'past_pending_trips' %}" class="btn" style="background: #3b82f6; color: white; font-weight: 600; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);">
+                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Review {{ past_pending_count }} Request{{ past_pending_count|pluralize }}
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Stats Grid -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px;">
     <!-- Stat Cards with Semantic Colors:

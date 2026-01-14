@@ -373,7 +373,9 @@ def dashboard(request):
         past_filter = Q(pick_up_date__lt=today) | Q(pick_up_date=today, pick_up_time__lt=current_time)
         
         stats = {
-            'pending_count': Booking.objects.filter(status='Pending').count(),
+            'pending_count': Booking.objects.filter(
+                status='Pending'
+            ).filter(future_filter).count(),
             'confirmed_count': Booking.objects.filter(status='Confirmed').count(),
             'upcoming_count': Booking.objects.filter(
                 status='Confirmed'
@@ -390,6 +392,11 @@ def dashboard(request):
         # Count past confirmed trips that need review
         context['past_confirmed_count'] = Booking.objects.filter(
             status='Confirmed'
+        ).filter(past_filter).count()
+        
+        # Count past pending trips that need review (never confirmed)
+        context['past_pending_count'] = Booking.objects.filter(
+            status='Pending'
         ).filter(past_filter).count()
 
         # Get complete booking history for admins (full audit trail)
@@ -413,8 +420,14 @@ def dashboard(request):
         
         context['stats'] = {
             'total_bookings': Booking.objects.filter(user=request.user).count(),
-            'active_bookings': Booking.objects.filter(user=request.user, status__in=['Pending', 'Confirmed']).count(),
-            'pending_count': Booking.objects.filter(user=request.user, status='Pending').count(),
+            'active_bookings': Booking.objects.filter(
+                user=request.user, 
+                status__in=['Pending', 'Confirmed']
+            ).filter(future_filter).count(),
+            'pending_count': Booking.objects.filter(
+                user=request.user, 
+                status='Pending'
+            ).filter(future_filter).count(),
             'confirmed_count': Booking.objects.filter(user=request.user, status='Confirmed').count(),
             'today_trips': Booking.objects.filter(user=request.user, pick_up_date=today).count(),
             'upcoming_trips': Booking.objects.filter(user=request.user).filter(future_filter).count(),
@@ -2073,3 +2086,110 @@ def confirm_trip_action(request, booking_id, action):
     return render(request, 'bookings/confirm_trip_action.html', context)
 
 
+@staff_member_required
+def past_pending_trips(request):
+    """
+    Admin view for pending trips that have passed their pickup time without being confirmed.
+    These trips were never confirmed by admin and may need to be cancelled or marked as "Trip Not Covered".
+    """
+    from django.db.models import Q
+    
+    now = timezone.now()
+    today = now.date()
+    current_time = now.time()
+    
+    # Find Pending trips where pickup datetime has passed
+    # Past trips: date < today OR (date == today AND time < current_time)
+    past_pending = Booking.objects.filter(
+        status='Pending'
+    ).filter(
+        Q(pick_up_date__lt=today) | Q(pick_up_date=today, pick_up_time__lt=current_time)
+    ).select_related(
+        'user',
+        'assigned_driver',
+        'linked_booking'
+    ).order_by('-pick_up_date', '-pick_up_time')
+    
+    # Calculate how long ago each trip was
+    from datetime import datetime
+    for booking in past_pending:
+        pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+        if timezone.is_naive(pickup_datetime):
+            pickup_datetime = timezone.make_aware(pickup_datetime)
+        booking.hours_overdue = int((now - pickup_datetime).total_seconds() / 3600)
+    
+    context = {
+        'past_pending_trips': past_pending,
+        'total_count': past_pending.count(),
+        'now': now,
+    }
+    
+    return render(request, 'bookings/past_pending_trips.html', context)
+
+
+@staff_member_required
+def confirm_pending_action(request, booking_id, action):
+    """
+    Page-based confirmation for pending trip actions from past_pending_trips page.
+    Shows confirmation page on GET, processes action on POST.
+    """
+    booking = get_object_or_404(Booking, id=booking_id)
+    next_url = request.GET.get('next', 'dashboard')
+    
+    # Define action details for confirmation page
+    action_details = {
+        'confirm': {
+            'title': 'Confirm This Trip',
+            'description': 'Confirm this pending trip request. This will change the status to Confirmed even though the pickup time has passed.',
+            'icon': '✅',
+            'btn_class': 'success',
+            'status': 'Confirmed',
+            'message': 'Trip confirmed successfully.'
+        },
+        'cancel': {
+            'title': 'Cancel This Trip',
+            'description': 'Cancel this trip request. The customer will be notified that the trip cannot be accommodated.',
+            'icon': '❌',
+            'btn_class': 'danger',
+            'status': 'Cancelled',
+            'message': 'Trip cancelled successfully.'
+        },
+        'not_covered': {
+            'title': 'Mark as Trip Not Covered',
+            'description': 'Mark this trip as not covered by M1 Limo services (outside service area, vehicle unavailable, etc.).',
+            'icon': '🚫',
+            'btn_class': 'secondary',
+            'status': 'Trip_Not_Covered',
+            'message': 'Trip marked as not covered.'
+        }
+    }
+    
+    if action not in action_details:
+        messages.error(request, "Invalid action.")
+        return redirect('past_pending_trips' if next_url == 'past_pending_trips' else 'dashboard')
+    
+    details = action_details[action]
+    
+    if request.method == 'POST':
+        # User confirmed the action
+        try:
+            BookingService.update_booking_status(booking, details['status'], changed_by=request.user)
+            messages.success(request, details['message'])
+        except Exception as e:
+            logger.error(f"Error updating pending booking {booking_id} to {details['status']}: {e}")
+            messages.error(request, f"Error: {str(e)}")
+        
+        # Redirect back to referring page
+        if next_url == 'past_pending_trips':
+            return redirect('past_pending_trips')
+        return redirect('dashboard')
+    
+    # GET request - show confirmation page
+    context = {
+        'booking': booking,
+        'action': action,
+        'action_details': details,
+        'next_url': next_url,
+    }
+    
+    return render(request, 'bookings/confirm_pending_action.html', context)
