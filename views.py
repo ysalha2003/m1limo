@@ -264,10 +264,16 @@ def dashboard(request):
     upcoming_filter = request.GET.get('upcoming')
     
     if upcoming_filter == 'true':
-        # Filter for upcoming trips (Confirmed bookings with future pickup dates)
+        # Filter for upcoming trips (Confirmed bookings with future pickup datetime)
+        from django.db.models import Q
+        now = timezone.now()
+        today = now.date()
+        current_time = now.time()
+        # Trip is upcoming if: date > today OR (date == today AND time >= current_time)
         base_queryset = base_queryset.filter(
-            status='Confirmed',
-            pick_up_date__gte=timezone.now().date()
+            status='Confirmed'
+        ).filter(
+            Q(pick_up_date__gt=today) | Q(pick_up_date=today, pick_up_time__gte=current_time)
         )
     elif status_filter:
         base_queryset = base_queryset.filter(status=status_filter)
@@ -359,22 +365,32 @@ def dashboard(request):
 
     if request.user.is_staff:
         # Calculate stats directly with fresh queries to ensure accurate counts
+        from django.db.models import Q
+        current_time = now.time()
+        # Future trips: date > today OR (date == today AND time >= current_time)
+        future_filter = Q(pick_up_date__gt=today) | Q(pick_up_date=today, pick_up_time__gte=current_time)
+        # Past trips: date < today OR (date == today AND time < current_time)
+        past_filter = Q(pick_up_date__lt=today) | Q(pick_up_date=today, pick_up_time__lt=current_time)
+        
         stats = {
             'pending_count': Booking.objects.filter(status='Pending').count(),
             'confirmed_count': Booking.objects.filter(status='Confirmed').count(),
             'upcoming_count': Booking.objects.filter(
-                status='Confirmed',
-                pick_up_date__gte=today
-            ).count(),
+                status='Confirmed'
+            ).filter(future_filter).count(),
         }
         
         # Get the next upcoming trip
         next_upcoming = Booking.objects.filter(
-            status='Confirmed',
-            pick_up_date__gte=today
-        ).order_by('pick_up_date', 'pick_up_time').first()
+            status='Confirmed'
+        ).filter(future_filter).order_by('pick_up_date', 'pick_up_time').first()
         context['next_upcoming_trip'] = next_upcoming
         context['stats'] = stats
+        
+        # Count past confirmed trips that need review
+        context['past_confirmed_count'] = Booking.objects.filter(
+            status='Confirmed'
+        ).filter(past_filter).count()
 
         # Get complete booking history for admins (full audit trail)
         context['booking_history'] = BookingHistory.objects.select_related(
@@ -383,12 +399,16 @@ def dashboard(request):
             'changed_by'
         ).order_by('-changed_at')[:50]
     else:
-        # Calculate upcoming trips for user (Confirmed bookings with future dates)
+        # Calculate upcoming trips for user (Confirmed bookings with future datetime)
+        from django.db.models import Q
+        current_time = now.time()
+        # Future trips: date > today OR (date == today AND time >= current_time)
+        future_filter = Q(pick_up_date__gt=today) | Q(pick_up_date=today, pick_up_time__gte=current_time)
+        
         next_upcoming = Booking.objects.filter(
             user=request.user,
-            status='Confirmed',
-            pick_up_date__gte=today
-        ).order_by('pick_up_date', 'pick_up_time').first()
+            status='Confirmed'
+        ).filter(future_filter).order_by('pick_up_date', 'pick_up_time').first()
         context['next_upcoming_trip'] = next_upcoming
         
         context['stats'] = {
@@ -397,8 +417,8 @@ def dashboard(request):
             'pending_count': Booking.objects.filter(user=request.user, status='Pending').count(),
             'confirmed_count': Booking.objects.filter(user=request.user, status='Confirmed').count(),
             'today_trips': Booking.objects.filter(user=request.user, pick_up_date=today).count(),
-            'upcoming_trips': Booking.objects.filter(user=request.user, pick_up_date__gte=today).count(),
-            'upcoming_count': Booking.objects.filter(user=request.user, status='Confirmed', pick_up_date__gte=today).count(),
+            'upcoming_trips': Booking.objects.filter(user=request.user).filter(future_filter).count(),
+            'upcoming_count': Booking.objects.filter(user=request.user, status='Confirmed').filter(future_filter).count(),
             'completed_trips': Booking.objects.filter(user=request.user, status='Trip_Completed').count(),
             'completed_today': Booking.objects.filter(user=request.user, status='Trip_Completed', pick_up_date=today).count(),
         }
@@ -1931,4 +1951,47 @@ def custom_404(request, exception):
 def custom_500(request):
     """Custom 500 error page."""
     return render(request, '500.html', status=500)
+
+
+@login_required
+@staff_member_required
+def past_confirmed_trips(request):
+    """
+    Admin view for confirmed trips that have passed their pickup time.
+    These trips need manual review to be marked as completed, cancelled, or no-show.
+    """
+    from django.db.models import Q
+    
+    now = timezone.now()
+    today = now.date()
+    current_time = now.time()
+    
+    # Find Confirmed trips where pickup datetime has passed
+    # Past trips: date < today OR (date == today AND time < current_time)
+    past_confirmed = Booking.objects.filter(
+        status='Confirmed'
+    ).filter(
+        Q(pick_up_date__lt=today) | Q(pick_up_date=today, pick_up_time__lt=current_time)
+    ).select_related(
+        'user',
+        'assigned_driver',
+        'linked_booking'
+    ).order_by('-pick_up_date', '-pick_up_time')
+    
+    # Calculate how long ago each trip was
+    from datetime import datetime
+    for booking in past_confirmed:
+        pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+        if timezone.is_naive(pickup_datetime):
+            pickup_datetime = timezone.make_aware(pickup_datetime)
+        booking.hours_overdue = int((now - pickup_datetime).total_seconds() / 3600)
+    
+    context = {
+        'past_confirmed_trips': past_confirmed,
+        'total_count': past_confirmed.count(),
+        'now': now,
+    }
+    
+    return render(request, 'bookings/past_confirmed_trips.html', context)
+
 

@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}Past Confirmed Trips - Admin Review{% endblock %}
+
+{% block extra_css %}
+<style>
+    .alert-warning-header {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #f59e0b;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);
+    }
+
+    .overdue-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .overdue-critical {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #ef4444;
+    }
+
+    .overdue-high {
+        background: #fed7aa;
+        color: #9a3412;
+        border: 1px solid #f97316;
+    }
+
+    .overdue-medium {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #f59e0b;
+    }
+
+    .trip-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        border: 2px solid var(--border);
+        transition: all 0.2s ease;
+    }
+
+    .trip-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(4, 8, 20, 0.1);
+    }
+
+    .trip-card.critical {
+        border-left: 4px solid #ef4444;
+    }
+
+    .trip-card.high {
+        border-left: 4px solid #f97316;
+    }
+
+    .trip-card.medium {
+        border-left: 4px solid #f59e0b;
+    }
+
+    .trip-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .trip-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        color: var(--dark);
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-complete {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-complete:hover {
+        background: #059669;
+        transform: translateY(-1px);
+    }
+
+    .btn-no-show {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-no-show:hover {
+        background: #dc2626;
+    }
+
+    .btn-view {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #0f172a;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: linear-gradient(to bottom, white, var(--light));
+        border-radius: 12px;
+        border: 2px dashed var(--border);
+    }
+
+    .empty-state svg {
+        width: 64px;
+        height: 64px;
+        color: var(--success);
+        margin-bottom: 16px;
+    }
+
+    .stats-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-box {
+        flex: 1;
+        background: linear-gradient(135deg, var(--primary-light) 0%, white 100%);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <div style="margin-bottom: 32px;">
+        <h1 style="font-size: 28px; font-weight: 700; color: var(--dark); margin-bottom: 8px;">
+            ⚠️ Past Confirmed Trips - Require Action
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 15px;">
+            These confirmed trips have passed their pickup time and need manual review. 
+            Mark them as completed, no-show, or cancelled.
+        </p>
+    </div>
+
+    {% if total_count > 0 %}
+        <div class="alert-warning-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <svg style="width: 24px; height: 24px; color: #f59e0b; flex-shrink: 0;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                <div style="flex: 1;">
+                    <h3 style="color: #92400e; font-size: 16px; font-weight: 700; margin: 0 0 4px 0;">
+                        Action Required
+                    </h3>
+                    <p style="color: #78350f; font-size: 14px; margin: 0;">
+                        <strong>{{ total_count }}</strong> confirmed trip{{ total_count|pluralize }} with past pickup times found. 
+                        Please review and update their status to maintain accurate records.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-value">{{ total_count }}</div>
+                <div class="stat-label">Trip{{ total_count|pluralize }} Needing Review</div>
+            </div>
+        </div>
+
+        {% for booking in past_confirmed_trips %}
+        <div class="trip-card {% if booking.hours_overdue >= 48 %}critical{% elif booking.hours_overdue >= 24 %}high{% else %}medium{% endif %}">
+            <div class="trip-header">
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 700; color: var(--dark); margin: 0 0 8px 0;">
+                        Booking #{{ booking.id }} - {{ booking.passenger_name }}
+                    </h3>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span class="badge badge-confirmed">Confirmed</span>
+                        {% if booking.hours_overdue >= 48 %}
+                            <span class="overdue-badge overdue-critical">
+                                🔴 {{ booking.hours_overdue }} hours overdue
+                            </span>
+                        {% elif booking.hours_overdue >= 24 %}
+                            <span class="overdue-badge overdue-high">
+                                🟠 {{ booking.hours_overdue }} hours overdue
+                            </span>
+                        {% else %}
+                            <span class="overdue-badge overdue-medium">
+                                🟡 {{ booking.hours_overdue }} hours overdue
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="trip-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Customer</span>
+                    <span class="info-value">{{ booking.user.get_full_name|default:booking.user.username }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Pickup Date & Time</span>
+                    <span class="info-value">{{ booking.pick_up_date|date:"M d, Y" }} at {{ booking.pick_up_time|time:"g:i A" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Vehicle Type</span>
+                    <span class="info-value">{{ booking.vehicle_type }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Trip Type</span>
+                    <span class="info-value">{{ booking.get_trip_type_display }}</span>
+                </div>
+                {% if booking.assigned_driver %}
+                <div class="info-item">
+                    <span class="info-label">Assigned Driver</span>
+                    <span class="info-value">{{ booking.assigned_driver.name }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="info-item" style="margin-bottom: 16px;">
+                <span class="info-label">Route</span>
+                <span class="info-value" style="font-size: 13px;">
+                    📍 {{ booking.pick_up_address }} 
+                    {% if booking.drop_off_address %}→ {{ booking.drop_off_address }}{% endif %}
+                </span>
+            </div>
+
+            <div class="action-buttons">
+                <form method="post" action="{% url 'booking_actions' booking.id 'complete' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-action btn-complete" onclick="return confirm('Mark this trip as completed?')">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </form>
+                
+                <form method="post" action="{% url 'booking_actions' booking.id 'no_show' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-action btn-no-show" onclick="return confirm('Mark this trip as customer no-show?')">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Customer No-Show
+                    </button>
+                </form>
+
+                <a href="{% url 'booking_detail' booking.id %}" class="btn-action btn-view">
+                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div style="margin-top: 24px; padding: 16px; background: var(--info-light); border-radius: 8px; border-left: 4px solid var(--info);">
+            <p style="color: #1e40af; font-size: 14px; margin: 0;">
+                <strong>💡 Tip:</strong> Trips are automatically filtered from "Upcoming" once their pickup time passes. 
+                Use this page to clean up past confirmed bookings and maintain accurate trip records.
+            </p>
+        </div>
+
+    {% else %}
+        <div class="empty-state">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 style="font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 8px;">
+                All Clear! 🎉
+            </h3>
+            <p style="color: var(--text-secondary); font-size: 15px; margin: 0;">
+                No confirmed trips with past pickup times found. All trips have been properly updated.
+            </p>
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 32px; text-align: center;">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

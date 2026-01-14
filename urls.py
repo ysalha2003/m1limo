@@ -12,6 +12,7 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('logout/', views.user_logout, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('admin/past-confirmed-trips/', views.past_confirmed_trips, name='past_confirmed_trips'),
 
     # Info pages
     path('privacy/', views.privacy_policy, name='privacy_policy'),
