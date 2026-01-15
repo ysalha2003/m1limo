@@ -86,40 +86,75 @@
     @media (max-width: 480px) {
         /* Extra small screens */
         .card {
-            padding: 16px !important;
+            padding: 12px !important;
+            margin-bottom: 16px !important;
         }
 
         h1 {
             font-size: 18px !important;
         }
+        
+        h2.card-title {
+            font-size: 16px !important;
+        }
 
         .badge {
-            font-size: 11px !important;
-            padding: 4px 10px !important;
+            font-size: 10px !important;
+            padding: 3px 8px !important;
         }
         
         /* Notification section mobile */
+        .notification-buttons-wrapper {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 8px !important;
+        }
+        
+        .notification-buttons-wrapper p {
+            font-size: 10px !important;
+        }
+        
+        .notification-buttons-wrapper > div {
+            width: 100% !important;
+            display: flex !important;
+            justify-content: space-between !important;
+        }
+        
+        .notification-buttons-wrapper button {
+            flex: 1 !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            min-height: 36px !important;
+        }
+        
+        .notification-buttons-wrapper form {
+            flex: 1 !important;
+        }
+        
+        .notification-buttons-wrapper form button {
+            width: 100% !important;
+        }
+        
         #notification-display span,
         #notification-edit label span {
-            font-size: 11px !important;
+            font-size: 12px !important;
         }
         
         #notification-edit textarea {
-            font-size: 11px !important;
-        }
-        
-        .notification-buttons-wrapper {
-            flex-wrap: wrap !important;
-            gap: 4px !important;
+            font-size: 13px !important;
+            padding: 8px !important;
         }
         
         .notification-edit-buttons {
             width: 100% !important;
-            justify-content: stretch !important;
+            flex-direction: column !important;
+            gap: 8px !important;
         }
         
         .notification-edit-buttons button {
-            flex: 1 !important;
+            width: 100% !important;
+            min-height: 40px !important;
+            font-size: 14px !important;
         }
     }
 </style>
@@ -223,23 +258,21 @@
                     {% endif %}
                     
                     <!-- Notification Status -->
-                    <div style="margin-top: 12px; padding: 10px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
-                        <div class="notification-buttons-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
-                            <p style="font-size: 11px; color: #64748b; margin: 0; font-weight: 600; text-transform: uppercase;">Email Notifications</p>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <button onclick="toggleNotificationEdit()" type="button" style="background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: 500; white-space: nowrap;">
-                                    <span id="notif-edit-btn-text">Edit</span>
+                    <div style="margin-top: 12px; padding: 12px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <p style="font-size: 11px; color: #64748b; margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase;">Email Notifications</p>
+                        <div class="notification-buttons-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px;">
+                            <button onclick="toggleNotificationEdit()" type="button" style="background: #ffffff; border: 1px solid #e2e8f0; color: #3b82f6; cursor: pointer; font-size: 13px; padding: 8px 16px; font-weight: 500; white-space: nowrap; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#ffffff'">
+                                <span id="notif-edit-btn-text">✏️ Edit</span>
+                            </button>
+                            <form method="post" action="{% url 'resend_notification' booking.id %}" style="flex: 1; max-width: 200px;">
+                                {% csrf_token %}
+                                <button type="submit" style="width: 100%; background: #10b981; border: none; color: white; cursor: pointer; font-size: 13px; padding: 8px 16px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; border-radius: 6px; transition: all 0.2s;" title="Resend booking confirmation" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+                                    <svg style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>Send</span>
                                 </button>
-                                <form method="post" action="{% url 'resend_notification' booking.id %}" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" style="background: none; border: none; color: #10b981; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: 500; display: flex; align-items: center; gap: 4px; white-space: nowrap;" title="Resend booking confirmation">
-                                        <svg style="width: 12px; height: 12px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                        </svg>
-                                        <span>Send</span>
-                                    </button>
-                                </form>
-                            </div>
+                            </form>
                         </div>
                         
                         <!-- Display Mode -->
