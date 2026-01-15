@@ -616,44 +616,40 @@
                 {% endif %}
                 <form method="post" action="{% url 'resend_notification' booking.id %}" style="margin: 0;">
                     {% csrf_token %}
+                    <!-- Recipient Selection -->
+                    <div style="margin-bottom: 8px; padding: 8px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0;">
+                        <p style="font-size: 11px; color: #64748b; margin: 0 0 6px 0; font-weight: 600; text-transform: uppercase;">Select Recipients:</p>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <!-- Admin -->
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: #0f172a;">
+                                <input type="checkbox" name="send_to_admin" value="1" checked style="width: 14px; height: 14px; cursor: pointer;">
+                                <span>Admin</span>
+                            </label>
+                            <!-- User -->
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; {% if not will_notify_user %}opacity: 0.6;{% endif %} color: #0f172a;">
+                                <input type="checkbox" name="send_to_user" value="1" {% if will_notify_user %}checked{% endif %} {% if not will_notify_user %}disabled{% endif %} style="width: 14px; height: 14px; cursor: pointer;">
+                                <span>User ({{ booking.user.email }}){% if not will_notify_user %} - notifications disabled{% endif %}</span>
+                            </label>
+                            <!-- Passenger -->
+                            {% if booking.passenger_email %}
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; {% if not will_notify_passenger %}opacity: 0.6;{% endif %} color: #0f172a;">
+                                <input type="checkbox" name="send_to_passenger" value="1" {% if will_notify_passenger %}checked{% endif %} {% if not will_notify_passenger %}disabled{% endif %} style="width: 14px; height: 14px; cursor: pointer;">
+                                <span>Passenger ({{ booking.passenger_email }}){% if not will_notify_passenger %} - notifications disabled{% endif %}</span>
+                            </label>
+                            {% endif %}
+                        </div>
+                        {% if not will_notify_user or not will_notify_passenger %}
+                        <p style="font-size: 10px; color: #64748b; margin: 6px 0 0 20px; font-style: italic;">
+                            Note: Disabled recipients have notifications turned off in their preferences
+                        </p>
+                        {% endif %}
+                    </div>
                     <button type="submit" class="btn btn-secondary" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 6px;">
                         <svg style="width: 16px; height: 16px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
                         <span>Send Email Notification</span>
                     </button>
-                    <!-- Recipient indicator -->
-                    <div style="margin-top: 6px; padding: 8px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0;">
-                        <p style="font-size: 11px; color: #64748b; margin: 0 0 4px 0; font-weight: 600; text-transform: uppercase;">Will send to:</p>
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <span style="font-size: 12px; color: #10b981; display: flex; align-items: center; gap: 4px;">
-                                <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Admin
-                            </span>
-                            {% if will_notify_user %}
-                            <span style="font-size: 12px; color: #10b981; display: flex; align-items: center; gap: 4px;">
-                                <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                User ({{ booking.user.email }})
-                            </span>
-                            {% else %}
-                            <span style="font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
-                                <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                                User (notifications disabled)
-                            </span>
-                            {% endif %}
-                            {% if will_notify_passenger %}
-                            <span style="font-size: 12px; color: #10b981; display: flex; align-items: center; gap: 4px;">
-                                <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Passenger ({{ booking.passenger_email }})
-                            </span>
-                            {% else %}
-                            <span style="font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
-                                <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                                Passenger (notifications disabled)
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
                 </form>
             </div>
         </div>

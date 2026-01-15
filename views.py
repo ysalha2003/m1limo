@@ -896,6 +896,7 @@ def resend_notification(request, booking_id):
     """
     Resend booking notification based on current status.
     Only allows account owner or admin to trigger.
+    Admin can select specific recipients.
     """
     booking = get_object_or_404(Booking, id=booking_id)
     
@@ -921,12 +922,44 @@ def resend_notification(request, booking_id):
             # Get notification type based on current status
             notification_type = status_to_notification.get(booking.status, 'confirmed')
             
-            # Send notification with current status
-            NotificationService.send_notification(booking, notification_type)
+            # Get selected recipients (admin only feature)
+            selected_recipients = []
+            if request.user.is_staff:
+                if request.POST.get('send_to_admin'):
+                    selected_recipients.append('admin')
+                if request.POST.get('send_to_user'):
+                    selected_recipients.append('user')
+                if request.POST.get('send_to_passenger'):
+                    selected_recipients.append('passenger')
+            else:
+                # Non-admin users send to all default recipients
+                selected_recipients = None
             
-            # Success message with status context
+            # Send notification with current status and selected recipients
+            result = NotificationService.send_notification(
+                booking, 
+                notification_type,
+                selected_recipients=selected_recipients
+            )
+            
+            # Build success message based on who was notified
             status_display = booking.get_status_display()
-            messages.success(request, f"Notification for '{status_display}' status resent successfully to all recipients.")
+            if selected_recipients:
+                recipient_names = []
+                if 'admin' in selected_recipients:
+                    recipient_names.append('Admin')
+                if 'user' in selected_recipients:
+                    recipient_names.append(f'User ({booking.user.email})')
+                if 'passenger' in selected_recipients and booking.passenger_email:
+                    recipient_names.append(f'Passenger ({booking.passenger_email})')
+                
+                if recipient_names:
+                    recipients_str = ', '.join(recipient_names)
+                    messages.success(request, f"Notification for '{status_display}' status sent to: {recipients_str}")
+                else:
+                    messages.warning(request, "No recipients selected. Notification not sent.")
+            else:
+                messages.success(request, f"Notification for '{status_display}' status resent successfully to all recipients.")
         except Exception as e:
             messages.error(request, f"Failed to send notification: {str(e)}")
     

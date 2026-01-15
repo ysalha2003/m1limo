@@ -25,16 +25,23 @@ class NotificationService:
         booking: Booking,
         notification_type: str,
         old_status: Optional[str] = None,
-        is_return: bool = False
+        is_return: bool = False,
+        selected_recipients: Optional[list] = None
     ) -> Dict[str, Any]:
         """
         Send notification to all configured recipients.
+        If selected_recipients is provided (admin override), only send to those recipients.
+        selected_recipients can contain: 'admin', 'user', 'passenger'
         Returns detailed status for error handling.
         """
         logger.info(f"[NOTIFICATION START] Booking: {booking.id}, Type: {notification_type}")
 
-        # Get recipients
-        recipients = cls.get_recipients(booking, notification_type)
+        # Get recipients based on selection or default logic
+        if selected_recipients is not None:
+            recipients = cls._get_selected_recipients(booking, notification_type, selected_recipients)
+            logger.info(f"[NOTIFICATION] Using admin-selected recipients: {selected_recipients}")
+        else:
+            recipients = cls.get_recipients(booking, notification_type)
 
         if not recipients:
             logger.warning(f"[NOTIFICATION] No recipients for booking {booking.id}")
@@ -189,6 +196,45 @@ class NotificationService:
         except Exception as e:
             logger.error(f"Error getting global recipients: {e}")
 
+        return list(recipients)
+    
+    @classmethod
+    def _get_selected_recipients(
+        cls,
+        booking: Booking,
+        notification_type: str,
+        selected_recipients: list
+    ) -> list:
+        """
+        Get recipients based on admin selection.
+        This bypasses normal preference checks for admin override capability.
+        
+        Args:
+            booking: The booking to send notifications for
+            notification_type: Type of notification
+            selected_recipients: List containing 'admin', 'user', and/or 'passenger'
+        
+        Returns:
+            List of email addresses to send to
+        """
+        recipients = set()
+        
+        # Admin
+        if 'admin' in selected_recipients:
+            admin_email = getattr(settings, 'ADMIN_EMAIL', None)
+            if admin_email:
+                recipients.add(admin_email)
+        
+        # User (account owner)
+        if 'user' in selected_recipients and booking.user.email:
+            recipients.add(booking.user.email)
+        
+        # Passenger
+        if 'passenger' in selected_recipients and booking.passenger_email:
+            # Avoid duplicate if passenger == user
+            if booking.passenger_email.lower() != booking.user.email.lower():
+                recipients.add(booking.passenger_email)
+        
         return list(recipients)
     
     @classmethod
