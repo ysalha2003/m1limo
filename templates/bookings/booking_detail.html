@@ -97,6 +97,30 @@
             font-size: 11px !important;
             padding: 4px 10px !important;
         }
+        
+        /* Notification section mobile */
+        #notification-display span,
+        #notification-edit label span {
+            font-size: 11px !important;
+        }
+        
+        #notification-edit textarea {
+            font-size: 11px !important;
+        }
+        
+        .notification-buttons-wrapper {
+            flex-wrap: wrap !important;
+            gap: 4px !important;
+        }
+        
+        .notification-edit-buttons {
+            width: 100% !important;
+            justify-content: stretch !important;
+        }
+        
+        .notification-edit-buttons button {
+            flex: 1 !important;
+        }
     }
 </style>
 
@@ -200,16 +224,16 @@
                     
                     <!-- Notification Status -->
                     <div style="margin-top: 12px; padding: 10px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <div class="notification-buttons-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
                             <p style="font-size: 11px; color: #64748b; margin: 0; font-weight: 600; text-transform: uppercase;">Email Notifications</p>
-                            <div style="display: flex; gap: 8px;">
-                                <button onclick="toggleNotificationEdit()" type="button" style="background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 11px; padding: 2px 6px; font-weight: 500;">
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button onclick="toggleNotificationEdit()" type="button" style="background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: 500; white-space: nowrap;">
                                     <span id="notif-edit-btn-text">Edit</span>
                                 </button>
                                 <form method="post" action="{% url 'resend_notification' booking.id %}" style="display: inline;">
                                     {% csrf_token %}
-                                    <button type="submit" style="background: none; border: none; color: #10b981; cursor: pointer; font-size: 11px; padding: 2px 6px; font-weight: 500; display: flex; align-items: center; gap: 4px;" title="Resend booking confirmation">
-                                        <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button type="submit" style="background: none; border: none; color: #10b981; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: 500; display: flex; align-items: center; gap: 4px; white-space: nowrap;" title="Resend booking confirmation">
+                                        <svg style="width: 12px; height: 12px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                         </svg>
                                         <span>Send</span>
@@ -249,13 +273,13 @@
                             <form method="post" action="{% url 'update_notification_preferences' booking.id %}" id="notification-form">
                                 {% csrf_token %}
                                 <div style="margin-bottom: 10px;">
-                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px; color: #0f172a;">
+                                    <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 12px; color: #0f172a;">
                                         <input type="checkbox" name="send_passenger_notifications" id="id_send_passenger_notifications" 
                                                {% if booking.send_passenger_notifications %}checked{% endif %}
-                                               style="width: 16px; height: 16px; cursor: pointer;">
-                                        <span>Send booking notifications to passenger</span>
+                                               style="width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; margin-top: 2px;">
+                                        <span style="word-break: break-word;">Send booking notifications to passenger</span>
                                     </label>
-                                    <p style="font-size: 11px; color: #64748b; margin: 4px 0 0 24px;">Passenger will receive confirmations, updates, and reminders</p>
+                                    <p style="font-size: 11px; color: #64748b; margin: 4px 0 0 24px; word-break: break-word;">Passenger will receive confirmations, updates, and reminders</p>
                                 </div>
                                 
                                 <div style="margin-bottom: 10px;">
@@ -263,14 +287,14 @@
                                         Additional Recipients (Optional)
                                     </label>
                                     <textarea name="additional_recipients" id="id_additional_recipients" rows="2" 
-                                              style="width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 4px; font-family: inherit; resize: vertical;"
+                                              style="width: 100%; max-width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 4px; font-family: inherit; resize: vertical; box-sizing: border-box;"
                                               placeholder="email1@example.com, email2@example.com">{{ booking.additional_recipients }}</textarea>
                                     <p style="font-size: 10px; color: #64748b; margin: 2px 0 0 0;">Separate multiple emails with commas</p>
                                 </div>
                                 
-                                <div style="display: flex; gap: 8px; margin-top: 12px;">
-                                    <button type="submit" class="btn btn-sm btn-primary" style="padding: 6px 12px; font-size: 12px;">Save</button>
-                                    <button type="button" onclick="toggleNotificationEdit()" class="btn btn-sm btn-secondary" style="padding: 6px 12px; font-size: 12px;">Cancel</button>
+                                <div class="notification-edit-buttons" style="display: flex; gap: 8px; margin-top: 12px;">
+                                    <button type="submit" class="btn btn-sm btn-primary" style="padding: 6px 12px; font-size: 12px; flex: 1;">Save</button>
+                                    <button type="button" onclick="toggleNotificationEdit()" class="btn btn-sm btn-secondary" style="padding: 6px 12px; font-size: 12px; flex: 1;">Cancel</button>
                                 </div>
                             </form>
                         </div>
