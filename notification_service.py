@@ -119,14 +119,29 @@ class NotificationService:
         if admin_email:
             recipients.add(admin_email)
 
-        # Always send to account holder's email for all notification types
+        # Account owner - check their UserProfile preferences
         if booking.user.email:
-            recipients.add(booking.user.email)
+            if cls._should_notify_user(booking.user, notification_type):
+                recipients.add(booking.user.email)
 
-        # Only send reminders to passenger email (if different from user email)
-        if notification_type == 'reminder' and booking.passenger_email:
-            if booking.passenger_email != booking.user.email:
-                recipients.add(booking.passenger_email)
+        # Passenger - check booking's send_passenger_notifications flag
+        if booking.send_passenger_notifications and booking.passenger_email:
+            # Skip if passenger email == account owner email (avoid duplicates)
+            if booking.passenger_email.lower() != booking.user.email.lower():
+                # Send all types except 'new' (passenger doesn't need "new booking" admin alert)
+                if notification_type in ['confirmed', 'status_change', 'cancelled', 'reminder']:
+                    recipients.add(booking.passenger_email)
+
+        # Additional recipients - parse comma-separated emails
+        if booking.additional_recipients:
+            emails = [email.strip() for email in booking.additional_recipients.split(',')]
+            for email in emails:
+                if email and '@' in email:  # Basic validation
+                    # Skip duplicates
+                    if email.lower() not in [r.lower() for r in recipients]:
+                        # Additional recipients get all notification types except 'new'
+                        if notification_type in ['confirmed', 'status_change', 'cancelled', 'reminder']:
+                            recipients.add(email)
 
         try:
             booking_ids = [booking.id]
@@ -175,6 +190,27 @@ class NotificationService:
             logger.error(f"Error getting global recipients: {e}")
 
         return list(recipients)
+    
+    @classmethod
+    def _should_notify_user(cls, user, notification_type: str) -> bool:
+        """Check if user should receive notification based on their preferences"""
+        try:
+            profile = user.profile
+            
+            if notification_type == 'confirmed':
+                return profile.receive_booking_confirmations
+            elif notification_type in ['status_change', 'cancelled']:
+                return profile.receive_status_updates
+            elif notification_type == 'reminder':
+                return profile.receive_pickup_reminders
+            else:
+                # For 'new' and other types, always send to account owner
+                return True
+                
+        except Exception as e:
+            logger.warning(f"Could not check user preferences for {user.email}: {e}")
+            # Default to sending if we can't check preferences
+            return True
     
     @staticmethod
     def _record_notification(

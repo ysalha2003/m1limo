@@ -101,6 +101,36 @@
                     {% if form.passenger_email.help_text %}
                         <div style="color: #64748b; font-size: 12px; margin-top: 4px;">{{ form.passenger_email.help_text }}</div>
                     {% endif %}
+                    
+                    <!-- Notification Preferences -->
+                    <div style="margin-top: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <label class="checkbox-label" style="display: flex; align-items: center; cursor: pointer; margin-bottom: 8px;">
+                            {{ form.send_passenger_notifications }}
+                            <span style="margin-left: 8px; font-size: 14px; font-weight: 500;">Send notifications to passenger</span>
+                        </label>
+                        <div style="font-size: 12px; color: #64748b; margin-left: 28px;">
+                            Passenger will receive booking confirmation, status updates, and pickup reminders
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 8px; font-size: 12px; color: #64748b;">
+                        You will always receive notifications based on your <a href="{% url 'edit_profile' %}" style="color: var(--primary); text-decoration: underline;">Email Preferences</a>
+                    </div>
+                </div>
+
+                <!-- Additional Recipients (Optional) -->
+                <div class="form-group" style="margin-top: 16px;">
+                    <label class="form-label" for="id_additional_recipients">
+                        Additional Recipients (Optional)
+                        <span style="font-weight: 400; font-size: 12px; color: #64748b;">• for group bookings</span>
+                    </label>
+                    {{ form.additional_recipients }}
+                    {% if form.additional_recipients.errors %}
+                        <div style="color: #ef4444; font-size: 13px; margin-top: 4px;">{{ form.additional_recipients.errors.0 }}</div>
+                    {% endif %}
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                        Enter additional email addresses separated by commas. They will receive all booking notifications.
+                    </div>
                 </div>
 
                 <div class="form-group">

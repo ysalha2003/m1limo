@@ -59,6 +59,30 @@ class BookingForm(BaseModelForm):
         }),
         help_text="Required: Email for booking confirmations and updates"
     )
+    
+    # Notification preferences
+    send_passenger_notifications = forms.BooleanField(
+        required=False,
+        initial=True,
+        label="Send notifications to passenger",
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-checkbox',
+            'checked': 'checked'
+        }),
+        help_text="Passenger will receive booking confirmation, updates, and reminders"
+    )
+    
+    additional_recipients = forms.CharField(
+        required=False,
+        label="Additional Recipients (Optional)",
+        widget=forms.Textarea(attrs={
+            'placeholder': 'john@example.com, jane@example.com',
+            'class': 'form-input',
+            'rows': '2',
+            'maxlength': '500'
+        }),
+        help_text="Enter additional email addresses separated by commas. They will receive all booking notifications."
+    )
 
     # Additional fields for trip configuration
     is_airport_trip = forms.BooleanField(required=False, label="Airport Pickup/Dropoff?")
@@ -77,6 +101,8 @@ class BookingForm(BaseModelForm):
             'passenger_name',
             'phone_number',
             'passenger_email',
+            'send_passenger_notifications',
+            'additional_recipients',
             'number_of_passengers',
             'vehicle_type',
             'trip_type',
@@ -173,6 +199,35 @@ class BookingForm(BaseModelForm):
                 self.add_error('return_dropoff_address', 'Return dropoff address required')
 
         return cleaned_data
+    
+    def clean_additional_recipients(self) -> str:
+        """Validate additional recipients email addresses"""
+        additional_recipients = self.cleaned_data.get('additional_recipients', '').strip()
+        
+        if not additional_recipients:
+            return ''
+        
+        # Parse comma-separated emails
+        emails = [email.strip() for email in additional_recipients.split(',')]
+        valid_emails = []
+        invalid_emails = []
+        
+        for email in emails:
+            if not email:
+                continue
+            try:
+                validate_email(email)
+                valid_emails.append(email)
+            except ValidationError:
+                invalid_emails.append(email)
+        
+        if invalid_emails:
+            raise ValidationError(
+                f"Invalid email address(es): {', '.join(invalid_emails)}"
+            )
+        
+        # Return cleaned comma-separated string
+        return ', '.join(valid_emails)
 
 
 class AdminBookingForm(BookingForm):

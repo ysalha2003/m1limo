@@ -317,6 +317,17 @@ class Booking(models.Model):
         help_text="Timestamp when customer communication was sent"
     )
 
+    # Notification preferences
+    send_passenger_notifications = models.BooleanField(
+        default=True,
+        help_text="Send booking confirmations and updates to passenger email"
+    )
+    additional_recipients = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Additional email addresses (comma-separated) to receive notifications"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
