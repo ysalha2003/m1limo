@@ -1275,7 +1275,21 @@ class EmailTemplate(models.Model):
                 'new_status': 'New booking status',
             })
 
-        if 'driver' in self.template_type:
+        if self.template_type == 'driver_notification':
+            # Driver notification has specific variables
+            common_vars.update({
+                'driver_full_name': 'Driver full name',
+                'driver_email': 'Driver email address',
+                'pickup_location': 'Pickup address',
+                'pickup_date': 'Pickup date (formatted)',
+                'pickup_time': 'Pickup time (formatted)',
+                'drop_off_location': 'Drop-off address (optional for hourly)',
+                'payment_amount': 'Driver payment amount (optional)',
+                'driver_portal_url': 'Link to driver portal for this trip',
+                'all_trips_url': 'Link to view all assigned trips',
+                'support_phone': 'Support phone number',
+            })
+        elif 'driver' in self.template_type:
             common_vars.update({
                 'driver_name': 'Assigned driver name',
                 'driver_phone': 'Driver phone number',

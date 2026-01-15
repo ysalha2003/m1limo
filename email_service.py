@@ -243,6 +243,59 @@ class EmailService:
         
         return context
     
+    @staticmethod
+    def _build_driver_template_context(booking: Booking, driver) -> dict:
+        """Build context dictionary for driver email templates (variable format)."""
+        import hashlib
+        from django.conf import settings
+        
+        # Generate secure tokens for driver portal access
+        token = hashlib.md5(f"{booking.id}-{driver.email}".encode()).hexdigest()[:16]
+        base_url = settings.BASE_URL
+        driver_portal_url = f"{base_url}/driver/trip/{booking.id}/{token}/"
+        
+        all_trips_token = hashlib.md5(driver.email.encode()).hexdigest()[:16]
+        all_trips_url = f"{base_url}/driver/trips/{driver.email}/{all_trips_token}/"
+        
+        context = {
+            # Driver information
+            'driver_full_name': driver.get_full_name() if hasattr(driver, 'get_full_name') else str(driver),
+            'driver_email': driver.email,
+            
+            # Booking reference
+            'booking_reference': booking.booking_reference or f"#{booking.id}",
+            
+            # Trip details (formatted strings for database templates)
+            'pickup_location': booking.pick_up_address,
+            'pickup_date': booking.pick_up_date.strftime('%A, %B %d, %Y') if booking.pick_up_date else '',
+            'pickup_time': booking.pick_up_time.strftime('%I:%M %p') if booking.pick_up_time else '',
+            'drop_off_location': booking.drop_off_address or '',
+            
+            # Passenger information
+            'passenger_name': booking.passenger_name,
+            'passenger_phone': booking.phone_number,
+            'passenger_email': booking.passenger_email or '',
+            
+            # Vehicle and trip details
+            'vehicle_type': booking.vehicle_type or '',
+            'trip_type': booking.get_trip_type_display() if hasattr(booking, 'get_trip_type_display') else booking.trip_type,
+            'number_of_passengers': str(booking.number_of_passengers) if booking.number_of_passengers else '',
+            
+            # Payment information
+            'payment_amount': str(booking.driver_payment_amount) if hasattr(booking, 'driver_payment_amount') and booking.driver_payment_amount else '',
+            
+            # Portal URLs
+            'driver_portal_url': driver_portal_url,
+            'all_trips_url': all_trips_url,
+            
+            # Company information
+            'company_name': settings.COMPANY_INFO.get('name', 'M1 Limousine Service'),
+            'support_email': settings.COMPANY_INFO.get('email', 'support@m1limo.com'),
+            'support_phone': settings.COMPANY_INFO.get('phone', ''),
+        }
+        
+        return context
+    
     @classmethod
     def send_round_trip_notification(
         cls,
@@ -585,45 +638,54 @@ Subject: {subject}
     @classmethod
     def send_driver_notification(cls, booking, driver) -> bool:
         """
-        Send driver assignment notification with essential trip details only.
-        User requested: pickup location, pickup date & time, passenger name, passenger phone.
-        Keep it simple and lightweight - no unnecessary system details.
+        Send driver assignment notification with programmable template support.
+        Tries database template first, falls back to file template if unavailable.
         """
         from django.template.loader import render_to_string
-        from django.conf import settings
-        import hashlib
 
         logger.info(f"Sending driver notification to {driver.email} for booking {booking.id}")
 
         try:
-            # Generate secure token for driver portal access
-            token = hashlib.md5(f"{booking.id}-{driver.email}".encode()).hexdigest()[:16]
-
-            # Build driver portal URL using production BASE_URL
-            base_url = settings.BASE_URL
-            driver_portal_url = f"{base_url}/driver/trip/{booking.id}/{token}/"
-
-            # Generate all trips URL token
-            all_trips_token = hashlib.md5(driver.email.encode()).hexdigest()[:16]
-            all_trips_url = f"{base_url}/driver/trips/{driver.email}/{all_trips_token}/"
-
-            # Render email template with minimal context
-            context = {
-                'driver': driver,
-                'booking': booking,
-                'pickup_location': booking.pick_up_address,
-                'pickup_date': booking.pick_up_date,
-                'pickup_time': booking.pick_up_time,
-                'passenger_name': booking.passenger_name,
-                'passenger_phone': booking.phone_number,
-                'drop_off_location': booking.drop_off_address if booking.drop_off_address else None,
-                'driver_portal_url': driver_portal_url,
-                'all_trips_url': all_trips_url,
-                'payment_amount': booking.driver_payment_amount if hasattr(booking, 'driver_payment_amount') and booking.driver_payment_amount else None,
-            }
-
-            html_message = render_to_string('emails/driver_notification.html', context)
-            subject = f"New Trip Assignment - {booking.pick_up_date.strftime('%b %d, %Y')}"
+            # Try to load database template first
+            db_template = cls._load_email_template('driver_notification')
+            
+            if db_template:
+                try:
+                    # Build context for database template (string-based variables)
+                    template_context = cls._build_driver_template_context(booking, driver)
+                    subject = db_template.render_subject(template_context)
+                    html_message = db_template.render_html(template_context)
+                    
+                    logger.info(f"Using database template for driver notification")
+                    db_template.increment_sent()
+                except Exception as e:
+                    logger.error(f"Database template rendering error: {e}, falling back to file template")
+                    db_template.increment_failed()
+                    db_template = None
+            
+            # Fallback to file template if database template not available or failed
+            if not db_template:
+                # Build context for file template with _build_driver_template_context
+                template_context = cls._build_driver_template_context(booking, driver)
+                
+                # For file template, we need objects for Django template filters
+                context = {
+                    'driver': driver,
+                    'booking': booking,
+                    'pickup_location': booking.pick_up_address,
+                    'pickup_date': booking.pick_up_date,
+                    'pickup_time': booking.pick_up_time,
+                    'passenger_name': booking.passenger_name,
+                    'passenger_phone': booking.phone_number,
+                    'drop_off_location': booking.drop_off_address if booking.drop_off_address else None,
+                    'driver_portal_url': template_context['driver_portal_url'],
+                    'all_trips_url': template_context['all_trips_url'],
+                    'payment_amount': booking.driver_payment_amount if hasattr(booking, 'driver_payment_amount') and booking.driver_payment_amount else None,
+                }
+                
+                html_message = render_to_string('emails/driver_notification.html', context)
+                subject = f"New Trip Assignment - {booking.pick_up_date.strftime('%b %d, %Y')}"
+                logger.info(f"Using file template fallback for driver notification")
 
             # Try all email sending methods
             success = (
