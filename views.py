@@ -218,17 +218,42 @@ def dashboard(request):
     search_query = request.GET.get('search', '').strip()
     if search_query:
         from django.db.models import Q
-        filters = (
-            Q(passenger_name__icontains=search_query) |
-            Q(phone_number__icontains=search_query) |
-            Q(pick_up_address__icontains=search_query) |
-            Q(drop_off_address__icontains=search_query) |
-            Q(booking_reference__icontains=search_query)
-        )
-        # Add exact ID match if search query is numeric
-        if search_query.isdigit():
-            filters |= Q(id=int(search_query))
-        base_queryset = base_queryset.filter(filters)
+        
+        # Smart Trip ID search: Check if search starts with # or is purely numeric
+        # This prevents false matches in phone numbers and other fields
+        if search_query.startswith('#'):
+            # User explicitly searched for Trip ID with # prefix
+            trip_id = search_query[1:].strip()
+            if trip_id.isdigit():
+                # Only search by ID - exact match
+                base_queryset = base_queryset.filter(id=int(trip_id))
+            else:
+                # Invalid format after #, return no results
+                base_queryset = base_queryset.none()
+        elif search_query.isdigit():
+            # Pure number without # - could be Trip ID or phone number
+            # Search ID first (exact match), then fallback to other fields
+            # This prioritizes Trip ID matches but still allows phone searches
+            filters = Q(id=int(search_query))
+            # Also search in other fields to catch partial phone numbers
+            filters |= (
+                Q(passenger_name__icontains=search_query) |
+                Q(phone_number__icontains=search_query) |
+                Q(pick_up_address__icontains=search_query) |
+                Q(drop_off_address__icontains=search_query) |
+                Q(booking_reference__icontains=search_query)
+            )
+            base_queryset = base_queryset.filter(filters)
+        else:
+            # Regular text search across all fields
+            filters = (
+                Q(passenger_name__icontains=search_query) |
+                Q(phone_number__icontains=search_query) |
+                Q(pick_up_address__icontains=search_query) |
+                Q(drop_off_address__icontains=search_query) |
+                Q(booking_reference__icontains=search_query)
+            )
+            base_queryset = base_queryset.filter(filters)
 
     # Date range filtering - supports both single date and date range
     date_from = request.GET.get('date_from')
