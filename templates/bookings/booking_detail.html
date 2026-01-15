@@ -321,7 +321,7 @@
                                     </label>
                                     <textarea name="additional_recipients" id="id_additional_recipients" rows="2" 
                                               style="width: 100%; max-width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 4px; font-family: inherit; resize: vertical; box-sizing: border-box;"
-                                              placeholder="email1@example.com, email2@example.com">{{ booking.additional_recipients }}</textarea>
+                                              placeholder="email1@example.com, email2@example.com">{{ booking.additional_recipients|default:"" }}</textarea>
                                     <p style="font-size: 10px; color: #64748b; margin: 2px 0 0 0;">Separate multiple emails with commas</p>
                                 </div>
                                 
