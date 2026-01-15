@@ -200,29 +200,69 @@
                     
                     <!-- Notification Status -->
                     <div style="margin-top: 12px; padding: 10px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
-                        <p style="font-size: 11px; color: #64748b; margin-bottom: 6px; font-weight: 600; text-transform: uppercase;">Email Notifications</p>
-                        {% if booking.send_passenger_notifications %}
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <svg style="width: 14px; height: 14px; color: #22c55e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                <span style="font-size: 12px; color: #0f172a;">Passenger notifications enabled</span>
-                            </div>
-                        {% else %}
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <svg style="width: 14px; height: 14px; color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                                </svg>
-                                <span style="font-size: 12px; color: #64748b;">Passenger notifications disabled</span>
-                            </div>
-                        {% endif %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <p style="font-size: 11px; color: #64748b; margin: 0; font-weight: 600; text-transform: uppercase;">Email Notifications</p>
+                            <button onclick="toggleNotificationEdit()" type="button" style="background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 11px; padding: 2px 6px; font-weight: 500;">
+                                <span id="notif-edit-btn-text">Edit</span>
+                            </button>
+                        </div>
                         
-                        {% if booking.additional_recipients %}
-                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0;">
-                                <p style="font-size: 11px; color: #64748b; margin-bottom: 4px;">Additional Recipients:</p>
-                                <p style="font-size: 12px; color: #0f172a;">{{ booking.additional_recipients }}</p>
-                            </div>
-                        {% endif %}
+                        <!-- Display Mode -->
+                        <div id="notification-display">
+                            {% if booking.send_passenger_notifications %}
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                    <svg style="width: 14px; height: 14px; color: #22c55e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span style="font-size: 12px; color: #0f172a;">Passenger notifications enabled</span>
+                                </div>
+                            {% else %}
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                    <svg style="width: 14px; height: 14px; color: #94a3b8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                    </svg>
+                                    <span style="font-size: 12px; color: #64748b;">Passenger notifications disabled</span>
+                                </div>
+                            {% endif %}
+                            
+                            {% if booking.additional_recipients %}
+                                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0;">
+                                    <p style="font-size: 11px; color: #64748b; margin-bottom: 4px;">Additional Recipients:</p>
+                                    <p style="font-size: 12px; color: #0f172a; word-break: break-word;">{{ booking.additional_recipients }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Edit Mode -->
+                        <div id="notification-edit" style="display: none;">
+                            <form method="post" action="{% url 'update_notification_preferences' booking.id %}" id="notification-form">
+                                {% csrf_token %}
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px; color: #0f172a;">
+                                        <input type="checkbox" name="send_passenger_notifications" id="id_send_passenger_notifications" 
+                                               {% if booking.send_passenger_notifications %}checked{% endif %}
+                                               style="width: 16px; height: 16px; cursor: pointer;">
+                                        <span>Send booking notifications to passenger</span>
+                                    </label>
+                                    <p style="font-size: 11px; color: #64748b; margin: 4px 0 0 24px;">Passenger will receive confirmations, updates, and reminders</p>
+                                </div>
+                                
+                                <div style="margin-bottom: 10px;">
+                                    <label for="id_additional_recipients" style="display: block; font-size: 12px; color: #0f172a; margin-bottom: 4px; font-weight: 500;">
+                                        Additional Recipients (Optional)
+                                    </label>
+                                    <textarea name="additional_recipients" id="id_additional_recipients" rows="2" 
+                                              style="width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #e2e8f0; border-radius: 4px; font-family: inherit; resize: vertical;"
+                                              placeholder="email1@example.com, email2@example.com">{{ booking.additional_recipients }}</textarea>
+                                    <p style="font-size: 10px; color: #64748b; margin: 2px 0 0 0;">Separate multiple emails with commas</p>
+                                </div>
+                                
+                                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                                    <button type="submit" class="btn btn-sm btn-primary" style="padding: 6px 12px; font-size: 12px;">Save</button>
+                                    <button type="button" onclick="toggleNotificationEdit()" class="btn btn-sm btn-secondary" style="padding: 6px 12px; font-size: 12px;">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
@@ -544,6 +584,24 @@ document.addEventListener('click', function(event) {
         menu.style.display = 'none';
     }
 });
+
+function toggleNotificationEdit() {
+    const displayDiv = document.getElementById('notification-display');
+    const editDiv = document.getElementById('notification-edit');
+    const btnText = document.getElementById('notif-edit-btn-text');
+    
+    if (editDiv.style.display === 'none') {
+        // Switch to edit mode
+        displayDiv.style.display = 'none';
+        editDiv.style.display = 'block';
+        btnText.textContent = 'Cancel';
+    } else {
+        // Switch to display mode
+        displayDiv.style.display = 'block';
+        editDiv.style.display = 'none';
+        btnText.textContent = 'Edit';
+    }
+}
 </script>
 
 {% endblock %}

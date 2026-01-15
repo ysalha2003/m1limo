@@ -819,6 +819,55 @@ def update_booking(request, booking_id):
 
 
 @login_required
+def update_notification_preferences(request, booking_id):
+    """
+    Update notification preferences for a booking.
+    Only allows updating send_passenger_notifications and additional_recipients.
+    """
+    booking = get_object_or_404(Booking, id=booking_id)
+    
+    # Check permissions
+    can_edit, error_message = BookingService.can_user_edit_booking(request.user, booking)
+    if not can_edit:
+        messages.error(request, error_message)
+        return redirect('booking_detail', booking_id=booking_id)
+    
+    if request.method == 'POST':
+        # Update send_passenger_notifications
+        booking.send_passenger_notifications = 'send_passenger_notifications' in request.POST
+        
+        # Update additional_recipients with validation
+        additional_recipients = request.POST.get('additional_recipients', '').strip()
+        
+        if additional_recipients:
+            # Validate email format
+            from django.core.validators import validate_email
+            from django.core.exceptions import ValidationError
+            
+            emails = [email.strip() for email in additional_recipients.split(',') if email.strip()]
+            invalid_emails = []
+            
+            for email in emails:
+                try:
+                    validate_email(email)
+                except ValidationError:
+                    invalid_emails.append(email)
+            
+            if invalid_emails:
+                messages.error(request, f"Invalid email address(es): {', '.join(invalid_emails)}")
+                return redirect('booking_detail', booking_id=booking_id)
+            
+            booking.additional_recipients = additional_recipients
+        else:
+            booking.additional_recipients = None
+        
+        booking.save()
+        messages.success(request, "Notification preferences updated successfully.")
+    
+    return redirect('booking_detail', booking_id=booking_id)
+
+
+@login_required
 def rebook_booking(request, booking_id):
     """
     Rebook a past trip with pre-filled information.

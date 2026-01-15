@@ -44,11 +44,13 @@ urlpatterns = [
     # Reservation management
     path('reservation/new/', views.new_booking, name='new_reservation'),
     path('reservation/<int:booking_id>/', views.booking_detail, name='reservation_detail'),
+    path('booking/<int:booking_id>/', views.booking_detail, name='booking_detail'),  # Alias for consistency
     path('activity/<int:activity_id>/', views.view_activity, name='view_activity'),
     path('my-reservation/<int:booking_id>/', views.view_user_booking, name='view_user_reservation'),
     path('reservation/<int:booking_id>/confirmation/', views.booking_confirmation, name='reservation_confirmation'),
     path('reservation/<int:booking_id>/update/', views.update_booking, name='update_reservation'),
     path('reservation/<int:booking_id>/update-round-trip/', views.update_round_trip, name='update_round_trip'),
+    path('reservation/<int:booking_id>/update-notifications/', views.update_notification_preferences, name='update_notification_preferences'),
     path('reservation/<int:booking_id>/rebook/', views.rebook_booking, name='rebook_reservation'),
     path('reservation/<int:booking_id>/cancel/', views.cancel_booking, name='cancel_reservation'),
     path('reservation/<int:booking_id>/delete/', views.delete_booking, name='delete_reservation'),  # Backwards compat
