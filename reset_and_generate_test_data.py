@@ -170,42 +170,15 @@ def flush_all_bookings():
 
 
 def create_test_users():
-    """Create or get test users"""
-    users = []
-    
-    # Main test user
-    user, created = User.objects.get_or_create(
-        username='testuser',
-        defaults={
-            'email': generate_test_email(1),
-            'first_name': 'Test',
-            'last_name': 'User'
-        }
-    )
-    if created:
-        user.set_password('test123')
-        user.save()
-        print(f"✓ Created user: {user.username} ({user.email})")
-    else:
+    """Get the existing 'co' user for all bookings"""
+    try:
+        user = User.objects.get(username='co')
         print(f"✓ Using existing user: {user.username} ({user.email})")
-    users.append(user)
-    
-    # Additional test users
-    for i in range(2, 5):
-        user, created = User.objects.get_or_create(
-            username=f'testuser{i}',
-            defaults={
-                'email': generate_test_email(i),
-                'first_name': f'Test{i}',
-                'last_name': 'User'
-            }
-        )
-        if created:
-            user.set_password('test123')
-            user.save()
-        users.append(user)
-    
-    return users
+        return [user]  # Return as list for compatibility
+    except User.DoesNotExist:
+        print("❌ ERROR: User 'co' not found in database")
+        print("   Please create the 'co' user first or modify the script.")
+        sys.exit(1)
 
 
 def create_point_to_point_booking(user, base_date, email_index):
@@ -381,8 +354,9 @@ def generate_test_data(num_bookings=20):
     print(f"GENERATING {num_bookings} TEST BOOKINGS")
     print(f"{'='*70}\n")
     
-    # Create users
+    # Get the 'co' user for all bookings
     users = create_test_users()
+    user = users[0]  # Use the 'co' user for all bookings
     base_date = datetime.now().date() + timedelta(days=1)
     
     created_count = 0
@@ -394,7 +368,6 @@ def generate_test_data(num_bookings=20):
     email_index = 1
     
     for i in range(num_bookings):
-        user = random.choice(users)
         trip_type = random.choice(TRIP_TYPES)
         
         try:
