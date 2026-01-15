@@ -273,12 +273,28 @@ class EmailService:
                     logger.warning(f"Could not check user preferences for {recipient_email}: {e}")
                     pass
 
+            # Build company info with dashboard URL
+            company_info = settings.COMPANY_INFO.copy()
+            company_info['dashboard_url'] = f"{settings.BASE_URL}/dashboard"
+            
             context = {
                 'is_round_trip': True,
                 'first_trip': first_trip,
                 'return_trip': return_trip,
                 'notification_type': notification_type,
-                'company_info': settings.COMPANY_INFO,
+                'company_info': company_info,
+                # Add flat variables for backwards compatibility with old template syntax
+                'booking_id': first_trip.id,
+                'booking_reference': first_trip.booking_reference,
+                'passenger_name': first_trip.passenger_name,
+                'phone_number': first_trip.phone_number,
+                'passenger_email': first_trip.passenger_email or '',
+                'pick_up_date': first_trip.pick_up_date.strftime('%B %d, %Y') if first_trip.pick_up_date else '',
+                'pick_up_time': first_trip.pick_up_time.strftime('%I:%M %p') if first_trip.pick_up_time else '',
+                'pick_up_address': first_trip.pick_up_address,
+                'drop_off_address': first_trip.drop_off_address,
+                'vehicle_type': first_trip.vehicle_type or '',
+                'trip_type': 'Round Trip',
             }
 
             # Map notification type to template type
@@ -295,10 +311,10 @@ class EmailService:
             
             if db_template:
                 try:
-                    # Build context for database template
-                    template_context = cls._build_round_trip_template_context(first_trip, return_trip, notification_type)
-                    subject = db_template.render_subject(template_context)
-                    html_message = db_template.render_html(template_context)
+                    # Use the same context as file templates (booking objects, not strings)
+                    # Database templates now use Django template syntax and expect booking objects
+                    subject = db_template.render_subject(context)
+                    html_message = db_template.render_html(context)
                     plain_message = strip_tags(html_message)
                     
                     logger.info(f"Using database template for round-trip {notification_type}")
