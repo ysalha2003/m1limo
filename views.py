@@ -870,7 +870,7 @@ def update_notification_preferences(request, booking_id):
 @login_required
 def resend_notification(request, booking_id):
     """
-    Resend booking confirmation notification.
+    Resend booking notification based on current status.
     Only allows account owner or admin to trigger.
     """
     booking = get_object_or_404(Booking, id=booking_id)
@@ -883,9 +883,26 @@ def resend_notification(request, booking_id):
     
     if request.method == 'POST':
         try:
-            # Send confirmation notification
-            NotificationService.send_notification(booking, 'confirmed')
-            messages.success(request, f"Booking confirmation resent successfully to all recipients.")
+            # Map booking status to notification type
+            status_to_notification = {
+                'Pending': 'new',
+                'Confirmed': 'confirmed',
+                'Cancelled': 'cancelled',
+                'Cancelled_Full_Charge': 'cancelled',
+                'Customer_No_Show': 'cancelled',
+                'Trip_Not_Covered': 'cancelled',
+                'Trip_Completed': 'status_change',
+            }
+            
+            # Get notification type based on current status
+            notification_type = status_to_notification.get(booking.status, 'confirmed')
+            
+            # Send notification with current status
+            NotificationService.send_notification(booking, notification_type)
+            
+            # Success message with status context
+            status_display = booking.get_status_display()
+            messages.success(request, f"Notification for '{status_display}' status resent successfully to all recipients.")
         except Exception as e:
             messages.error(request, f"Failed to send notification: {str(e)}")
     
