@@ -109,7 +109,7 @@ CONTACT_NUMBERS = [
 
 # Vehicle types with capacities
 VEHICLE_TYPES = ['Sedan', 'SUV', 'Sprinter Van']
-VEHICLE_CAPACITY = {'Sedan': 3, 'SUV': 6, 'Sprinter Van': 14}
+VEHICLE_CAPACITY = {'Sedan': 2, 'SUV': 6, 'Sprinter Van': 12}
 
 # Booking statuses
 STATUSES = ['Pending', 'Confirmed', 'Confirmed', 'Confirmed']  # Weighted toward Confirmed
@@ -346,7 +346,7 @@ def create_hourly_booking(user, base_date, email_index):
     pickup_date, pickup_time = get_random_date_time(base_date)
     
     # Hours
-    hours = random.choice([3, 4, 5, 6, 8])
+    hours_booked = random.choice([3, 4, 5, 6, 8])
     
     # New features
     send_passenger_notifications = random.choice([True, True, True, False])
@@ -365,7 +365,7 @@ def create_hourly_booking(user, base_date, email_index):
         trip_type='Hourly',
         vehicle_type=vehicle_type,
         number_of_passengers=num_passengers,
-        hours=hours,
+        hours_booked=hours_booked,
         status=status,
         send_passenger_notifications=send_passenger_notifications,
         additional_recipients=additional_recipients,
@@ -430,7 +430,7 @@ def generate_test_data(num_bookings=20):
                 created_count += 1
                 hourly_count += 1
                 print(f"✓ Hourly #{booking.id}: {booking.passenger_name}")
-                print(f"  📍 {booking.pick_up_address[:50]}... ({booking.hours} hours)")
+                print(f"  📍 {booking.pick_up_address[:50]}... ({booking.hours_booked} hours)")
                 print(f"  📅 {booking.pick_up_date} @ {booking.pick_up_time} | {booking.vehicle_type} | {booking.status}")
                 print(f"  📧 Passenger Email: {booking.passenger_email} (notifications: {'✅' if booking.send_passenger_notifications else '❌'})")
                 if booking.additional_recipients:
