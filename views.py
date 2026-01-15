@@ -868,6 +868,31 @@ def update_notification_preferences(request, booking_id):
 
 
 @login_required
+def resend_notification(request, booking_id):
+    """
+    Resend booking confirmation notification.
+    Only allows account owner or admin to trigger.
+    """
+    booking = get_object_or_404(Booking, id=booking_id)
+    
+    # Check permissions
+    can_edit, error_message = BookingService.can_user_edit_booking(request.user, booking)
+    if not can_edit:
+        messages.error(request, error_message)
+        return redirect('booking_detail', booking_id=booking_id)
+    
+    if request.method == 'POST':
+        try:
+            # Send confirmation notification
+            NotificationService.send_notification(booking, 'confirmed')
+            messages.success(request, f"Booking confirmation resent successfully to all recipients.")
+        except Exception as e:
+            messages.error(request, f"Failed to send notification: {str(e)}")
+    
+    return redirect('booking_detail', booking_id=booking_id)
+
+
+@login_required
 def rebook_booking(request, booking_id):
     """
     Rebook a past trip with pre-filled information.

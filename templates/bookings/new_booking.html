@@ -666,21 +666,6 @@
                         </div>
                     </div>
 
-                    <!-- Additional Recipients (Optional) -->
-                    <div class="form-group" style="margin-top: 16px;">
-                        <label class="form-label" for="id_additional_recipients">
-                            Additional Recipients (Optional)
-                            <span style="font-weight: 400; font-size: 12px; color: #64748b;">• for group bookings</span>
-                        </label>
-                        {{ form.additional_recipients }}
-                        {% if form.additional_recipients.errors %}
-                            <div class="form-error">{{ form.additional_recipients.errors.0 }}</div>
-                        {% endif %}
-                        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
-                            Enter additional email addresses separated by commas. They will receive all booking notifications.
-                        </div>
-                    </div>
-
                     <div class="form-group">
                         <label class="form-label" for="id_number_of_passengers">Number of Passengers * <span id="passengerCount" style="color: var(--primary); font-weight: 700;">1</span></label>
                         <input type="range" id="passengerSlider" min="1" max="15" value="1" class="passenger-slider" style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, var(--primary) 0%, var(--primary) 6.67%, var(--border) 6.67%, var(--border) 100%); outline: none; -webkit-appearance: none;">

@@ -51,6 +51,7 @@ urlpatterns = [
     path('reservation/<int:booking_id>/update/', views.update_booking, name='update_reservation'),
     path('reservation/<int:booking_id>/update-round-trip/', views.update_round_trip, name='update_round_trip'),
     path('reservation/<int:booking_id>/update-notifications/', views.update_notification_preferences, name='update_notification_preferences'),
+    path('reservation/<int:booking_id>/resend-notification/', views.resend_notification, name='resend_notification'),
     path('reservation/<int:booking_id>/rebook/', views.rebook_booking, name='rebook_reservation'),
     path('reservation/<int:booking_id>/cancel/', views.cancel_booking, name='cancel_reservation'),
     path('reservation/<int:booking_id>/delete/', views.delete_booking, name='delete_reservation'),  # Backwards compat

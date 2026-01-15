@@ -118,21 +118,6 @@
                     </div>
                 </div>
 
-                <!-- Additional Recipients (Optional) -->
-                <div class="form-group" style="margin-top: 16px;">
-                    <label class="form-label" for="id_additional_recipients">
-                        Additional Recipients (Optional)
-                        <span style="font-weight: 400; font-size: 12px; color: #64748b;">• for group bookings</span>
-                    </label>
-                    {{ form.additional_recipients }}
-                    {% if form.additional_recipients.errors %}
-                        <div style="color: #ef4444; font-size: 13px; margin-top: 4px;">{{ form.additional_recipients.errors.0 }}</div>
-                    {% endif %}
-                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
-                        Enter additional email addresses separated by commas. They will receive all booking notifications.
-                    </div>
-                </div>
-
                 <div class="form-group">
                     <label class="form-label" for="id_number_of_passengers">Passenger Count *</label>
                     {{ form.number_of_passengers }}
