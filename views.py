@@ -1196,7 +1196,7 @@ def update_round_trip(request, booking_id):
     )
 
     # Redirect to single-trip edit
-    return redirect('update_booking', booking_id=booking.id)
+    return redirect('update_reservation', booking_id=booking.id)
 
 
 @login_required

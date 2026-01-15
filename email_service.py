@@ -330,12 +330,17 @@ class EmailService:
             company_info = settings.COMPANY_INFO.copy()
             company_info['dashboard_url'] = f"{settings.BASE_URL}/dashboard"
             
+            # Build booking URL for the view details button
+            booking_url = f"{settings.BASE_URL}/reservation/{first_trip.id}/"
+            
             context = {
                 'is_round_trip': True,
+                'booking': first_trip,  # Main booking for template
                 'first_trip': first_trip,
                 'return_trip': return_trip,
                 'notification_type': notification_type,
                 'company_info': company_info,
+                'booking_url': booking_url,
                 # Add flat variables for backwards compatibility with old template syntax
                 'booking_id': first_trip.id,
                 'booking_reference': first_trip.booking_reference,

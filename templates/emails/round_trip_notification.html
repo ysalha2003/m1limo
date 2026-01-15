@@ -67,13 +67,28 @@
                 
                 <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
                     <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">➡️ OUTBOUND</div>
-                    <div style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 4px;">{{ booking.pick_up_date|date:"M j, Y" }} at {{ booking.pick_up_time|time:"g:i A" }}</div>
-                    <div style="font-size: 13px; color: #475569;">{{ booking.pick_up_address }} → {{ booking.drop_off_address }}</div>
+                    <div style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 4px;">
+                        {% if first_trip %}
+                            {{ first_trip.pick_up_date|date:"M j, Y" }} at {{ first_trip.pick_up_time|time:"g:i A" }}
+                        {% else %}
+                            {{ booking.pick_up_date|date:"M j, Y" }} at {{ booking.pick_up_time|time:"g:i A" }}
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 13px; color: #475569;">
+                        {% if first_trip %}
+                            {{ first_trip.pick_up_address }} → {{ first_trip.drop_off_address }}
+                        {% else %}
+                            {{ booking.pick_up_address }} → {{ booking.drop_off_address }}
+                        {% endif %}
+                    </div>
                 </div>
                 
                 <div>
                     <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">⬅️ RETURN</div>
-                    {% if booking.linked_booking %}
+                    {% if return_trip %}
+                    <div style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 4px;">{{ return_trip.pick_up_date|date:"M j, Y" }} at {{ return_trip.pick_up_time|time:"g:i A" }}</div>
+                    <div style="font-size: 13px; color: #475569;">{{ return_trip.pick_up_address }} → {{ return_trip.drop_off_address }}</div>
+                    {% elif booking.linked_booking %}
                     <div style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 4px;">{{ booking.linked_booking.pick_up_date|date:"M j, Y" }} at {{ booking.linked_booking.pick_up_time|time:"g:i A" }}</div>
                     <div style="font-size: 13px; color: #475569;">{{ booking.linked_booking.pick_up_address }} → {{ booking.linked_booking.drop_off_address }}</div>
                     {% else %}
