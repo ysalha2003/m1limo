@@ -234,10 +234,14 @@ class BookingService:
         else:
             # User editing their own booking
             if original_status == 'Confirmed':
-                # Check if any fields were actually changed (compare against DB original)
+                # Check if any TRIP-RELATED fields were changed (compare against DB original)
+                # Notification preferences (send_passenger_notifications, additional_recipients) 
+                # should NOT trigger status revert - they are user preferences, not trip details
+                notification_fields = {'send_passenger_notifications', 'additional_recipients'}
+                
                 any_field_changed = False
                 for field in booking_data:
-                    if field != 'status':
+                    if field != 'status' and field not in notification_fields:
                         old_value = getattr(old_booking, field, None)
                         new_value = booking_data[field]
                         if old_value != new_value:
@@ -248,6 +252,11 @@ class BookingService:
                 if any_field_changed:
                     booking_data['status'] = 'Pending'
                     logger.info(f"User edit: Booking {booking.id} reverted to Pending after edit by user {booking.user.username}")
+                else:
+                    # Check if only notification fields changed
+                    notification_only = all(field in notification_fields or field == 'status' for field in booking_data.keys())
+                    if notification_only:
+                        logger.info(f"User edit: Only notification preferences changed - status remains Confirmed")
 
         return_booking_updates = None
         if is_outbound_with_return:

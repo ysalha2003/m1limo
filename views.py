@@ -676,6 +676,28 @@ def booking_detail(request, booking_id):
 
     can_cancel, will_charge, hours_until = booking.can_cancel()
 
+    # Determine who will receive email notifications
+    will_notify_user = False
+    will_notify_passenger = False
+    
+    if request.user.is_staff and booking.user:
+        # Check user preferences for current status
+        status_to_notification = {
+            'Pending': 'new',
+            'Confirmed': 'confirmed',
+            'Cancelled': 'cancelled',
+            'Cancelled_Full_Charge': 'cancelled',
+            'Customer_No_Show': 'cancelled',
+            'Trip_Not_Covered': 'cancelled',
+            'Trip_Completed': 'status_change',
+        }
+        notification_type = status_to_notification.get(booking.status, 'confirmed')
+        
+        # Import NotificationService to check preferences
+        from notification_service import NotificationService
+        will_notify_user = NotificationService._should_notify_user(booking.user, notification_type)
+        will_notify_passenger = booking.send_passenger_notifications and bool(booking.passenger_email)
+
     context = {
         'booking': booking,
         'linked_booking': linked_booking,
@@ -690,6 +712,8 @@ def booking_detail(request, booking_id):
         'hours_until_pickup': hours_until,
         'time_until_pickup_formatted': booking.time_until_pickup_formatted,
         'is_admin': request.user.is_staff,
+        'will_notify_user': will_notify_user,
+        'will_notify_passenger': will_notify_passenger,
     }
 
     return render(request, 'bookings/booking_detail.html', context)
