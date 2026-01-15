@@ -183,7 +183,7 @@ class EmailService:
             'user_username': booking.user.username if booking.user else '',
             'company_name': settings.COMPANY_INFO.get('name', 'M1 Limousine Service'),
             'support_email': settings.COMPANY_INFO.get('email', 'support@m1limo.com'),
-            'dashboard_url': f"{settings.COMPANY_INFO.get('website', '')}/dashboard" if settings.COMPANY_INFO.get('website') else '',
+            'dashboard_url': f"{settings.BASE_URL}/dashboard",
         }
         
         # Add driver information if available
@@ -238,7 +238,7 @@ class EmailService:
             'user_username': first_trip.user.username if first_trip.user else '',
             'company_name': settings.COMPANY_INFO.get('name', 'M1 Limousine Service'),
             'support_email': settings.COMPANY_INFO.get('email', 'support@m1limo.com'),
-            'dashboard_url': f"{settings.COMPANY_INFO.get('website', '')}/dashboard" if settings.COMPANY_INFO.get('website') else '',
+            'dashboard_url': f"{settings.BASE_URL}/dashboard",
         }
         
         return context
@@ -356,7 +356,7 @@ class EmailService:
         elif notification_type == 'cancelled':
             return f"Trip Cancelled: {booking.passenger_name} - {booking.pick_up_date}"
         elif notification_type == 'status_change':
-            return f"Trip Update: {old_status} → {booking.status} - {booking.passenger_name}"
+            return f"Trip Update: {old_status} -> {booking.status} - {booking.passenger_name}"
         elif notification_type == 'reminder':
             trip_type = "Return Trip" if is_return else "Pickup"
             time = booking.return_time if is_return else booking.pick_up_time
@@ -583,8 +583,8 @@ Subject: {subject}
             # Generate secure token for driver portal access
             token = hashlib.md5(f"{booking.id}-{driver.email}".encode()).hexdigest()[:16]
 
-            # Build driver portal URL
-            base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+            # Build driver portal URL using production BASE_URL
+            base_url = settings.BASE_URL
             driver_portal_url = f"{base_url}/driver/trip/{booking.id}/{token}/"
 
             # Generate all trips URL token

@@ -619,7 +619,7 @@ def view_activity(request, activity_id):
     )
 
     # Redirect to the booking detail page
-    return redirect('booking_detail', booking_id=activity.booking.id)
+    return redirect('reservation_detail', booking_id=activity.booking.id)
 
 
 @login_required
@@ -639,7 +639,7 @@ def view_user_booking(request, booking_id):
     )
 
     # Redirect to the booking detail page
-    return redirect('booking_detail', booking_id=booking.id)
+    return redirect('reservation_detail', booking_id=booking.id)
 
 
 @login_required
@@ -1149,7 +1149,7 @@ def assign_driver(request, booking_id):
     # Prevent driver assignment for cancelled or completed trips
     if booking.status in ['Cancelled', 'Cancelled_Full_Charge', 'Trip_Completed']:
         messages.error(request, f"Cannot assign driver to {booking.get_status_display()} trips.")
-        return redirect('booking_detail', booking_id=booking.id)
+        return redirect('reservation_detail', booking_id=booking.id)
 
     drivers = Driver.objects.filter(is_active=True).order_by('full_name')
 
@@ -1189,7 +1189,7 @@ def assign_driver(request, booking_id):
                 else:
                     messages.success(request, f"Driver info is now hidden from the customer (no notification sent).")
 
-                return redirect('booking_detail', booking_id=booking.id)
+                return redirect('reservation_detail', booking_id=booking.id)
             else:
                 messages.error(request, "No driver is currently assigned. Please assign a driver first.")
                 return redirect('assign_driver', booking_id=booking_id)
@@ -1233,7 +1233,7 @@ def assign_driver(request, booking_id):
                 )
 
                 messages.success(request, f"Driver {old_driver_name} has been unassigned from this trip.")
-                return redirect('booking_detail', booking_id=booking.id)
+                return redirect('reservation_detail', booking_id=booking.id)
             else:
                 messages.warning(request, "No driver is currently assigned to this trip.")
                 return redirect('assign_driver', booking_id=booking_id)
@@ -1284,7 +1284,7 @@ def assign_driver(request, booking_id):
                 else:
                     messages.success(request, f"Notification resent to {booking.assigned_driver.full_name}.")
 
-                return redirect('booking_detail', booking_id=booking.id)
+                return redirect('reservation_detail', booking_id=booking.id)
             else:
                 messages.error(request, "No driver is currently assigned. Please assign a driver first.")
                 return redirect('assign_driver', booking_id=booking_id)
@@ -1396,7 +1396,7 @@ def assign_driver(request, booking_id):
 
                     messages.success(request, success_msg)
 
-                    return redirect('booking_detail', booking_id=booking.id)
+                    return redirect('reservation_detail', booking_id=booking.id)
 
                 except Driver.DoesNotExist:
                     messages.error(request, "Selected driver not found or inactive.")
@@ -1659,7 +1659,7 @@ def resend_driver_notification(request, booking_id):
 
     if not booking.assigned_driver:
         messages.error(request, "No driver assigned to this trip.")
-        return redirect('booking_detail', booking_id=booking.id)
+        return redirect('reservation_detail', booking_id=booking.id)
 
     from notification_service import NotificationService
     success = NotificationService.send_driver_notification(booking, booking.assigned_driver)
@@ -1669,7 +1669,7 @@ def resend_driver_notification(request, booking_id):
     else:
         messages.error(request, "Failed to resend driver notification. Please check email settings.")
 
-    return redirect('booking_detail', booking_id=booking.id)
+    return redirect('reservation_detail', booking_id=booking.id)
 
 
 def driver_trips_list(request, driver_email, token):
@@ -1827,15 +1827,15 @@ def mark_driver_paid(request, booking_id):
 
     if not booking.assigned_driver:
         messages.error(request, "No driver assigned to this trip.")
-        return redirect('booking_detail', booking_id=booking.id)
+        return redirect('reservation_detail', booking_id=booking.id)
 
     if booking.driver_response_status != 'completed':
         messages.error(request, "Trip must be marked as completed by driver before marking as paid.")
-        return redirect('booking_detail', booking_id=booking.id)
+        return redirect('reservation_detail', booking_id=booking.id)
 
     if booking.driver_paid:
         messages.warning(request, "Driver has already been marked as paid.")
-        return redirect('booking_detail', booking_id=booking.id)
+        return redirect('reservation_detail', booking_id=booking.id)
 
     # Mark as paid
     from django.utils import timezone
@@ -1863,7 +1863,7 @@ def mark_driver_paid(request, booking_id):
 
     payment_msg = f" (${booking.driver_payment_amount:.2f})" if booking.driver_payment_amount else ""
     messages.success(request, f"Driver {booking.assigned_driver.full_name} marked as paid{payment_msg}.")
-    return redirect('booking_detail', booking_id=booking.id)
+    return redirect('reservation_detail', booking_id=booking.id)
 
 
 @login_required

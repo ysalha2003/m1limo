@@ -289,7 +289,7 @@ class BookingService:
         if 'status' in booking_data and booking_data['status'] != original_status:
             # Validate the transition is allowed
             booking.validate_status_transition(original_status, booking_data['status'])
-            logger.info(f"Validated status transition: {original_status} → {booking_data['status']}")
+            logger.info(f"Validated status transition: {original_status} -> {booking_data['status']}")
 
         # Track field changes for history - old_booking already fetched above
         changes = {}
@@ -299,7 +299,7 @@ class BookingService:
             old_value = getattr(old_booking, field, None)  # Use old_booking from database
             if old_value != new_value:
                 changes[field] = {'old': str(old_value), 'new': str(new_value)}
-                logger.debug(f"Change detected - {field}: {old_value} → {new_value}")
+                logger.debug(f"Change detected - {field}: {old_value} -> {new_value}")
 
         logger.info(f"Detected {len(changes)} changed fields: {list(changes.keys())}")
 
@@ -348,7 +348,7 @@ class BookingService:
                     linked_original_status = linked_booking.status
                     if return_booking_updates['status'] != linked_original_status:
                         linked_booking.validate_status_transition(linked_original_status, return_booking_updates['status'])
-                        logger.info(f"Validated linked booking status transition: {linked_original_status} → {return_booking_updates['status']}")
+                        logger.info(f"Validated linked booking status transition: {linked_original_status} -> {return_booking_updates['status']}")
 
                 for field, value in return_booking_updates.items():
                     setattr(linked_booking, field, value)
@@ -428,7 +428,7 @@ class BookingService:
             logger.error(f"Invalid status transition for booking {booking.id}: {e}")
             raise
 
-        logger.info(f"Updating booking {booking.id} status: {original_status} → {new_status}")
+        logger.info(f"Updating booking {booking.id} status: {original_status} -> {new_status}")
 
         # CRITICAL FIX #4: Apply 4-hour cancellation policy
         if new_status in ['Cancelled', 'Cancelled_Full_Charge']:
@@ -449,11 +449,11 @@ class BookingService:
             if hours_until < threshold:
                 # Within threshold → Full charge
                 booking.status = 'Cancelled_Full_Charge'
-                logger.info(f'Cancellation within {threshold} hours ({hours_until:.1f}h) → Full charge')
+                logger.info(f'Cancellation within {threshold} hours ({hours_until:.1f}h) -> Full charge')
             else:
                 # More than threshold → Free cancellation
                 booking.status = 'Cancelled'
-                logger.info(f'Cancellation > {threshold} hours ({hours_until:.1f}h) → Free')
+                logger.info(f'Cancellation > {threshold} hours ({hours_until:.1f}h) -> Free')
 
             booking.cancellation_reason = reason
         else:

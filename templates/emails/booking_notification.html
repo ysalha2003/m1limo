@@ -115,14 +115,10 @@
 <body>
     <div class="container">
         <div class="header">
-            <!-- Logo -->
+            <!-- Clean Text Logo - No images for faster email loading -->
             <div style="margin-bottom: 20px;">
-                {% if company_info.logo_url %}
-                <img src="{{ company_info.logo_url }}" alt="M1 Limousine" style="height: 60px; width: auto; display: inline-block;">
-                {% else %}
                 <div style="font-size: 32px; font-weight: 700; letter-spacing: -0.02em;">M1</div>
-                <div style="font-size: 14px; font-weight: 400; letter-spacing: 0.1em; margin-top: 4px;">Limousine</div>
-                {% endif %}
+                <div style="font-size: 14px; font-weight: 400; letter-spacing: 0.1em; margin-top: 4px;">LIMOUSINE SERVICE</div>
             </div>
             <h1>
                 {% if notification_type == 'new' %}
@@ -168,7 +164,9 @@
                 {% endif %}
             </p>
 
-            <a href="{{ company_info.dashboard_url|default:'#' }}" class="btn">View in Dashboard</a>
+            {% if company_info.dashboard_url %}
+            <a href="{{ company_info.dashboard_url }}" class="btn">View in Dashboard</a>
+            {% endif %}
         </div>
 
         <div class="footer">
