@@ -63,11 +63,11 @@ class BookingForm(BaseModelForm):
     # Notification preferences
     send_passenger_notifications = forms.BooleanField(
         required=False,
-        initial=True,
+        initial=True,  # Default to True for NEW bookings only
         label="Send notifications to passenger",
         widget=forms.CheckboxInput(attrs={
-            'class': 'form-checkbox',
-            'checked': 'checked'
+            'class': 'form-checkbox'
+            # DO NOT hardcode 'checked' - Django will set it based on field value
         }),
         help_text="Passenger will receive booking confirmation, updates, and reminders"
     )
