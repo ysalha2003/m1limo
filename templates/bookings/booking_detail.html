@@ -257,7 +257,8 @@
                     <p style="color: #64748b; font-size: 13px;">{{ booking.passenger_email }}</p>
                     {% endif %}
                     
-                    <!-- Notification Status -->
+                    <!-- Notification Status (User only - admins see this in Quick Actions) -->
+                    {% if not is_admin %}
                     <div style="margin-top: 12px; padding: 12px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
                         <p style="font-size: 11px; color: #64748b; margin: 0 0 10px 0; font-weight: 600; text-transform: uppercase;">Email Notifications</p>
                         <div class="notification-buttons-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px;">
@@ -338,6 +339,7 @@
                             </form>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
 
                 <!-- Trip Details -->
