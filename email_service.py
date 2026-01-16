@@ -178,17 +178,17 @@ class EmailService:
         }
         
         # Add driver information if available
-        if booking.driver:
-            context['driver_name'] = booking.driver.get_full_name() if hasattr(booking.driver, 'get_full_name') else str(booking.driver)
-            context['driver_phone'] = booking.driver.phone if hasattr(booking.driver, 'phone') else ''
-            context['driver_vehicle'] = f"{booking.driver.vehicle_make} {booking.driver.vehicle_model}" if hasattr(booking.driver, 'vehicle_make') else ''
+        if booking.assigned_driver:
+            context['driver_name'] = booking.assigned_driver.get_full_name() if hasattr(booking.assigned_driver, 'get_full_name') else str(booking.assigned_driver)
+            context['driver_phone'] = booking.assigned_driver.phone if hasattr(booking.assigned_driver, 'phone') else ''
+            context['driver_vehicle'] = f"{booking.assigned_driver.vehicle_make} {booking.assigned_driver.vehicle_model}" if hasattr(booking.assigned_driver, 'vehicle_make') else ''
         else:
             context['driver_name'] = ''
             context['driver_phone'] = ''
             context['driver_vehicle'] = ''
             
-        # Add return trip information if it's a round trip
-        if booking.is_round_trip and is_return:
+        # Add return trip information if it's the return leg of a round trip
+        if booking.trip_type == 'Round' and booking.is_return_trip:
             context['return_pick_up_date'] = booking.return_date.strftime('%B %d, %Y') if booking.return_date else ''
             context['return_pick_up_time'] = booking.return_time.strftime('%I:%M %p') if booking.return_time else ''
             context['return_pick_up_address'] = booking.drop_off_address  # Return starts from drop-off
