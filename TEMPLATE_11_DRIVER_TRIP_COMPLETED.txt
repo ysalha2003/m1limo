@@ -1,0 +1,107 @@
+==============================================
+TEMPLATE 11: DRIVER TRIP COMPLETED (ADMIN ALERT)
+==============================================
+
+Template Type: driver_trip_completed
+Name: Driver Trip Completion Alert
+Description: Sent to admin when driver marks a trip as completed
+
+SUBJECT TEMPLATE:
+-----------------
+✓ Trip Completed by {{ driver_name }} - Booking #{{ booking_id }}
+
+HTML TEMPLATE:
+--------------
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1 Limousine - Trip Completed</title>
+</head>
+<body style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #0f172a; margin: 0; padding: 0; background-color: #f8fafc;">
+    <div style="max-width: 500px; margin: 40px auto; background-color: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);">
+        
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; padding: 32px 24px; text-align: center;">
+            <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">✓ Trip Completed</h1>
+            <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500;">Admin Notification</p>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 32px 24px;">
+            <p style="font-size: 15px; color: #475569; margin-bottom: 24px; line-height: 1.6; text-align: center;">
+                <strong>{{ driver_name }}</strong> has marked the trip as completed.
+            </p>
+            
+            <div style="font-size: 14px; color: #64748b; margin-bottom: 8px; text-align: center;">
+                Booking ID: <strong style="color: #0f172a; font-weight: 600;">#{{ booking_id }}</strong>
+            </div>
+            
+            <!-- Completion Time Badge -->
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #059669; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
+                <div style="font-size: 12px; color: #065f46; margin-bottom: 6px; font-weight: 600;">COMPLETED AT</div>
+                <div style="font-size: 16px; font-weight: 600; color: #065f46;">
+                    {{ driver_completed_at|date:"M j, Y" }} at {{ driver_completed_at|time:"g:i A" }}
+                </div>
+            </div>
+            
+            <!-- Trip Details Box -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 24px 0;">
+                <h3 style="margin: 0 0 16px 0; font-size: 14px; color: #64748b; text-transform: uppercase;">Trip Details</h3>
+                
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">DRIVER</div>
+                    <div style="font-size: 14px; color: #0f172a; font-weight: 500;">{{ driver_name }}</div>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">PASSENGER</div>
+                    <div style="font-size: 14px; color: #0f172a; font-weight: 500;">{{ passenger_name }}</div>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">SCHEDULED DATE & TIME</div>
+                    <div style="font-size: 14px; color: #0f172a; font-weight: 500;">
+                        {{ pick_up_date|date:"M j, Y" }} at {{ pick_up_time|time:"g:i A" }}
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px;">
+                    <div style="margin-bottom: 12px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">PICKUP LOCATION</div>
+                        <div style="font-size: 13px; color: #0f172a;">{{ pick_up_location }}</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 12px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">DROP-OFF LOCATION</div>
+                        <div style="font-size: 13px; color: #0f172a;">{{ drop_off_location }}</div>
+                    </div>
+                </div>
+                
+                {% if booking_url %}
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px; text-align: center;">
+                    <a href="{{ booking_url }}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 10px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 13px;">
+                        View Booking Details
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Billing Note -->
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin-top: 24px; border-radius: 6px;">
+                <p style="font-size: 13px; color: #92400e; margin: 0; line-height: 1.5;">
+                    <strong>Note:</strong> This completion data will be used for billing and reporting purposes.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="padding: 24px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9;">
+            <p style="margin: 6px 0;"><strong>M1 Limousine Service</strong></p>
+            <p style="margin: 6px 0;">{{ support_phone }} | {{ support_email }}</p>
+            <p style="margin: 12px 0 6px 0; font-size: 11px;">&copy; {% now "Y" %} M1 Limousine Service</p>
+        </div>
+    </div>
+</body>
+</html>
