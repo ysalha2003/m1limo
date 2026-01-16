@@ -53,6 +53,41 @@
         background: linear-gradient(90deg, transparent 0%, var(--primary) 50%, transparent 100%);
     }
 
+    /* Sortable columns */
+    .sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        padding-right: 24px !important;
+        transition: background-color 0.2s;
+    }
+
+    .sortable:hover {
+        background-color: rgba(15, 23, 42, 0.05);
+    }
+
+    .sort-icon {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 11px;
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+
+    .sortable.sort-asc .sort-icon::after {
+        content: ' ▲';
+        color: var(--primary);
+        opacity: 1;
+    }
+
+    .sortable.sort-desc .sort-icon::after {
+        content: ' ▼';
+        color: var(--primary);
+        opacity: 1;
+    }
+
     .stat-icon {
         width: 40px;
         height: 40px;
@@ -707,13 +742,35 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Passenger</th>
-                        {% if is_admin %}<th class="hide-mobile">Customer</th>{% endif %}
+                        <th class="sortable {% if sort_field == 'passenger' %}sort-{{ sort_order }}{% endif %}" data-sort="passenger">
+                            Passenger
+                            <span class="sort-icon"></span>
+                        </th>
+                        {% if is_admin %}
+                        <th class="sortable hide-mobile {% if sort_field == 'customer' %}sort-{{ sort_order }}{% endif %}" data-sort="customer">
+                            Customer
+                            <span class="sort-icon"></span>
+                        </th>
+                        {% endif %}
                         <th>Pickup</th>
-                        <th>Date & Time</th>
-                        <th class="hide-mobile">Vehicle</th>
-                        <th>Status</th>
-                        {% if is_admin %}<th class="hide-mobile">Driver</th>{% endif %}
+                        <th class="sortable {% if sort_field == 'datetime' %}sort-{{ sort_order }}{% endif %}" data-sort="datetime">
+                            Date & Time
+                            <span class="sort-icon"></span>
+                        </th>
+                        <th class="sortable hide-mobile {% if sort_field == 'vehicle' %}sort-{{ sort_order }}{% endif %}" data-sort="vehicle">
+                            Vehicle
+                            <span class="sort-icon"></span>
+                        </th>
+                        <th class="sortable {% if sort_field == 'status' %}sort-{{ sort_order }}{% endif %}" data-sort="status">
+                            Status
+                            <span class="sort-icon"></span>
+                        </th>
+                        {% if is_admin %}
+                        <th class="sortable hide-mobile {% if sort_field == 'driver' %}sort-{{ sort_order }}{% endif %}" data-sort="driver">
+                            Driver
+                            <span class="sort-icon"></span>
+                        </th>
+                        {% endif %}
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -915,13 +972,13 @@
         {% if page_obj.has_other_pages %}
         <div style="margin-top: 24px; display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap;">
             {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">← Previous</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.upcoming %}&upcoming={{ request.GET.upcoming }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}{% if sort_field %}&sort={{ sort_field }}&order={{ sort_order }}{% endif %}" class="btn btn-secondary">← Previous</a>
             {% endif %}
 
             <span style="color: var(--text-secondary);">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Next →</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.upcoming %}&upcoming={{ request.GET.upcoming }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}{% if sort_field %}&sort={{ sort_field }}&order={{ sort_order }}{% endif %}" class="btn btn-secondary">Next →</a>
             {% endif %}
         </div>
         {% endif %}
@@ -956,5 +1013,20 @@ function toggleReturn(bookingId) {
         expandBtn.innerHTML = expandBtn.innerHTML.replace('Show Return', 'Hide Return');
     }
 }
+
+// Column sorting functionality
+document.querySelectorAll('.sortable').forEach(header => {
+    header.addEventListener('click', function() {
+        const sortField = this.dataset.sort;
+        const currentOrder = this.classList.contains('sort-asc') ? 'desc' : 'asc';
+        
+        // Build URL with sort parameters and preserve existing filters
+        const url = new URL(window.location);
+        url.searchParams.set('sort', sortField);
+        url.searchParams.set('order', currentOrder);
+        
+        window.location = url.toString();
+    });
+});
 </script>
 {% endblock %}

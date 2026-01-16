@@ -350,12 +350,52 @@ def dashboard(request):
     today_pickups = future_pickups
     from django.core.paginator import Paginator
     
-    # Sort order: For upcoming trips, show soonest first; otherwise, show most recent first
-    if upcoming_filter == 'true':
-        paginator = Paginator(queryset.order_by('pick_up_date', 'pick_up_time'), 10)
-    else:
-        paginator = Paginator(queryset.order_by('-pick_up_date', '-pick_up_time'), 10)
+    # Handle sorting
+    sort_field = request.GET.get('sort', 'datetime')
+    sort_order = request.GET.get('order', 'asc')
     
+    # Map frontend sort fields to actual model fields
+    sort_mapping = {
+        'passenger': 'passenger_name',
+        'customer': 'user__username',
+        'datetime': ['pick_up_date', 'pick_up_time'],
+        'vehicle': 'vehicle_type',
+        'status': 'status',
+        'driver': 'assigned_driver__full_name'
+    }
+    
+    # Get the actual database field(s) to sort by
+    sort_fields = sort_mapping.get(sort_field, ['pick_up_date', 'pick_up_time'])
+    
+    # Convert to list if single field
+    if not isinstance(sort_fields, list):
+        sort_fields = [sort_fields]
+    
+    # Apply sort direction
+    if sort_order == 'desc':
+        sort_fields = [f'-{field}' for field in sort_fields]
+    
+    # Default behavior: For datetime sorting, upcoming trips should show soonest first (ascending)
+    # For other fields or when explicitly sorted, use the specified order
+    if sort_field == 'datetime' and not request.GET.get('sort'):
+        # Default: show upcoming reservations at top (ascending date/time)
+        if upcoming_filter == 'true':
+            sort_fields = ['pick_up_date', 'pick_up_time']
+        else:
+            # Not filtering for upcoming, show most recent first
+            sort_fields = ['-pick_up_date', '-pick_up_time']
+    
+    # For driver sorting, handle NULL values (unassigned) - sort them last
+    if sort_field == 'driver':
+        from django.db.models import F
+        if sort_order == 'asc':
+            queryset = queryset.order_by(F('assigned_driver__full_name').asc(nulls_last=True))
+        else:
+            queryset = queryset.order_by(F('assigned_driver__full_name').desc(nulls_last=True))
+    else:
+        queryset = queryset.order_by(*sort_fields)
+    
+    paginator = Paginator(queryset, 10)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
 
@@ -386,6 +426,8 @@ def dashboard(request):
         'today_pickups': today_pickups,
         'is_admin': request.user.is_staff,
         'users': users_for_filter,
+        'sort_field': sort_field,
+        'sort_order': sort_order,
     }
 
     if request.user.is_staff:
