@@ -148,8 +148,8 @@
                 </div>
                 <div style="flex: 1;">
                     <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Email Notification</p>
-                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">You'll receive an email once your reservation is confirmed.</p>
                     {% if notification_recipients %}
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">You'll receive an email once your reservation is confirmed.</p>
                     <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #3b82f6;">
                         <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Will be sent to:</p>
                         {% for email in notification_recipients %}
@@ -157,6 +157,13 @@
                             <span style="color: #3b82f6;">•</span> {{ email }}
                         </p>
                         {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color: #dc2626; font-size: 14px; margin-bottom: 8px;">You have opted out of booking confirmation emails.</p>
+                    <div style="background: #fef2f2; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #dc2626;">
+                        <p style="font-size: 13px; color: #991b1b;">
+                            To receive confirmation emails, update your <a href="{{ user_profile_url }}" style="color: #dc2626; text-decoration: underline;">Email Notification Preferences</a>.
+                        </p>
                     </div>
                     {% endif %}
                 </div>
@@ -167,8 +174,8 @@
                 </div>
                 <div style="flex: 1;">
                     <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Pickup Reminder</p>
-                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">We'll send you a reminder 24 hours before your scheduled pickup.</p>
                     {% if reminder_recipients %}
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">We'll send you a reminder 24 hours before your scheduled pickup.</p>
                     <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #3b82f6;">
                         <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Will be sent to:</p>
                         {% for email in reminder_recipients %}
@@ -176,6 +183,13 @@
                             <span style="color: #3b82f6;">•</span> {{ email }}
                         </p>
                         {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color: #dc2626; font-size: 14px; margin-bottom: 8px;">You have opted out of pickup reminder emails.</p>
+                    <div style="background: #fef2f2; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #dc2626;">
+                        <p style="font-size: 13px; color: #991b1b;">
+                            To receive pickup reminders, update your <a href="{{ user_profile_url }}" style="color: #dc2626; text-decoration: underline;">Email Notification Preferences</a>.
+                        </p>
                     </div>
                     {% endif %}
                 </div>
@@ -186,9 +200,9 @@
                     <span style="font-weight: 700; color: #10b981;">✓</span>
                 </div>
                 <div style="flex: 1;">
-                    <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Confirmation Email Sent</p>
-                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">Check your email for reservation details and confirmation.</p>
+                    <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Confirmation Email</p>
                     {% if notification_recipients %}
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">Check your email for reservation details and confirmation.</p>
                     <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #10b981;">
                         <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Sent to:</p>
                         {% for email in notification_recipients %}
@@ -196,6 +210,13 @@
                             <span style="color: #10b981;">✓</span> {{ email }}
                         </p>
                         {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color: #dc2626; font-size: 14px; margin-bottom: 8px;">No confirmation email sent - you have opted out of booking notifications.</p>
+                    <div style="background: #fef2f2; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #dc2626;">
+                        <p style="font-size: 13px; color: #991b1b;">
+                            To receive future confirmations, update your <a href="{{ user_profile_url }}" style="color: #dc2626; text-decoration: underline;">Email Notification Preferences</a>.
+                        </p>
                     </div>
                     {% endif %}
                 </div>
@@ -206,8 +227,8 @@
                 </div>
                 <div style="flex: 1;">
                     <p style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">Pickup Reminder</p>
-                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">We'll send you a reminder 24 hours before your scheduled pickup.</p>
                     {% if reminder_recipients %}
+                    <p style="color: #475569; font-size: 14px; margin-bottom: 8px;">We'll send you a reminder 24 hours before your scheduled pickup.</p>
                     <div style="background: white; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #3b82f6;">
                         <p style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Will be sent to:</p>
                         {% for email in reminder_recipients %}
@@ -215,6 +236,13 @@
                             <span style="color: #3b82f6;">•</span> {{ email }}
                         </p>
                         {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color: #dc2626; font-size: 14px; margin-bottom: 8px;">You have opted out of pickup reminder emails.</p>
+                    <div style="background: #fef2f2; padding: 10px 12px; border-radius: 6px; border-left: 3px solid #dc2626;">
+                        <p style="font-size: 13px; color: #991b1b;">
+                            To receive pickup reminders, update your <a href="{{ user_profile_url }}" style="color: #dc2626; text-decoration: underline;">Email Notification Preferences</a>.
+                        </p>
                     </div>
                     {% endif %}
                 </div>

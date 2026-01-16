@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.utils import timezone
+from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout
@@ -626,23 +627,46 @@ def booking_confirmation(request, booking_id):
 
     linked_booking = booking.linked_booking
 
-    # Get notification recipients for display
-    from notification_service import NotificationService
-    notification_type = 'confirmed' if booking.status == 'Confirmed' else 'new'
-    # Build recipient list manually
-    notification_recipients = [booking.user.email]
+    # Get notification recipients based on user preferences
+    notification_recipients = []
+    reminder_recipients = []
+    
+    # Check if user profile exists and get preferences
+    try:
+        user_profile = booking.user.profile
+        user_wants_confirmations = user_profile.receive_booking_confirmations
+        user_wants_reminders = user_profile.receive_pickup_reminders
+    except:
+        # Default to True if profile doesn't exist
+        user_wants_confirmations = True
+        user_wants_reminders = True
+    
+    # Build notification recipients (for booking confirmations)
+    if user_wants_confirmations:
+        notification_recipients.append(booking.user.email)
+    
+    # Add passenger email if they opted in during booking
     if booking.send_passenger_notifications and booking.passenger_email:
         if booking.passenger_email.lower() != booking.user.email.lower():
             notification_recipients.append(booking.passenger_email)
-
-    # Get reminder recipients (24 hours before pickup)
-    reminder_recipients = notification_recipients.copy()
+    
+    # Build reminder recipients (for pickup reminders 24hrs before)
+    if user_wants_reminders:
+        reminder_recipients.append(booking.user.email)
+    
+    # Add passenger email for reminders if they opted in
+    if booking.send_passenger_notifications and booking.passenger_email:
+        if booking.passenger_email.lower() != booking.user.email.lower():
+            reminder_recipients.append(booking.passenger_email)
 
     context = {
         'booking': booking,
         'linked_booking': linked_booking,
         'notification_recipients': notification_recipients,
         'reminder_recipients': reminder_recipients,
+        'user_wants_confirmations': user_wants_confirmations,
+        'user_wants_reminders': user_wants_reminders,
+        'user_profile_url': reverse('edit_profile'),
     }
 
     return render(request, 'bookings/booking_confirmation.html', context)
