@@ -136,6 +136,67 @@
         cursor: not-allowed;
     }
 
+    /* Sortable columns */
+    .sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        padding-right: 24px !important;
+        transition: background-color 0.2s;
+    }
+
+    .sortable:hover {
+        background-color: rgba(59, 130, 246, 0.05);
+    }
+
+    .sort-icon {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 12px;
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+
+    .sortable.sort-asc .sort-icon::after {
+        content: ' ▲';
+        color: var(--primary);
+        opacity: 1;
+    }
+
+    .sortable.sort-desc .sort-icon::after {
+        content: ' ▼';
+        color: var(--primary);
+        opacity: 1;
+    }
+
+    /* Change display badges */
+    .change-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12px;
+        word-break: break-word;
+    }
+
+    .change-old {
+        color: #991b1b;
+        background: rgba(220, 38, 38, 0.1);
+    }
+
+    .change-new {
+        color: #065f46;
+        background: rgba(5, 150, 105, 0.1);
+    }
+
+    .change-message {
+        color: #1e40af;
+        background: rgba(59, 130, 246, 0.1);
+        font-style: italic;
+    }
+
     /* Mobile Responsiveness */
     @media (max-width: 1024px) {
         .activity-header {
@@ -367,10 +428,22 @@
             <table class="booking-table" style="margin: 0; min-width: 1200px;">
                 <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
                     <tr>
-                        <th style="padding: 16px;">Timestamp</th>
-                        <th style="padding: 16px;">Reservation</th>
-                        <th style="padding: 16px;">Action</th>
-                        <th style="padding: 16px;">Changed By</th>
+                        <th class="sortable {% if sort_field == 'timestamp' %}sort-{{ sort_order }}{% endif %}" data-sort="timestamp" style="padding: 16px;">
+                            Timestamp
+                            <span class="sort-icon"></span>
+                        </th>
+                        <th class="sortable {% if sort_field == 'reservation' %}sort-{{ sort_order }}{% endif %}" data-sort="reservation" style="padding: 16px;">
+                            Reservation
+                            <span class="sort-icon"></span>
+                        </th>
+                        <th class="sortable {% if sort_field == 'action' %}sort-{{ sort_order }}{% endif %}" data-sort="action" style="padding: 16px;">
+                            Action
+                            <span class="sort-icon"></span>
+                        </th>
+                        <th class="sortable {% if sort_field == 'changed_by' %}sort-{{ sort_order }}{% endif %}" data-sort="changed_by" style="padding: 16px;">
+                            Changed By
+                            <span class="sort-icon"></span>
+                        </th>
                         <th style="padding: 16px;">Details</th>
                     </tr>
                 </thead>
@@ -479,22 +552,36 @@
                             <div style="display: flex; flex-direction: column; gap: 8px;">
                                 {% for field in history.get_changed_fields %}
                                 {% with change_data=history|get_field_change:field %}
+                                {% with formatted=change_data|format_change_display:field %}
+                                {% if formatted %}
                                 <div style="background: rgba(248, 250, 252, 1); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(226, 232, 240, 1);">
                                     <div style="font-weight: 600; color: #2563eb; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
                                         {{ field|format_field_name }}
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; flex-wrap: wrap;">
-                                        <span style="color: #dc2626; background: rgba(220, 38, 38, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; word-break: break-word;">
-                                            {{ change_data.old|default:"(empty)" }}
-                                        </span>
-                                        <svg style="width: 12px; height: 12px; color: var(--text-secondary); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                        </svg>
-                                        <span style="color: #059669; background: rgba(5, 150, 105, 0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; word-break: break-word;">
-                                            {{ change_data.new|default:"(empty)" }}
-                                        </span>
+                                        {% if formatted.type == 'added' %}
+                                            <span class="change-badge change-message">
+                                                Set to "{{ formatted.new }}"
+                                            </span>
+                                        {% elif formatted.type == 'removed' %}
+                                            <span class="change-badge change-message">
+                                                Removed (was "{{ formatted.old }}")
+                                            </span>
+                                        {% else %}
+                                            <span class="change-badge change-old">
+                                                {{ formatted.old|default:"(not set)" }}
+                                            </span>
+                                            <svg style="width: 12px; height: 12px; color: var(--text-secondary); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                            </svg>
+                                            <span class="change-badge change-new">
+                                                {{ formatted.new|default:"(not set)" }}
+                                            </span>
+                                        {% endif %}
                                     </div>
                                 </div>
+                                {% endif %}
+                                {% endwith %}
                                 {% endwith %}
                                 {% endfor %}
                             </div>
@@ -516,10 +603,10 @@
         {% if page_obj.paginator.num_pages > 1 %}
         <div class="pagination">
             {% if page_obj.has_previous %}
-                <a href="?page=1{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <a href="?page=1{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort_field %}&sort={{ sort_field }}&order={{ sort_order }}{% endif %}">
                     « First
                 </a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <a href="?page={{ page_obj.previous_page_number }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort_field %}&sort={{ sort_field }}&order={{ sort_order }}{% endif %}">
                     ‹ Previous
                 </a>
             {% else %}
@@ -532,10 +619,10 @@
             </span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <a href="?page={{ page_obj.next_page_number }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort_field %}&sort={{ sort_field }}&order={{ sort_order }}{% endif %}">
                     Next ›
                 </a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort_field %}&sort={{ sort_field }}&order={{ sort_order }}{% endif %}">
                     Last »
                 </a>
             {% else %}
@@ -570,4 +657,21 @@
         </a>
     </div>
 </div>
+
+<script>
+// Column sorting functionality
+document.querySelectorAll('.sortable').forEach(header => {
+    header.addEventListener('click', function() {
+        const sortField = this.dataset.sort;
+        const currentOrder = this.classList.contains('sort-asc') ? 'desc' : 'asc';
+        
+        // Build URL with sort parameters and preserve existing filters
+        const url = new URL(window.location);
+        url.searchParams.set('sort', sortField);
+        url.searchParams.set('order', currentOrder);
+        
+        window.location = url.toString();
+    });
+});
+</script>
 {% endblock %}

@@ -97,6 +97,133 @@ def get_changed_fields(history):
 
 
 @register.filter
+def format_change_value(value, field_name=''):
+    """
+    Format change values for clean display in activity logs.
+    Handles dates, times, booleans, None values, etc.
+    
+    Usage: {{ value|format_change_value:field_name }}
+    """
+    from datetime import datetime, date, time
+    
+    # Handle None/empty - return special marker
+    if value is None or value == '' or value == 'None':
+        return None  # Will be displayed as "(not set)" in template
+    
+    # Handle datetime objects
+    if isinstance(value, datetime):
+        return value.strftime('%b %d, %Y at %I:%M %p')
+    
+    # Handle date objects
+    if isinstance(value, date):
+        return value.strftime('%b %d, %Y')
+    
+    # Handle time objects or time strings with seconds
+    if isinstance(value, time):
+        return value.strftime('%I:%M %p').lstrip('0')  # Remove leading zero
+    
+    # Handle time strings like "19:15:00"
+    if isinstance(value, str) and ':' in value:
+        try:
+            # Try to parse as time
+            parts = value.split(':')
+            if len(parts) >= 2:
+                hour = int(parts[0])
+                minute = int(parts[1])
+                # Convert to 12-hour format
+                period = 'AM' if hour < 12 else 'PM'
+                if hour == 0:
+                    hour = 12
+                elif hour > 12:
+                    hour -= 12
+                return f"{hour}:{minute:02d} {period}"
+        except (ValueError, IndexError):
+            pass  # Not a time string, continue
+    
+    # Handle booleans
+    if isinstance(value, bool):
+        # Context-aware boolean formatting
+        if field_name in ['share_driver_info', 'is_active', 'driver_paid']:
+            return 'Enabled' if value else 'Disabled'
+        return 'Yes' if value else 'No'
+    
+    # Handle "True"/"False" strings
+    if value == 'True':
+        if field_name in ['share_driver_info', 'is_active', 'driver_paid']:
+            return 'Enabled'
+        return 'Yes'
+    if value == 'False':
+        if field_name in ['share_driver_info', 'is_active', 'driver_paid']:
+            return 'Disabled'
+        return 'No'
+    
+    # Return as-is for everything else
+    return str(value)
+
+
+@register.filter
+def format_change_display(change_data, field_name):
+    """
+    Format the entire change display (old → new) with smart messaging.
+    
+    Usage: {{ change_data|format_change_display:field_name }}
+    Returns: dict with 'old', 'new', 'type' keys
+    """
+    if not change_data:
+        return None
+    
+    old_value = change_data.get('old')
+    new_value = change_data.get('new')
+    
+    # Format both values
+    old_formatted = format_change_value(old_value, field_name)
+    new_formatted = format_change_value(new_value, field_name)
+    
+    # Determine change type for smarter display
+    if old_formatted is None and new_formatted is None:
+        return None  # No meaningful change
+    elif old_formatted is None:
+        return {
+            'type': 'added',
+            'old': None,
+            'new': new_formatted,
+            'message': f"Set to {new_formatted}"
+        }
+    elif new_formatted is None:
+        return {
+            'type': 'removed',
+            'old': old_formatted,
+            'new': None,
+            'message': f"Removed (was {old_formatted})"
+        }
+    else:
+        return {
+            'type': 'changed',
+            'old': old_formatted,
+            'new': new_formatted,
+            'message': None
+        }
+
+
+@register.filter
+def format_action_name(action):
+    """
+    Format action names for display
+    """
+    action_map = {
+        'created': 'Created',
+        'updated': 'Updated',
+        'status_changed': 'Status Changed',
+        'cancelled': 'Cancelled',
+        'driver_assigned': 'Driver Assigned',
+        'driver_reassigned': 'Driver Reassigned',
+        'driver_rejected': 'Driver Rejected',
+        'driver_completed': 'Trip Completed',
+    }
+    return action_map.get(action, action.replace('_', ' ').title())
+
+
+@register.filter
 def hours_until_pickup(booking):
     """
     Calculate hours remaining until pickup time

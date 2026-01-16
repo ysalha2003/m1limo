@@ -2374,7 +2374,32 @@ def booking_activity(request):
         'booking',
         'booking__user',
         'changed_by'
-    ).order_by('-changed_at')
+    )
+    
+    # Sorting
+    sort_field = request.GET.get('sort', 'timestamp')
+    sort_order = request.GET.get('order', 'desc')
+    
+    # Map frontend sort fields to actual model fields
+    sort_mapping = {
+        'timestamp': 'changed_at',
+        'reservation': 'booking__id',
+        'action': 'action',
+        'changed_by': 'changed_by__username'
+    }
+    
+    actual_field = sort_mapping.get(sort_field, 'changed_at')
+    if sort_order == 'desc':
+        actual_field = f'-{actual_field}'
+    
+    # Handle NULL values in changed_by (System actions) - sort them last
+    if sort_field == 'changed_by':
+        if sort_order == 'asc':
+            history_qs = history_qs.order_by('changed_by__username', 'changed_at')
+        else:
+            history_qs = history_qs.order_by('-changed_by__username', '-changed_at')
+    else:
+        history_qs = history_qs.order_by(actual_field)
     
     # Optional filtering by action type
     action_filter = request.GET.get('action')
@@ -2415,6 +2440,8 @@ def booking_activity(request):
         'date_from': date_from,
         'date_to': date_to,
         'total_count': history_qs.count(),
+        'sort_field': sort_field,
+        'sort_order': sort_order,
     }
     
     return render(request, 'bookings/booking_activity.html', context)
