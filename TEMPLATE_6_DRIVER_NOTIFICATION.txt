@@ -1,0 +1,137 @@
+==============================================
+TEMPLATE 6: DRIVER NOTIFICATION
+==============================================
+
+Template Type: driver_notification
+Name: Driver Trip Assignment
+Description: Sent to driver when assigned to a trip
+
+SUBJECT TEMPLATE:
+-----------------
+New Trip Assignment: {{ pickup_date }} at {{ pickup_time }} - {{ passenger_name }}
+
+HTML TEMPLATE:
+--------------
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1 Limousine - Driver Assignment</title>
+</head>
+<body style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #0f172a; margin: 0; padding: 0; background-color: #f8fafc;">
+    <div style="max-width: 500px; margin: 40px auto; background-color: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);">
+        
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; padding: 32px 24px; text-align: center;">
+            <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">New Trip Assignment 🚗</h1>
+            <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500;">Driver Portal</p>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 32px 24px;">
+            <p style="font-size: 15px; color: #475569; margin-bottom: 24px; line-height: 1.6; text-align: center;">
+                Hello <strong>{{ driver_full_name }}</strong>,<br>
+                You have been assigned to a new trip. Please review the details below.
+            </p>
+            
+            <div style="font-size: 14px; color: #64748b; margin-bottom: 8px; text-align: center;">
+                Booking Reference: <strong style="color: #0f172a; font-weight: 600;">{{ booking_reference }}</strong>
+            </div>
+            
+            <!-- Pickup Time Highlight -->
+            <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 2px solid #7c3aed; border-radius: 12px; padding: 20px; margin: 24px 0; text-align: center;">
+                <div style="font-size: 13px; color: #5b21b6; margin-bottom: 8px; font-weight: 600;">SCHEDULED PICKUP</div>
+                <div style="font-size: 24px; font-weight: 700; color: #5b21b6; margin-bottom: 4px;">
+                    {{ pickup_time }}
+                </div>
+                <div style="font-size: 14px; color: #5b21b6;">
+                    {{ pickup_date }}
+                </div>
+            </div>
+            
+            <!-- Trip Details Box -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 24px 0;">
+                <h3 style="margin: 0 0 16px 0; font-size: 14px; color: #64748b; text-transform: uppercase;">Trip Details</h3>
+                
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">PICKUP LOCATION</div>
+                    <div style="font-size: 14px; color: #0f172a; font-weight: 500;">{{ pickup_location }}</div>
+                </div>
+                
+                {% if drop_off_location %}
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">DROP-OFF LOCATION</div>
+                    <div style="font-size: 14px; color: #0f172a; font-weight: 500;">{{ drop_off_location }}</div>
+                </div>
+                {% endif %}
+                
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px;">
+                    <h4 style="margin: 0 0 12px 0; font-size: 12px; color: #64748b; text-transform: uppercase;">Passenger Information</h4>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 2px;">NAME</div>
+                        <div style="font-size: 14px; color: #0f172a;">{{ passenger_name }}</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 2px;">PHONE</div>
+                        <div style="font-size: 14px; color: #0f172a;">{{ passenger_phone }}</div>
+                    </div>
+                    
+                    {% if passenger_email %}
+                    <div style="margin-bottom: 8px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 2px;">EMAIL</div>
+                        <div style="font-size: 13px; color: #475569;">{{ passenger_email }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">VEHICLE TYPE</div>
+                            <div style="font-size: 13px; color: #0f172a; font-weight: 500;">{{ vehicle_type }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">PASSENGERS</div>
+                            <div style="font-size: 13px; color: #0f172a; font-weight: 500;">{{ number_of_passengers }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if payment_amount %}
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px;">
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">DRIVER PAYMENT</div>
+                    <div style="font-size: 16px; color: #059669; font-weight: 600;">${{ payment_amount }}</div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="display: grid; gap: 12px; margin: 24px 0;">
+                <a href="{{ driver_portal_url }}" style="display: block; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 14.5px; text-align: center; box-shadow: 0 4px 6px rgba(124, 58, 237, 0.15);">
+                    Accept or Reject Trip
+                </a>
+                
+                <a href="{{ all_trips_url }}" style="display: block; background: #f8fafc; border: 2px solid #e2e8f0; color: #475569; padding: 12px 28px; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 14px; text-align: center;">
+                    View All My Trips
+                </a>
+            </div>
+            
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin-top: 24px; border-radius: 6px;">
+                <p style="font-size: 13px; color: #92400e; margin: 0; line-height: 1.5;">
+                    <strong>Important:</strong> Please respond to this trip assignment as soon as possible. Contact support at {{ support_phone }} if you have any questions.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="padding: 24px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9;">
+            <p style="margin: 6px 0;"><strong>M1 Limousine Service</strong></p>
+            <p style="margin: 6px 0;">{{ support_phone }} | {{ support_email }}</p>
+            <p style="margin: 12px 0 6px 0; font-size: 11px;">&copy; {% now "Y" %} M1 Limousine Service</p>
+        </div>
+    </div>
+</body>
+</html>

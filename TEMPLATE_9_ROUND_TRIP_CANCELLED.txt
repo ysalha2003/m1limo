@@ -1,0 +1,78 @@
+==============================================
+TEMPLATE 9: ROUND TRIP - CANCELLED
+==============================================
+
+Template Type: round_trip_cancelled
+Name: Round Trip Cancellation
+Description: Sent when a round trip booking is cancelled
+
+SUBJECT TEMPLATE:
+-----------------
+Round Trip Cancelled: {{ passenger_name }} - {{ pick_up_date }} & {{ return_pick_up_date }}
+
+HTML TEMPLATE:
+--------------
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1 Limousine - Round Trip Cancelled</title>
+</head>
+<body style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #0f172a; margin: 0; padding: 0; background-color: #f8fafc;">
+    <div style="max-width: 500px; margin: 40px auto; background-color: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);">
+        
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 32px 24px; text-align: center;">
+            <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">Round Trip Cancelled</h1>
+            <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500;">M1 Limousine Service</p>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 32px 24px; text-align: center;">
+            <p style="font-size: 15px; color: #475569; margin-bottom: 24px;">
+                Dear <strong>{{ passenger_name }}</strong>,<br>
+                Your round trip reservation has been cancelled.
+            </p>
+            
+            <div style="font-size: 14px; color: #64748b; margin-bottom: 16px;">
+                Booking Reference: <strong style="color: #0f172a; font-weight: 600;">{{ booking_reference }}</strong>
+            </div>
+            
+            <!-- Round Trip Details -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 24px 0; text-align: left;">
+                <h3 style="margin: 0 0 16px 0; font-size: 14px; color: #64748b; text-transform: uppercase;">Cancelled Trip Details</h3>
+                
+                <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">➡️ OUTBOUND</div>
+                    <div style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 4px;">{{ pick_up_date }} at {{ pick_up_time }}</div>
+                    <div style="font-size: 13px; color: #475569;">{{ pick_up_address }} → {{ drop_off_address }}</div>
+                </div>
+                
+                <div>
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">⬅️ RETURN</div>
+                    <div style="font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 4px;">{{ return_pick_up_date }} at {{ return_pick_up_time }}</div>
+                    <div style="font-size: 13px; color: #475569;">{{ return_pick_up_address }} → {{ return_drop_off_address }}</div>
+                </div>
+            </div>
+            
+            <a href="{{ dashboard_url }}" style="display: inline-block; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 14.5px; margin-top: 8px;">
+                Visit Dashboard
+            </a>
+            
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin-top: 24px; border-radius: 6px; text-align: left;">
+                <p style="font-size: 13px; color: #92400e; margin: 0; line-height: 1.5;">
+                    <strong>Need Another Trip?</strong> Visit your dashboard to create a new booking anytime.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="padding: 24px; text-align: center; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 12px; color: #64748b; margin: 0;">
+                M1 Limousine Service | {{ support_phone }} | {{ support_email }}
+            </p>
+        </div>
+    </div>
+</body>
+</html>
