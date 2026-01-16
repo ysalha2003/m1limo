@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.mail import EmailMessage, send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.utils import timezone
 from models import Booking
 
 logger = logging.getLogger('services')
@@ -239,6 +240,78 @@ class EmailService:
             'company_name': settings.COMPANY_INFO.get('name', 'M1 Limousine Service'),
             'support_email': settings.COMPANY_INFO.get('email', 'support@m1limo.com'),
             'dashboard_url': f"{settings.BASE_URL}/dashboard",
+        }
+        
+        return context
+    
+    @staticmethod
+    def _build_driver_rejection_template_context(booking: Booking) -> dict:
+        """Build context dictionary for driver rejection notification templates."""
+        from django.conf import settings
+        
+        context = {
+            # Driver information
+            'driver_full_name': booking.assigned_driver.get_full_name() if hasattr(booking.assigned_driver, 'get_full_name') else str(booking.assigned_driver),
+            'driver_email': booking.assigned_driver.email if hasattr(booking.assigned_driver, 'email') else '',
+            
+            # Booking reference
+            'booking_reference': booking.booking_reference or f"#{booking.id}",
+            'booking_id': str(booking.id),
+            
+            # Trip details
+            'passenger_name': booking.passenger_name,
+            'pickup_date': booking.pick_up_date.strftime('%A, %B %d, %Y') if booking.pick_up_date else '',
+            'pickup_time': booking.pick_up_time.strftime('%I:%M %p') if booking.pick_up_time else '',
+            'pick_up_address': booking.pick_up_address,
+            'drop_off_address': booking.drop_off_address or '',
+            
+            # Rejection details
+            'rejection_reason': booking.driver_rejection_reason or 'No reason provided',
+            'rejected_at': booking.driver_rejected_at.strftime('%B %d, %Y at %I:%M %p') if hasattr(booking, 'driver_rejected_at') and booking.driver_rejected_at else timezone.now().strftime('%B %d, %Y at %I:%M %p'),
+            
+            # URLs
+            'dashboard_url': f"{settings.BASE_URL}/dashboard",
+            'booking_url': f"{settings.BASE_URL}/reservation/{booking.id}/",
+            
+            # Company information
+            'company_name': settings.COMPANY_INFO.get('name', 'M1 Limousine Service'),
+            'support_email': settings.COMPANY_INFO.get('email', 'support@m1limo.com'),
+        }
+        
+        return context
+    
+    @staticmethod
+    def _build_driver_completion_template_context(booking: Booking) -> dict:
+        """Build context dictionary for driver completion notification templates."""
+        from django.conf import settings
+        
+        context = {
+            # Driver information
+            'driver_full_name': booking.assigned_driver.get_full_name() if hasattr(booking.assigned_driver, 'get_full_name') else str(booking.assigned_driver),
+            'driver_email': booking.assigned_driver.email if hasattr(booking.assigned_driver, 'email') else '',
+            
+            # Booking reference
+            'booking_reference': booking.booking_reference or f"#{booking.id}",
+            'booking_id': str(booking.id),
+            
+            # Trip details
+            'passenger_name': booking.passenger_name,
+            'pickup_date': booking.pick_up_date.strftime('%A, %B %d, %Y') if booking.pick_up_date else '',
+            'pickup_time': booking.pick_up_time.strftime('%I:%M %p') if booking.pick_up_time else '',
+            'pick_up_address': booking.pick_up_address,
+            'drop_off_address': booking.drop_off_address or '',
+            
+            # Completion details
+            'completed_at': booking.driver_completed_at.strftime('%B %d, %Y at %I:%M %p') if hasattr(booking, 'driver_completed_at') and booking.driver_completed_at else timezone.now().strftime('%B %d, %Y at %I:%M %p'),
+            'trip_notes': getattr(booking, 'driver_completion_notes', '') or '',
+            
+            # URLs
+            'dashboard_url': f"{settings.BASE_URL}/dashboard",
+            'booking_url': f"{settings.BASE_URL}/reservation/{booking.id}/",
+            
+            # Company information
+            'company_name': settings.COMPANY_INFO.get('name', 'M1 Limousine Service'),
+            'support_email': settings.COMPANY_INFO.get('email', 'support@m1limo.com'),
         }
         
         return context
