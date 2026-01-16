@@ -185,12 +185,12 @@ class BookingService:
         # For 30 bookings/day, immediate sending is more reliable than background tasks
         notification_type = 'confirmed' if booking.status == 'Confirmed' else 'new'
 
-        if return_booking:
-            logger.info(f"Sending unified round-trip {notification_type} notification (First: {booking.id}, Return: {return_booking.id})")
-            NotificationService.send_round_trip_notification(booking, return_booking, notification_type)
-        else:
-            logger.info(f"Sending {notification_type} notification for booking {booking.id}")
-            NotificationService.send_notification(booking, notification_type)
+        logger.info(f"Sending {notification_type} notification for booking {booking.id}")
+        NotificationService.send_unified_booking_notification(
+            booking=booking,
+            event=notification_type,
+            old_status=None
+        )
 
         return booking
     
@@ -395,14 +395,11 @@ class BookingService:
 
         if original_status != booking.status:
             logger.info(f"Status changed from {original_status} to {booking.status}")
-            if is_outbound_with_return:
-                NotificationService.send_round_trip_notification(
-                    booking,
-                    booking.linked_booking,
-                    'status_change'
-                )
-            else:
-                NotificationService.send_notification(booking, 'status_change', old_status=original_status)
+            NotificationService.send_unified_booking_notification(
+                booking=booking,
+                event='status_change',
+                old_status=original_status
+            )
 
         return booking
     
@@ -548,15 +545,11 @@ class BookingService:
 
         notification_type = notification_map.get(new_status)
         if notification_type:
-            if send_unified_notification and linked_booking:
-                logger.info(f"Sending unified round-trip {notification_type} notification")
-                NotificationService.send_round_trip_notification(
-                    booking,
-                    linked_booking,
-                    notification_type
-                )
-            else:
-                NotificationService.send_notification(booking, notification_type, old_status=original_status)
+            NotificationService.send_unified_booking_notification(
+                booking=booking,
+                event=notification_type,
+                old_status=original_status
+            )
 
         return booking
     
@@ -708,11 +701,19 @@ class BookingService:
             linked_booking.save()
             logger.info(f"Linked return booking {linked_booking.id} cancelled (charge: {linked_will_charge})")
 
-            NotificationService.send_notification(linked_booking, 'cancelled')
+            NotificationService.send_unified_booking_notification(
+                booking=linked_booking,
+                event='cancelled',
+                old_status=None
+            )
 
         cache.delete('dashboard_stats')
 
-        NotificationService.send_notification(booking, 'cancelled')
+        NotificationService.send_unified_booking_notification(
+            booking=booking,
+            event='cancelled',
+            old_status=None
+        )
 
         return booking
 
@@ -835,10 +836,18 @@ class BookingService:
 
         if return_trip:
             logger.info(f"Sending unified round-trip cancellation notification")
-            NotificationService.send_round_trip_notification(first_trip, return_trip, 'cancelled')
+            NotificationService.send_unified_booking_notification(
+                booking=first_trip,
+                event='cancelled',
+                old_status=None
+            )
         else:
             logger.info(f"Sending single-trip cancellation notification")
-            NotificationService.send_notification(first_trip, 'cancelled')
+            NotificationService.send_unified_booking_notification(
+                booking=first_trip,
+                event='cancelled',
+                old_status=None
+            )
 
         return (first_trip, return_trip)
 
@@ -920,7 +929,11 @@ class BookingService:
 
         cache.delete('dashboard_stats')
 
-        NotificationService.send_notification(booking, 'cancelled')
+        NotificationService.send_unified_booking_notification(
+            booking=booking,
+            event='cancelled',
+            old_status=None
+        )
 
         return booking
 

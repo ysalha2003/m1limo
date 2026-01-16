@@ -18,10 +18,14 @@ def send_pickup_reminder_email(booking: Booking, is_return: bool = False) -> boo
             f"for booking {booking.id} - {booking.passenger_name}"
         )
 
-        success = NotificationService.send_notification(
+        from email_service import EmailService
+        
+        # Send unified reminder
+        success = EmailService.send_unified_notification(
+            template_type='customer_reminder',
             booking=booking,
-            notification_type='reminder',
-            is_return=is_return
+            recipient_email=booking.user.email,
+            extra_context={}
         )
 
         if success:

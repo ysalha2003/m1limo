@@ -29,7 +29,11 @@ def send_booking_notification_async(booking_id, notification_type, old_status=No
         logger.info(f"[ASYNC] Starting notification task for booking {booking_id}, type: {notification_type}")
 
         booking = Booking.objects.get(id=booking_id)
-        result = NotificationService.send_notification(booking, notification_type, old_status)
+        result = NotificationService.send_unified_booking_notification(
+            booking=booking,
+            event=notification_type,
+            old_status=old_status
+        )
 
         if result['sent']:
             logger.info(f"[ASYNC] Successfully sent {notification_type} notification for booking {booking_id}")
@@ -65,10 +69,10 @@ def send_round_trip_notification_async(outbound_id, return_id, notification_type
         outbound = Booking.objects.get(id=outbound_id)
         return_booking = Booking.objects.get(id=return_id)
 
-        result = NotificationService.send_round_trip_notification(
-            outbound,
-            return_booking,
-            notification_type
+        result = NotificationService.send_unified_booking_notification(
+            booking=outbound,
+            event=notification_type,
+            old_status=None
         )
 
         if result['sent']:

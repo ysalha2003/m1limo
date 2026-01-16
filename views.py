@@ -629,10 +629,14 @@ def booking_confirmation(request, booking_id):
     # Get notification recipients for display
     from notification_service import NotificationService
     notification_type = 'confirmed' if booking.status == 'Confirmed' else 'new'
-    notification_recipients = NotificationService.get_recipients(booking, notification_type)
+    # Build recipient list manually
+    notification_recipients = [booking.user.email]
+    if booking.send_passenger_notifications and booking.passenger_email:
+        if booking.passenger_email.lower() != booking.user.email.lower():
+            notification_recipients.append(booking.passenger_email)
 
     # Get reminder recipients (24 hours before pickup)
-    reminder_recipients = NotificationService.get_recipients(booking, 'reminder')
+    reminder_recipients = notification_recipients.copy()
 
     context = {
         'booking': booking,
@@ -735,9 +739,19 @@ def booking_detail(request, booking_id):
         }
         notification_type = status_to_notification.get(booking.status, 'confirmed')
         
-        # Import NotificationService to check preferences
-        from notification_service import NotificationService
-        will_notify_user = NotificationService._should_notify_user(booking.user, notification_type)
+        # Check user notification preferences
+        will_notify_user = True  # Default to sending
+        try:
+            profile = booking.user.profile
+            if notification_type == 'confirmed':
+                will_notify_user = profile.receive_booking_confirmations
+            elif notification_type in ['status_change', 'cancelled']:
+                will_notify_user = profile.receive_status_updates
+            elif notification_type == 'reminder':
+                will_notify_user = profile.receive_pickup_reminders
+        except Exception:
+            pass  # Keep default True if preferences not available
+        
         will_notify_passenger = booking.send_passenger_notifications and bool(booking.passenger_email)
 
     context = {
@@ -978,9 +992,10 @@ def resend_notification(request, booking_id):
                 selected_recipients = None
             
             # Send notification with current status and selected recipients
-            result = NotificationService.send_notification(
-                booking, 
-                notification_type,
+            result = NotificationService.send_unified_booking_notification(
+                booking=booking,
+                event='status_change',
+                old_status=None,
                 selected_recipients=selected_recipients
             )
             
@@ -1450,7 +1465,12 @@ def assign_driver(request, booking_id):
                 booking.share_driver_info = share_driver_info
 
                 # Resend notification
-                NotificationService.send_driver_notification(booking, booking.assigned_driver)
+                NotificationService.send_unified_driver_notification(
+                    booking=booking,
+                    driver=booking.assigned_driver,
+                    accept_url='#',
+                    reject_url='#'
+                )
                 booking.driver_notified_at = timezone.now()
                 booking.save(update_fields=['driver_notified_at', 'driver_payment_amount', 'share_driver_info'])
 
@@ -1517,7 +1537,12 @@ def assign_driver(request, booking_id):
                     booking.share_driver_info = share_driver_info
 
                     # Send driver notification email
-                    NotificationService.send_driver_notification(booking, driver)
+                    NotificationService.send_unified_driver_notification(
+                        booking=booking,
+                        driver=driver,
+                        accept_url='#',
+                        reject_url='#'
+                    )
                     booking.driver_notified_at = timezone.now()
                     booking.driver_response_status = 'accepted'  # Admin confirmed driver accepted verbally
 
@@ -1852,7 +1877,12 @@ def resend_driver_notification(request, booking_id):
         return redirect('reservation_detail', booking_id=booking.id)
 
     from notification_service import NotificationService
-    success = NotificationService.send_driver_notification(booking, booking.assigned_driver)
+    success = NotificationService.send_unified_driver_notification(
+        booking=booking,
+        driver=booking.assigned_driver,
+        accept_url='#',
+        reject_url='#'
+    )
 
     if success:
         messages.success(request, f"Driver notification resent to {booking.assigned_driver.full_name}.")

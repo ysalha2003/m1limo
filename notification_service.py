@@ -1,7 +1,8 @@
 # services/notification_service.py
 import logging
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from django.conf import settings
+from django.utils import timezone
 from email_service import EmailService
 from models import Booking, Notification, NotificationRecipient, BookingNotification
 
@@ -9,620 +10,391 @@ logger = logging.getLogger('services')
 
 
 class NotificationService:
-    """Orchestrates sending notifications via email."""
+    """
+    Unified Notification Service for M1 Limo.
     
-    NOTIFICATION_MAP = {
-        'new': {'email_template': 'booking_notification'},
-        'confirmed': {'email_template': 'booking_notification'},
-        'cancelled': {'email_template': 'booking_notification'},
-        'status_change': {'email_template': 'booking_notification'},
-        'reminder': {'email_template': 'booking_reminder'},
-    }
+    Orchestrates notification sending via unified email templates:
+    - send_unified_booking_notification(): Customer & admin alerts for booking events
+    - send_unified_driver_notification(): Driver trip assignments
+    - send_unified_admin_driver_alert(): Admin alerts for driver events (rejection/completion)
     
+    All notifications are recorded in the database for auditing.
+    """
+
+    # ============================================================================
+    # UNIFIED NOTIFICATION METHODS
+    # ============================================================================
+
     @classmethod
-    def send_notification(
+    def send_unified_booking_notification(
         cls,
         booking: Booking,
-        notification_type: str,
+        event: str,
         old_status: Optional[str] = None,
-        is_return: bool = False,
         selected_recipients: Optional[list] = None
     ) -> Dict[str, Any]:
         """
-        Send notification to all configured recipients.
-        If selected_recipients is provided (admin override), only send to those recipients.
-        selected_recipients can contain: 'admin', 'user', 'passenger'
-        Returns detailed status for error handling.
+        Send unified booking notification (replaces send_notification for booking events).
+        Uses customer_booking template for customers and admin_booking template for admins.
+        
+        Args:
+            booking: Booking instance
+            event: 'new' | 'confirmed' | 'cancelled' | 'status_change'
+            old_status: Previous status (for status_change events)
+            selected_recipients: Optional list of recipient types ['user', 'passenger', 'admin']
+                               If None, sends to all (default behavior)
+        
+        Returns:
+            dict: Status with sent, successful_recipients, failed_recipients, errors
         """
-        logger.info(f"[NOTIFICATION START] Booking: {booking.id}, Type: {notification_type}")
-
-        # Get recipients based on selection or default logic
-        if selected_recipients is not None:
-            recipients = cls._get_selected_recipients(booking, notification_type, selected_recipients)
-            logger.info(f"[NOTIFICATION] Using admin-selected recipients: {selected_recipients}")
-        else:
-            recipients = cls.get_recipients(booking, notification_type)
-
-        if not recipients:
-            logger.warning(f"[NOTIFICATION] No recipients for booking {booking.id}")
-            return {
-                'sent': False,
-                'total_recipients': 0,
-                'successful_recipients': [],
-                'failed_recipients': [],
-                'errors': ['No recipients configured']
-            }
-
-        logger.info(f"[NOTIFICATION] Sending to {len(recipients)} recipients")
-
-        notification_sent = False
+        logger.info(f"[UNIFIED NOTIFICATION] Booking: {booking.id}, Event: {event}, Selected: {selected_recipients}")
+        
         successful_recipients = []
         failed_recipients = []
         errors = []
-
-        for recipient_email in recipients:
-            try:
-                logger.info(f"[EMAIL] Sending {notification_type} to {recipient_email}")
-
-                success = EmailService.send_booking_notification(
-                    booking=booking,
-                    notification_type=notification_type,
-                    recipient_email=recipient_email,
-                    old_status=old_status,
-                    is_return=is_return
-                )
-
-                cls._record_notification(
-                    booking=booking,
-                    notification_type=notification_type,
-                    channel='email',
-                    recipient=recipient_email,
-                    success=success
-                )
-
-                if success:
-                    logger.info(f"[EMAIL] OK Sent to {recipient_email}")
-                    notification_sent = True
-                    successful_recipients.append(recipient_email)
-                else:
-                    logger.error(f"[EMAIL] FAIL Failed to send to {recipient_email}")
+        
+        # Build context for notifications
+        extra_context = {
+            'event': event,
+            'old_status': old_status
+        }
+        
+        # Send to customers (User + Passenger) - only if selected or no selection specified
+        should_send_to_customers = selected_recipients is None or 'user' in selected_recipients or 'passenger' in selected_recipients
+        
+        if should_send_to_customers:
+            customer_recipients = cls._get_customer_recipients(booking, selected_recipients)
+            for recipient_email in customer_recipients:
+                try:
+                    success = EmailService.send_unified_notification(
+                        template_type='customer_booking',
+                        booking=booking,
+                        recipient_email=recipient_email,
+                        extra_context=extra_context
+                    )
+                    
+                    cls._record_notification(
+                        booking=booking,
+                        notification_type=f'customer_{event}',
+                        channel='email',
+                        recipient=recipient_email,
+                        success=success
+                    )
+                    
+                    if success:
+                        successful_recipients.append(recipient_email)
+                        logger.info(f"[UNIFIED] Customer notification sent to {recipient_email}")
+                    else:
+                        failed_recipients.append(recipient_email)
+                        errors.append(f"Customer notification failed: {recipient_email}")
+                
+                except Exception as e:
+                    logger.error(f"[UNIFIED] Error sending to customer {recipient_email}: {e}")
                     failed_recipients.append(recipient_email)
-                    errors.append(f"Failed to send to {recipient_email}")
-
-            except Exception as e:
-                error_msg = str(e)
-                logger.error(f"[EMAIL] Exception sending to {recipient_email}: {e}", exc_info=True)
-                cls._record_notification(
-                    booking=booking,
-                    notification_type=notification_type,
-                    channel='email',
-                    recipient=recipient_email,
-                    success=False,
-                    error_message=error_msg
-                )
-                failed_recipients.append(recipient_email)
-                errors.append(f"{recipient_email}: {error_msg}")
-
-        logger.info(f"[NOTIFICATION END] Booking: {booking.id}, Sent: {notification_sent}")
-
+                    errors.append(f"{recipient_email}: {str(e)}")
+        
+        # Send to admins - only if selected or no selection specified
+        should_send_to_admin = selected_recipients is None or 'admin' in selected_recipients
+        
+        if should_send_to_admin:
+            admin_recipients = cls._get_admin_recipients(booking, event)
+            for recipient_email in admin_recipients:
+                try:
+                    success = EmailService.send_unified_notification(
+                        template_type='admin_booking',
+                        booking=booking,
+                        recipient_email=recipient_email,
+                        extra_context=extra_context
+                    )
+                    
+                    cls._record_notification(
+                        booking=booking,
+                        notification_type=f'admin_{event}',
+                        channel='email',
+                        recipient=recipient_email,
+                        success=success
+                    )
+                    
+                    if success:
+                        successful_recipients.append(recipient_email)
+                        logger.info(f"[UNIFIED] Admin notification sent to {recipient_email}")
+                    else:
+                        failed_recipients.append(recipient_email)
+                        errors.append(f"Admin notification failed: {recipient_email}")
+                
+                except Exception as e:
+                    logger.error(f"[UNIFIED] Error sending to admin {recipient_email}: {e}")
+                    failed_recipients.append(recipient_email)
+                    errors.append(f"{recipient_email}: {str(e)}")
+        
+        # Calculate total recipients actually attempted
+        total_attempted = len(successful_recipients) + len(failed_recipients)
+        notification_sent = len(successful_recipients) > 0
+        
+        logger.info(f"[UNIFIED NOTIFICATION END] Booking: {booking.id}, Sent: {notification_sent}, Success: {len(successful_recipients)}/{total_attempted}")
+        
         return {
             'sent': notification_sent,
-            'total_recipients': len(recipients),
+            'total_recipients': total_attempted,
             'successful_recipients': successful_recipients,
             'failed_recipients': failed_recipients,
             'errors': errors
         }
-    
+
     @classmethod
-    def get_recipients(
+    def send_unified_driver_notification(
         cls,
         booking: Booking,
-        notification_type: str
-    ) -> list:
-        """Get all email recipients based on notification preferences."""
-        recipients = set()
-
-        admin_email = getattr(settings, 'ADMIN_EMAIL', None)
-        if admin_email:
-            recipients.add(admin_email)
-
-        # Account owner - check their UserProfile preferences
-        if booking.user.email:
-            if cls._should_notify_user(booking.user, notification_type):
-                recipients.add(booking.user.email)
-
-        # Passenger - check booking's send_passenger_notifications flag
-        if booking.send_passenger_notifications and booking.passenger_email:
-            # Skip if passenger email == account owner email (avoid duplicates)
-            if booking.passenger_email.lower() != booking.user.email.lower():
-                # Send all types except 'new' (passenger doesn't need "new booking" admin alert)
-                if notification_type in ['confirmed', 'status_change', 'cancelled', 'reminder']:
-                    recipients.add(booking.passenger_email)
-
-        # Additional recipients - parse comma-separated emails
-        if booking.additional_recipients:
-            emails = [email.strip() for email in booking.additional_recipients.split(',')]
-            for email in emails:
-                if email and '@' in email:  # Basic validation
-                    # Skip duplicates
-                    if email.lower() not in [r.lower() for r in recipients]:
-                        # Additional recipients get all notification types except 'new'
-                        if notification_type in ['confirmed', 'status_change', 'cancelled', 'reminder']:
-                            recipients.add(email)
-
-        try:
-            booking_ids = [booking.id]
-            if booking.linked_booking:
-                booking_ids.append(booking.linked_booking.id)
-                logger.info(f"Including recipients from linked booking {booking.linked_booking.id}")
-
-            booking_notifications = BookingNotification.objects.filter(
-                booking__id__in=booking_ids,
-                recipient__is_active=True
-            ).select_related('recipient')
-
-            for bn in booking_notifications:
-                recipient = bn.recipient
-
-                if notification_type == 'new' and recipient.notify_new:
-                    recipients.add(recipient.email)
-                elif notification_type == 'confirmed' and recipient.notify_confirmed:
-                    recipients.add(recipient.email)
-                elif notification_type == 'cancelled' and recipient.notify_cancelled:
-                    recipients.add(recipient.email)
-                elif notification_type == 'status_change' and getattr(recipient, 'notify_status_changes', True):
-                    recipients.add(recipient.email)
-                elif notification_type == 'reminder' and getattr(recipient, 'notify_reminders', True):
-                    recipients.add(recipient.email)
-
-        except Exception as e:
-            logger.error(f"Error getting booking-specific recipients: {e}")
-
-        try:
-            global_recipients = NotificationRecipient.objects.filter(is_active=True)
-
-            for recipient in global_recipients:
-                if notification_type == 'new' and recipient.notify_new:
-                    recipients.add(recipient.email)
-                elif notification_type == 'confirmed' and recipient.notify_confirmed:
-                    recipients.add(recipient.email)
-                elif notification_type == 'cancelled' and recipient.notify_cancelled:
-                    recipients.add(recipient.email)
-                elif notification_type == 'status_change' and getattr(recipient, 'notify_status_changes', True):
-                    recipients.add(recipient.email)
-                elif notification_type == 'reminder' and getattr(recipient, 'notify_reminders', True):
-                    recipients.add(recipient.email)
-
-        except Exception as e:
-            logger.error(f"Error getting global recipients: {e}")
-
-        return list(recipients)
-    
-    @classmethod
-    def _get_selected_recipients(
-        cls,
-        booking: Booking,
-        notification_type: str,
-        selected_recipients: list
-    ) -> list:
+        driver: 'Driver',
+        accept_url: str = '#',
+        reject_url: str = '#'
+    ) -> bool:
         """
-        Get recipients based on admin selection.
-        This bypasses normal preference checks for admin override capability.
+        Send unified driver assignment notification.
+        Uses driver_assignment template.
         
         Args:
-            booking: The booking to send notifications for
-            notification_type: Type of notification
-            selected_recipients: List containing 'admin', 'user', and/or 'passenger'
+            booking: Booking instance
+            driver: Driver instance
+            accept_url: URL for driver to accept trip
+            reject_url: URL for driver to reject trip
         
         Returns:
-            List of email addresses to send to
+            bool: True if sent successfully
+        """
+        logger.info(f"[UNIFIED DRIVER] Booking: {booking.id}, Driver: {driver.full_name}")
+        
+        if not driver.email:
+            logger.warning(f"[UNIFIED DRIVER] Driver {driver.full_name} has no email")
+            return False
+        
+        try:
+            extra_context = {
+                'accept_url': accept_url,
+                'reject_url': reject_url
+            }
+            
+            success = EmailService.send_unified_notification(
+                template_type='driver_assignment',
+                booking=booking,
+                recipient_email=driver.email,
+                extra_context=extra_context
+            )
+            
+            cls._record_notification(
+                booking=booking,
+                notification_type='driver_assignment',
+                channel='email',
+                recipient=driver.email,
+                success=success
+            )
+            
+            if success:
+                logger.info(f"[UNIFIED DRIVER] Notification sent to {driver.email}")
+            else:
+                logger.error(f"[UNIFIED DRIVER] Failed to send to {driver.email}")
+            
+            return success
+        
+        except Exception as e:
+            logger.error(f"[UNIFIED DRIVER] Error: {e}", exc_info=True)
+            return False
+
+    @classmethod
+    def send_unified_admin_driver_alert(
+        cls,
+        booking: Booking,
+        driver: 'Driver',
+        event_type: str,
+        reason: str = '',
+        notes: str = ''
+    ) -> bool:
+        """
+        Send unified admin driver alert (rejection/completion).
+        Uses admin_driver template.
+        
+        Args:
+            booking: Booking instance
+            driver: Driver instance
+            event_type: 'rejection' | 'completion'
+            reason: Reason for rejection/completion
+            notes: Additional notes
+        
+        Returns:
+            bool: True if sent to at least one admin
+        """
+        logger.info(f"[UNIFIED ADMIN DRIVER] Booking: {booking.id}, Event: {event_type}")
+        
+        # Get all admin recipients
+        admin_recipients = cls._get_all_admin_recipients()
+        
+        if not admin_recipients:
+            logger.warning(f"[UNIFIED ADMIN DRIVER] No admin recipients configured")
+            return False
+        
+        extra_context = {
+            'event_type': event_type,
+            'driver_name': driver.full_name,
+            'driver_phone': driver.phone_number,
+            'reason': reason,
+            'notes': notes,
+            'timestamp': timezone.now()
+        }
+        
+        success_count = 0
+        for admin_email in admin_recipients:
+            try:
+                success = EmailService.send_unified_notification(
+                    template_type='admin_driver',
+                    booking=booking,
+                    recipient_email=admin_email,
+                    extra_context=extra_context
+                )
+                
+                cls._record_notification(
+                    booking=booking,
+                    notification_type=f'admin_driver_{event_type}',
+                    channel='email',
+                    recipient=admin_email,
+                    success=success
+                )
+                
+                if success:
+                    success_count += 1
+                    logger.info(f"[UNIFIED ADMIN DRIVER] Sent to {admin_email}")
+                else:
+                    logger.error(f"[UNIFIED ADMIN DRIVER] Failed to send to {admin_email}")
+            
+            except Exception as e:
+                logger.error(f"[UNIFIED ADMIN DRIVER] Error sending to {admin_email}: {e}")
+        
+        logger.info(f"[UNIFIED ADMIN DRIVER END] Sent to {success_count}/{len(admin_recipients)} admins")
+        return success_count > 0
+
+    # ============================================================================
+    # HELPER METHODS
+    # ============================================================================
+
+    @classmethod
+    def _get_customer_recipients(cls, booking: Booking, selected_recipients: Optional[list] = None) -> List[str]:
+        """
+        Get customer recipients (User + Passenger if different).
+        
+        Args:
+            booking: Booking instance
+            selected_recipients: Optional list to filter recipients ['user', 'passenger']
+        
+        Returns:
+            list: List of customer email addresses
+        """
+        recipients = []
+        
+        # User who created booking (only if selected or no selection)
+        if (selected_recipients is None or 'user' in selected_recipients):
+            if booking.user and booking.user.email:
+                recipients.append(booking.user.email)
+        
+        # Passenger if different email (only if selected or no selection)
+        if (selected_recipients is None or 'passenger' in selected_recipients):
+            if booking.send_passenger_notifications and booking.passenger_email:
+                if booking.passenger_email.lower() != booking.user.email.lower():
+                    recipients.append(booking.passenger_email)
+        
+        return recipients
+
+    @classmethod
+    def _get_admin_recipients(cls, booking: Booking, event: str) -> List[str]:
+        """
+        Get admin recipients dynamically from staff/superuser accounts.
+        Uses current email from User profile, respects changes in admin panel.
+        
+        Args:
+            booking: Booking instance
+            event: 'new' | 'confirmed' | 'cancelled' | 'status_change'
+        
+        Returns:
+            list: List of admin email addresses (from User.email field)
         """
         recipients = set()
         
-        # Admin
-        if 'admin' in selected_recipients:
-            admin_email = getattr(settings, 'ADMIN_EMAIL', None)
-            if admin_email:
-                recipients.add(admin_email)
+        try:
+            from django.contrib.auth.models import User
+            
+            # Get all active staff/superuser accounts with email
+            admin_users = User.objects.filter(
+                is_active=True,
+                is_staff=True
+            ).exclude(email='')
+            
+            # Admin/staff users receive all booking notifications by default
+            # This ensures business operations are not missed
+            for admin in admin_users:
+                if admin.email:
+                    recipients.add(admin.email)
+            
+            logger.info(f"[ADMIN RECIPIENTS] Found {len(recipients)} admin(s) for event '{event}'")
         
-        # User (account owner)
-        if 'user' in selected_recipients and booking.user.email:
-            recipients.add(booking.user.email)
-        
-        # Passenger
-        if 'passenger' in selected_recipients and booking.passenger_email:
-            # Avoid duplicate if passenger == user
-            if booking.passenger_email.lower() != booking.user.email.lower():
-                recipients.add(booking.passenger_email)
+        except Exception as e:
+            logger.error(f"Error getting admin recipients: {e}")
         
         return list(recipients)
-    
+
     @classmethod
-    def _should_notify_user(cls, user, notification_type: str) -> bool:
-        """Check if user should receive notification based on their preferences"""
+    def _get_all_admin_recipients(cls) -> List[str]:
+        """
+        Get all active admin recipients dynamically from staff/superuser accounts.
+        Driver events are critical and sent to all admins.
+        Uses current email from User.email field.
+        
+        Returns:
+            list: List of all admin email addresses
+        """
+        recipients = []
+        
         try:
-            profile = user.profile
+            from django.contrib.auth.models import User
             
-            if notification_type == 'confirmed':
-                return profile.receive_booking_confirmations
-            elif notification_type in ['status_change', 'cancelled']:
-                return profile.receive_status_updates
-            elif notification_type == 'reminder':
-                return profile.receive_pickup_reminders
-            else:
-                # For 'new' and other types, always send to account owner
-                return True
-                
+            # Get all active staff/superuser accounts with email
+            admin_users = User.objects.filter(
+                is_active=True,
+                is_staff=True
+            ).exclude(email='').values_list('email', flat=True)
+            
+            recipients = list(admin_users)
+            logger.info(f"[ADMIN RECIPIENTS] Found {len(recipients)} admin(s) for driver alerts")
+        
         except Exception as e:
-            logger.warning(f"Could not check user preferences for {user.email}: {e}")
-            # Default to sending if we can't check preferences
-            return True
-    
-    @staticmethod
+            logger.error(f"Error getting all admin recipients: {e}")
+        
+        return recipients
+
+    @classmethod
     def _record_notification(
+        cls,
         booking: Booking,
         notification_type: str,
         channel: str,
         recipient: str,
-        success: bool,
-        error_message: Optional[str] = None
+        success: bool
     ) -> None:
-        """Record notification attempt in database for tracking."""
+        """
+        Record notification in database for auditing.
+        
+        Args:
+            booking: Booking instance
+            notification_type: Type of notification (e.g., 'customer_confirmed')
+            channel: 'email' | 'sms'
+            recipient: Recipient address
+            success: Whether notification was sent successfully
+        """
         try:
-            notification = Notification.objects.create(
+            Notification.objects.create(
                 booking=booking,
                 notification_type=notification_type,
                 channel=channel,
                 recipient=recipient,
                 success=success,
-                error_message=error_message
+                error_message=None if success else 'Failed to send'
             )
-            
-            status_text = "OK" if success else "FAIL"
-            logger.info(
-                f"[DB] {status_text} Recorded {channel} {notification_type} "
-                f"to {recipient} for booking {booking.id}, success: {success}"
-            )
-            
         except Exception as e:
-            logger.error(f"[DB] Failed to record notification: {e}", exc_info=True)
-    
-    @classmethod
-    def send_reminder(
-        cls,
-        booking: Booking,
-        is_return: bool = False
-    ) -> bool:
-        """Send pickup reminder notification."""
-        return cls.send_notification(
-            booking=booking,
-            notification_type='reminder',
-            is_return=is_return
-        )
-    
-    @classmethod
-    def send_round_trip_notification(
-        cls,
-        first_trip: Booking,
-        return_trip: Booking,
-        notification_type: str
-    ) -> Dict[str, Any]:
-        """
-        Send unified email for round-trip bookings.
-        Prevents duplicate emails by combining both trips in one message.
-        """
-        logger.info(f"[ROUND TRIP NOTIFICATION] First: {first_trip.id}, Return: {return_trip.id}, Type: {notification_type}")
-
-        recipients = cls.get_recipients(first_trip, notification_type)
-
-        if not recipients:
-            logger.warning(f"[NOTIFICATION] No recipients for booking {first_trip.id}")
-            return {
-                'sent': False,
-                'total_recipients': 0,
-                'successful_recipients': [],
-                'failed_recipients': [],
-                'errors': ['No recipients configured']
-            }
-
-        logger.info(f"[NOTIFICATION] Sending unified round-trip email to {len(recipients)} recipients")
-
-        notification_sent = False
-        successful_recipients = []
-        failed_recipients = []
-        errors = []
-
-        for recipient_email in recipients:
-            try:
-                logger.info(f"[EMAIL] Sending round-trip {notification_type} to {recipient_email}")
-
-                success = EmailService.send_round_trip_notification(
-                    first_trip=first_trip,
-                    return_trip=return_trip,
-                    notification_type=notification_type,
-                    recipient_email=recipient_email
-                )
-
-                cls._record_notification(
-                    booking=first_trip,
-                    notification_type=notification_type,
-                    channel='email',
-                    recipient=recipient_email,
-                    success=success
-                )
-                cls._record_notification(
-                    booking=return_trip,
-                    notification_type=notification_type,
-                    channel='email',
-                    recipient=recipient_email,
-                    success=success
-                )
-
-                if success:
-                    logger.info(f"[EMAIL] OK Sent unified round-trip email to {recipient_email}")
-                    notification_sent = True
-                    successful_recipients.append(recipient_email)
-                else:
-                    logger.error(f"[EMAIL] FAIL Failed to send to {recipient_email}")
-                    failed_recipients.append(recipient_email)
-                    errors.append(f"Failed to send to {recipient_email}")
-
-            except Exception as e:
-                error_msg = str(e)
-                logger.error(f"[EMAIL] Exception sending to {recipient_email}: {e}", exc_info=True)
-                cls._record_notification(
-                    booking=first_trip,
-                    notification_type=notification_type,
-                    channel='email',
-                    recipient=recipient_email,
-                    success=False,
-                    error_message=error_msg
-                )
-                failed_recipients.append(recipient_email)
-                errors.append(f"{recipient_email}: {error_msg}")
-
-        logger.info(f"[ROUND TRIP NOTIFICATION END] First: {first_trip.id}, Return: {return_trip.id}")
-
-        return {
-            'sent': notification_sent,
-            'total_recipients': len(recipients),
-            'successful_recipients': successful_recipients,
-            'failed_recipients': failed_recipients,
-            'errors': errors
-        }
-
-    @classmethod
-    def resend_notification(
-        cls,
-        booking: Booking,
-        notification_type: str
-    ) -> bool:
-        """Manually resend a notification."""
-        logger.info(f"Manually resending {notification_type} for booking {booking.id}")
-        return cls.send_notification(booking, notification_type)
-    
-    @classmethod
-    def get_notification_history(cls, booking: Booking) -> Dict[str, Any]:
-        """Get notification history and statistics for a booking."""
-        notifications = booking.notification_log.all().order_by('-sent_at')
-        
-        return {
-            'total_sent': notifications.count(),
-            'email_sent': notifications.filter(channel='email', success=True).count(),
-            'email_failed': notifications.filter(channel='email', success=False).count(),
-            'latest_notifications': list(notifications[:10]),
-            'all_notifications': notifications,
-        }
-    
-    @classmethod
-    def test_notification(
-        cls,
-        booking: Booking,
-        test_email: str,
-        notification_type: str = 'new'
-    ) -> bool:
-        """Send test notification to specific email address."""
-        logger.info(f"[TEST] Sending test {notification_type} notification to {test_email}")
-
-        try:
-            success = EmailService.send_booking_notification(
-                booking=booking,
-                notification_type=notification_type,
-                recipient_email=test_email
-            )
-
-            if success:
-                logger.info(f"[TEST] OK Test email sent to {test_email}")
-            else:
-                logger.error(f"[TEST] FAIL Test email failed")
-
-            return success
-
-        except Exception as e:
-            logger.error(f"[TEST] Exception: {e}", exc_info=True)
-            return False
-
-    @classmethod
-    def send_driver_notification(cls, booking: Booking, driver) -> bool:
-        """
-        Send driver assignment notification email with essential trip details only.
-
-        Args:
-            booking: The Booking instance
-            driver: The Driver instance
-
-        Returns:
-            bool: True if email sent successfully, False otherwise
-        """
-        logger.info(f"[DRIVER NOTIFICATION] Booking {booking.id} assigned to driver {driver.full_name}")
-
-        try:
-            success = EmailService.send_driver_notification(
-                booking=booking,
-                driver=driver
-            )
-
-            # Record notification
-            cls._record_notification(
-                booking=booking,
-                notification_type='driver_assignment',
-                channel='email',
-                recipient=driver.email,
-                success=success
-            )
-
-            if success:
-                logger.info(f"[DRIVER NOTIFICATION] OK Sent to {driver.email}")
-            else:
-                logger.error(f"[DRIVER NOTIFICATION] FAIL Failed to send to {driver.email}")
-
-            return success
-
-        except Exception as e:
-            logger.error(f"[DRIVER NOTIFICATION] Exception: {e}", exc_info=True)
-            cls._record_notification(
-                booking=booking,
-                notification_type='driver_assignment',
-                channel='email',
-                recipient=driver.email,
-                success=False,
-                error_message=str(e)
-            )
-            return False
-
-    @classmethod
-    def send_driver_rejection_notification(cls, booking: Booking) -> bool:
-        """
-        Notify admin when a driver rejects a previously accepted trip.
-        Uses programmable template (driver_rejection) with fallback to hardcoded HTML.
-
-        Args:
-            booking: The Booking instance with driver rejection details
-
-        Returns:
-            bool: True if email sent successfully, False otherwise
-        """
-        logger.info(f"[DRIVER REJECTION] Booking {booking.id} rejected by driver {booking.assigned_driver.full_name}")
-
-        try:
-            from django.conf import settings
-            from django.utils.html import strip_tags
-            
-            admin_email = getattr(settings, 'ADMIN_EMAIL', None)
-
-            if not admin_email:
-                logger.warning(f"[DRIVER REJECTION] No admin email configured")
-                return False
-
-            # Load active database template (NO FALLBACK)
-            db_template = EmailService._load_email_template('driver_rejection')
-            
-            if not db_template:
-                logger.warning(f"[DRIVER REJECTION] No active database template found, email NOT sent")
-                return False
-            
-            try:
-                # Build context for database template
-                template_context = EmailService._build_driver_rejection_template_context(booking)
-                subject = db_template.render_subject(template_context)
-                html_message = db_template.render_html(template_context)
-                
-                logger.info(f"[DRIVER REJECTION] Using database template")
-                db_template.increment_sent()
-            except Exception as e:
-                logger.error(f"[DRIVER REJECTION] Database template rendering error: {e}")
-                db_template.increment_failed()
-                return False
-
-            success = (
-                EmailService._try_email_message(admin_email, subject, html_message) or
-                EmailService._try_send_mail(admin_email, subject, strip_tags(html_message), html_message)
-            )
-
-            cls._record_notification(
-                booking=booking,
-                notification_type='driver_rejection',
-                channel='email',
-                recipient=admin_email,
-                success=success
-            )
-
-            if success:
-                logger.info(f"[DRIVER REJECTION] OK Notification sent to admin")
-            else:
-                logger.error(f"[DRIVER REJECTION] FAIL Failed to send notification to admin")
-
-            return success
-
-        except Exception as e:
-            logger.error(f"[DRIVER REJECTION] Exception: {e}", exc_info=True)
-            return False
-
-    @classmethod
-    def send_driver_completion_notification(cls, booking: Booking) -> bool:
-        """
-        Notify admin when a driver marks a trip as completed.
-        Uses programmable template (driver_completion) with fallback to hardcoded HTML.
-        This data will be used for billing purposes in the future.
-
-        Args:
-            booking: The Booking instance with driver completion details
-
-        Returns:
-            bool: True if email sent successfully, False otherwise
-        """
-        logger.info(f"[DRIVER COMPLETION] Booking {booking.id} completed by driver {booking.assigned_driver.full_name}")
-
-        try:
-            from django.conf import settings
-            from django.utils.html import strip_tags
-            
-            admin_email = getattr(settings, 'ADMIN_EMAIL', None)
-
-            if not admin_email:
-                logger.warning(f"[DRIVER COMPLETION] No admin email configured")
-                return False
-
-            # Load active database template (NO FALLBACK)
-            db_template = EmailService._load_email_template('driver_completion')
-            
-            if not db_template:
-                logger.warning(f"[DRIVER COMPLETION] No active database template found, email NOT sent")
-                return False
-            
-            try:
-                # Build context for database template
-                template_context = EmailService._build_driver_completion_template_context(booking)
-                subject = db_template.render_subject(template_context)
-                html_message = db_template.render_html(template_context)
-                
-                logger.info(f"[DRIVER COMPLETION] Using database template")
-                db_template.increment_sent()
-            except Exception as e:
-                logger.error(f"[DRIVER COMPLETION] Database template rendering error: {e}")
-                db_template.increment_failed()
-                return False
-
-            success = (
-                EmailService._try_email_message(admin_email, subject, html_message) or
-                EmailService._try_send_mail(admin_email, subject, strip_tags(html_message), html_message)
-            )
-
-            cls._record_notification(
-                booking=booking,
-                notification_type='driver_completion',
-                channel='email',
-                recipient=admin_email,
-                success=success
-            )
-
-            if success:
-                logger.info(f"[DRIVER COMPLETION] OK Notification sent to admin")
-            else:
-                logger.error(f"[DRIVER COMPLETION] FAIL Failed to send notification to admin")
-
-            return success
-
-        except Exception as e:
-            logger.error(f"[DRIVER COMPLETION] Exception: {e}", exc_info=True)
-            return False
+            logger.error(f"Error recording notification: {e}")
