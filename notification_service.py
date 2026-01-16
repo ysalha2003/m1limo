@@ -514,56 +514,25 @@ class NotificationService:
                 logger.warning(f"[DRIVER REJECTION] No admin email configured")
                 return False
 
-            # Try to load programmable template from database
+            # Load active database template (NO FALLBACK)
             db_template = EmailService._load_email_template('driver_rejection')
             
-            if db_template:
-                try:
-                    # Build context for database template
-                    template_context = EmailService._build_driver_rejection_template_context(booking)
-                    subject = db_template.render_subject(template_context)
-                    html_message = db_template.render_html(template_context)
-                    
-                    logger.info(f"[DRIVER REJECTION] Using database template")
-                    db_template.increment_sent()
-                except Exception as e:
-                    logger.error(f"[DRIVER REJECTION] Database template rendering error: {e}, falling back to hardcoded HTML")
-                    db_template.increment_failed()
-                    db_template = None
-            
-            # Fallback to hardcoded HTML if database template not available or failed
             if not db_template:
-                subject = f"DRIVER REJECTION - Trip {booking.id} - {booking.pick_up_date.strftime('%b %d, %Y')}"
-
-                html_message = f"""
-                <html>
-                <body style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h2 style="color: #dc3545;">Driver Trip Rejection</h2>
-
-                    <p><strong>{booking.assigned_driver.full_name}</strong> has rejected a previously accepted trip assignment.</p>
-
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #dc3545; margin: 20px 0;">
-                        <h3 style="margin-top: 0;">Trip Details:</h3>
-                        <p><strong>Booking ID:</strong> {booking.id}</p>
-                        <p><strong>Passenger:</strong> {booking.passenger_name}</p>
-                        <p><strong>Pickup Date:</strong> {booking.pick_up_date.strftime('%B %d, %Y')}</p>
-                        <p><strong>Pickup Time:</strong> {booking.pick_up_time.strftime('%I:%M %p')}</p>
-                        <p><strong>Pickup Location:</strong> {booking.pick_up_address}</p>
-                        {f'<p><strong>Drop-off Location:</strong> {booking.drop_off_address}</p>' if booking.drop_off_address else ''}
-                    </div>
-
-                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; border: 1px solid #ffc107; margin: 20px 0;">
-                        <h4 style="margin-top: 0; color: #856404;">Rejection Reason:</h4>
-                        <p style="color: #856404; margin: 0;">{booking.driver_rejection_reason}</p>
-                    </div>
-
-                    <p style="color: #666; font-size: 13px; margin-top: 30px;">
-                        <strong>Action Required:</strong> Please assign a different driver to this trip.
-                    </p>
-                </body>
-                </html>
-                """
-                logger.info(f"[DRIVER REJECTION] Using hardcoded HTML fallback")
+                logger.warning(f"[DRIVER REJECTION] No active database template found, email NOT sent")
+                return False
+            
+            try:
+                # Build context for database template
+                template_context = EmailService._build_driver_rejection_template_context(booking)
+                subject = db_template.render_subject(template_context)
+                html_message = db_template.render_html(template_context)
+                
+                logger.info(f"[DRIVER REJECTION] Using database template")
+                db_template.increment_sent()
+            except Exception as e:
+                logger.error(f"[DRIVER REJECTION] Database template rendering error: {e}")
+                db_template.increment_failed()
+                return False
 
             success = (
                 EmailService._try_email_message(admin_email, subject, html_message) or
@@ -614,53 +583,25 @@ class NotificationService:
                 logger.warning(f"[DRIVER COMPLETION] No admin email configured")
                 return False
 
-            # Try to load programmable template from database
+            # Load active database template (NO FALLBACK)
             db_template = EmailService._load_email_template('driver_completion')
             
-            if db_template:
-                try:
-                    # Build context for database template
-                    template_context = EmailService._build_driver_completion_template_context(booking)
-                    subject = db_template.render_subject(template_context)
-                    html_message = db_template.render_html(template_context)
-                    
-                    logger.info(f"[DRIVER COMPLETION] Using database template")
-                    db_template.increment_sent()
-                except Exception as e:
-                    logger.error(f"[DRIVER COMPLETION] Database template rendering error: {e}, falling back to hardcoded HTML")
-                    db_template.increment_failed()
-                    db_template = None
-            
-            # Fallback to hardcoded HTML if database template not available or failed
             if not db_template:
-                subject = f"Trip Completed - {booking.passenger_name} - {booking.pick_up_date.strftime('%b %d, %Y')}"
-
-                html_message = f"""
-                <html>
-                <body style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h2 style="color: #28a745;">Trip Completed</h2>
-
-                    <p><strong>{booking.assigned_driver.full_name}</strong> has marked the trip as completed.</p>
-
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; margin: 20px 0;">
-                        <h3 style="margin-top: 0;">Trip Details:</h3>
-                        <p><strong>Booking ID:</strong> {booking.id}</p>
-                        <p><strong>Driver:</strong> {booking.assigned_driver.full_name}</p>
-                        <p><strong>Passenger:</strong> {booking.passenger_name}</p>
-                        <p><strong>Pickup Date:</strong> {booking.pick_up_date.strftime('%B %d, %Y')}</p>
-                        <p><strong>Pickup Time:</strong> {booking.pick_up_time.strftime('%I:%M %p')}</p>
-                        <p><strong>Pickup Location:</strong> {booking.pick_up_address}</p>
-                        {f'<p><strong>Drop-off Location:</strong> {booking.drop_off_address}</p>' if booking.drop_off_address else ''}
-                        <p><strong>Completed At:</strong> {booking.driver_completed_at.strftime('%B %d, %Y at %I:%M %p')}</p>
-                    </div>
-
-                    <p style="color: #666; font-size: 13px; margin-top: 30px;">
-                        <em>Note: This completion data will be used for billing purposes.</em>
-                    </p>
-                </body>
-                </html>
-                """
-                logger.info(f"[DRIVER COMPLETION] Using hardcoded HTML fallback")
+                logger.warning(f"[DRIVER COMPLETION] No active database template found, email NOT sent")
+                return False
+            
+            try:
+                # Build context for database template
+                template_context = EmailService._build_driver_completion_template_context(booking)
+                subject = db_template.render_subject(template_context)
+                html_message = db_template.render_html(template_context)
+                
+                logger.info(f"[DRIVER COMPLETION] Using database template")
+                db_template.increment_sent()
+            except Exception as e:
+                logger.error(f"[DRIVER COMPLETION] Database template rendering error: {e}")
+                db_template.increment_failed()
+                return False
 
             success = (
                 EmailService._try_email_message(admin_email, subject, html_message) or

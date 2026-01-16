@@ -84,36 +84,26 @@ class EmailService:
             }
             db_template_type = template_type_map.get(notification_type)
             
-            # Try to load from database first
+            # Load active database template (NO FALLBACK)
             db_template = cls._load_email_template(db_template_type) if db_template_type else None
             
-            if db_template:
-                try:
-                    # Build context for database template
-                    template_context = cls._build_template_context(booking, notification_type, old_status, is_return)
-                    subject = db_template.render_subject(template_context)
-                    html_message = db_template.render_html(template_context)
-                    plain_message = strip_tags(html_message)
-                    
-                    logger.info(f"Using database template for {notification_type}")
-                    db_template.increment_sent()
-                except Exception as e:
-                    logger.error(f"Database template rendering error: {e}, falling back to file template")
-                    db_template.increment_failed()
-                    db_template = None
-            
-            # Fallback to file templates if database template not available or failed
             if not db_template:
-                subject = cls._get_email_subject(booking, notification_type, old_status, is_return)
-                template_name = cls._get_template_name(notification_type)
-
-                try:
-                    html_message = render_to_string(template_name, context)
-                    plain_message = strip_tags(html_message)
-                except Exception as e:
-                    logger.error(f"Template rendering error: {e}")
-                    html_message = cls._get_fallback_message(booking, notification_type)
-                    plain_message = strip_tags(html_message)
+                logger.warning(f"No active database template found for {notification_type}, email NOT sent to {recipient_email}")
+                return False
+            
+            try:
+                # Build context for database template
+                template_context = cls._build_template_context(booking, notification_type, old_status, is_return)
+                subject = db_template.render_subject(template_context)
+                html_message = db_template.render_html(template_context)
+                plain_message = strip_tags(html_message)
+                
+                logger.info(f"Using database template for {notification_type}")
+                db_template.increment_sent()
+            except Exception as e:
+                logger.error(f"Database template rendering error: {e}")
+                db_template.increment_failed()
+                return False
 
             logger.info(f"Sending {notification_type} email to {recipient_email}")
 
@@ -437,37 +427,26 @@ class EmailService:
             }
             db_template_type = template_type_map.get(notification_type)
             
-            # Try to load from database first
+            # Load active database template (NO FALLBACK)
             db_template = cls._load_email_template(db_template_type) if db_template_type else None
             
-            if db_template:
-                try:
-                    # Use the same context as file templates (booking objects, not strings)
-                    # Database templates now use Django template syntax and expect booking objects
-                    subject = db_template.render_subject(context)
-                    html_message = db_template.render_html(context)
-                    plain_message = strip_tags(html_message)
-                    
-                    logger.info(f"Using database template for round-trip {notification_type}")
-                    db_template.increment_sent()
-                except Exception as e:
-                    logger.error(f"Database template rendering error for round-trip: {e}, falling back to file template")
-                    db_template.increment_failed()
-                    db_template = None
-            
-            # Fallback to file templates if database template not available or failed
             if not db_template:
-                subject = cls._get_round_trip_subject(first_trip, return_trip, notification_type)
-
-                template_name = 'emails/round_trip_notification.html'
-
-                try:
-                    html_message = render_to_string(template_name, context)
-                    plain_message = strip_tags(html_message)
-                except Exception as e:
-                    logger.error(f"Round trip template rendering error: {e}")
-                    html_message = cls._get_fallback_round_trip_message(first_trip, return_trip, notification_type)
-                    plain_message = strip_tags(html_message)
+                logger.warning(f"No active database template found for round-trip {notification_type}, email NOT sent to {recipient_email}")
+                return False
+            
+            try:
+                # Use the same context as file templates (booking objects, not strings)
+                # Database templates now use Django template syntax and expect booking objects
+                subject = db_template.render_subject(context)
+                html_message = db_template.render_html(context)
+                plain_message = strip_tags(html_message)
+                
+                logger.info(f"Using database template for round-trip {notification_type}")
+                db_template.increment_sent()
+            except Exception as e:
+                logger.error(f"Database template rendering error for round-trip: {e}")
+                db_template.increment_failed()
+                return False
 
             logger.info(f"Sending round-trip {notification_type} email to {recipient_email}")
 
@@ -724,46 +703,25 @@ Subject: {subject}
         logger.info(f"Sending driver notification to {driver.email} for booking {booking.id}")
 
         try:
-            # Try to load database template first
+            # Load active database template (NO FALLBACK)
             db_template = cls._load_email_template('driver_notification')
             
-            if db_template:
-                try:
-                    # Build context for database template (string-based variables)
-                    template_context = cls._build_driver_template_context(booking, driver)
-                    subject = db_template.render_subject(template_context)
-                    html_message = db_template.render_html(template_context)
-                    
-                    logger.info(f"Using database template for driver notification")
-                    db_template.increment_sent()
-                except Exception as e:
-                    logger.error(f"Database template rendering error: {e}, falling back to file template")
-                    db_template.increment_failed()
-                    db_template = None
-            
-            # Fallback to file template if database template not available or failed
             if not db_template:
-                # Build context for file template with _build_driver_template_context
+                logger.warning(f"No active database template found for driver_notification, email NOT sent to {driver.email}")
+                return False
+            
+            try:
+                # Build context for database template (string-based variables)
                 template_context = cls._build_driver_template_context(booking, driver)
+                subject = db_template.render_subject(template_context)
+                html_message = db_template.render_html(template_context)
                 
-                # For file template, we need objects for Django template filters
-                context = {
-                    'driver': driver,
-                    'booking': booking,
-                    'pickup_location': booking.pick_up_address,
-                    'pickup_date': booking.pick_up_date,
-                    'pickup_time': booking.pick_up_time,
-                    'passenger_name': booking.passenger_name,
-                    'passenger_phone': booking.phone_number,
-                    'drop_off_location': booking.drop_off_address if booking.drop_off_address else None,
-                    'driver_portal_url': template_context['driver_portal_url'],
-                    'all_trips_url': template_context['all_trips_url'],
-                    'payment_amount': booking.driver_payment_amount if hasattr(booking, 'driver_payment_amount') and booking.driver_payment_amount else None,
-                }
-                
-                html_message = render_to_string('emails/driver_notification.html', context)
-                subject = f"New Trip Assignment - {booking.pick_up_date.strftime('%b %d, %Y')}"
-                logger.info(f"Using file template fallback for driver notification")
+                logger.info(f"Using database template for driver notification")
+                db_template.increment_sent()
+            except Exception as e:
+                logger.error(f"Database template rendering error: {e}")
+                db_template.increment_failed()
+                return False
 
             # Try all email sending methods
             success = (
