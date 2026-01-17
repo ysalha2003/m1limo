@@ -6,12 +6,12 @@
 <style>
     /* Enhanced alert banner with animation - Blue informational theme */
     .alert-pending-header {
-        background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
-        border: 3px solid #3b82f6;
-        border-radius: 16px;
-        padding: 24px;
-        margin-bottom: var(--spacing-md);
-        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+        background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%);
+        border: 2px solid #7dd3fc;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(125, 211, 252, 0.12);
         animation: pulse-glow-blue 3s ease-in-out infinite;
         position: relative;
         overflow: hidden;
@@ -24,16 +24,16 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         animation: shimmer 3s infinite;
     }
 
     @keyframes pulse-glow-blue {
         0%, 100% {
-            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 2px 8px rgba(125, 211, 252, 0.12);
         }
         50% {
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+            box-shadow: 0 2px 12px rgba(125, 211, 252, 0.18);
         }
     }
 
@@ -50,40 +50,40 @@
     .overdue-badge {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 800;
-        letter-spacing: 0.02em;
-        border: 2px solid;
-        transition: all 0.3s ease;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        border: 1.5px solid;
+        transition: all 0.2s ease;
     }
 
     .overdue-badge:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
-    /* <6 hours - Yellow/Amber */
+    /* <6 hours - Soft Gold */
     .overdue-low {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        color: #92400e;
-        border-color: #f59e0b;
+        background: linear-gradient(135deg, #fef9e7 0%, #fdedb4 100%);
+        color: #8b6914;
+        border-color: #e8b44f;
     }
 
-    /* 6-24 hours - Orange */
+    /* 6-24 hours - Soft Orange */
     .overdue-medium {
-        background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
-        color: #9a3412;
-        border-color: #f97316;
+        background: linear-gradient(135deg, #fee8d6 0%, #fcd9b8 100%);
+        color: #8e4a1d;
+        border-color: #e89654;
     }
 
-    /* >24 hours - Red with pulse */
+    /* >24 hours - Soft Coral */
     .overdue-critical {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        color: #991b1b;
-        border-color: #ef4444;
+        background: linear-gradient(135deg, #fef0ef 0%, #fddbd9 100%);
+        color: #8b302b;
+        border-color: #e87f77;
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
@@ -98,31 +98,31 @@
 
     .trip-card {
         background: white;
-        border-radius: 16px;
-        padding: 24px;
-        margin-bottom: 20px;
-        border: 2px solid var(--border);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     .trip-card:hover {
-        border-color: var(--primary);
-        box-shadow: 0 8px 24px rgba(4, 8, 20, 0.12);
-        transform: translateY(-4px);
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
     }
 
     .trip-card.critical {
-        border-left: 6px solid var(--color-error);
+        border-left: 4px solid #e87f77;
         animation: pulse-border 3s ease-in-out infinite;
     }
 
     .trip-card.medium {
-        border-left: 6px solid #f97316;
+        border-left: 4px solid #e89654;
     }
 
     .trip-card.low {
-        border-left: 6px solid var(--color-warning);
+        border-left: 4px solid #e8b44f;
     }
 
     @keyframes pulse-border {
@@ -175,18 +175,18 @@
     }
 
     .btn-action {
-        padding: 12px 20px;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 700;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
         border: none;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s ease;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         position: relative;
         overflow: hidden;
     }
@@ -199,18 +199,18 @@
         width: 0;
         height: 0;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.2);
         transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
+        transition: width 0.5s, height 0.5s;
     }
 
     .btn-action:hover::before {
-        width: 300px;
-        height: 300px;
+        width: 200px;
+        height: 200px;
     }
 
     .btn-action:active {
-        transform: scale(0.95);
+        transform: scale(0.97);
     }
 
     .btn-action.loading {
@@ -221,11 +221,11 @@
     .btn-action.loading::after {
         content: '';
         position: absolute;
-        width: 16px;
-        height: 16px;
+        width: 12px;
+        height: 12px;
         top: 50%;
-        right: 12px;
-        margin-top: -8px;
+        right: 10px;
+        margin-top: -6px;
         border: 2px solid rgba(255, 255, 255, 0.3);
         border-top-color: white;
         border-radius: 50%;
@@ -237,14 +237,14 @@
     }
 
     .btn-confirm-now {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, #8fbc8f 0%, #6fa86f 100%);
         color: white;
     }
 
     .btn-confirm-now:hover {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        background: linear-gradient(135deg, #7aaa7a 0%, #5e955e 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(143, 188, 143, 0.25);
     }
 
     .btn-cancel {
@@ -381,33 +381,33 @@
         <div class="trip-card {% if booking.hours_overdue >= 24 %}critical{% elif booking.hours_overdue >= 6 %}medium{% else %}low{% endif %}">
             <div class="trip-header">
                 <div>
-                    <h3 style="font-size: 18px; font-weight: 700; color: var(--dark); margin: 0 0 8px 0;">
+                    <h3 style="font-size: 16px; font-weight: 700; color: var(--dark); margin: 0 0 8px 0;">
                         Reservation #{{ booking.id }} - {{ booking.passenger_name }}
                     </h3>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <span class="badge badge-pending" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 700; border: 2px solid;">
-                            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <span class="badge badge-pending" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 11px; font-weight: 600; border: 1.5px solid; border-radius: 6px; background: linear-gradient(135deg, #fef9e7 0%, #fdedb4 100%); color: #8b6914; border-color: #e8b44f;">
+                            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Pending
                         </span>
                         {% if booking.hours_overdue >= 24 %}
                             <span class="overdue-badge overdue-critical">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg style="width: 13px; height: 13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                 </svg>
                                 {{ booking.hours_overdue }} HRS OVERDUE
                             </span>
                         {% elif booking.hours_overdue >= 6 %}
                             <span class="overdue-badge overdue-medium">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg style="width: 13px; height: 13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 {{ booking.hours_overdue }} HRS OVERDUE
                             </span>
                         {% else %}
                             <span class="overdue-badge overdue-low">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg style="width: 13px; height: 13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 {{ booking.hours_overdue }} HRS OVERDUE
@@ -440,26 +440,26 @@
                 </div>
             </div>
 
-            <div class="info-item" style="margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 12px; border-left: 4px solid #3b82f6;">
-                <span class="info-label" style="font-size: 13px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Route</span>
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
-                    <div style="display: flex; align-items: start; gap: 8px; flex: 1; min-width: 200px;">
-                        <svg style="width: 20px; height: 20px; color: #3b82f6; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="info-item" style="margin-bottom: 16px; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #94a3b8;">
+                <span class="info-label" style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Route</span>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px;">
+                    <div style="display: flex; align-items: start; gap: 6px; flex: 1; min-width: 180px;">
+                        <svg style="width: 14px; height: 14px; color: #64748b; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        <span class="info-value" style="font-size: 14px; font-weight: 600; color: #1e293b;">{{ booking.pick_up_address }}</span>
+                        <span class="info-value" style="font-size: 13px; font-weight: 600; color: #334155;">{{ booking.pick_up_address }}</span>
                     </div>
                     {% if booking.drop_off_address %}
-                        <svg style="width: 24px; height: 24px; color: #64748b; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px; color: #94a3b8; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                         </svg>
-                        <div style="display: flex; align-items: start; gap: 8px; flex: 1; min-width: 200px;">
-                            <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div style="display: flex; align-items: start; gap: 6px; flex: 1; min-width: 180px;">
+                            <svg style="width: 14px; height: 14px; color: #6fa86f; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            <span class="info-value" style="font-size: 14px; font-weight: 600; color: #1e293b;">{{ booking.drop_off_address }}</span>
+                            <span class="info-value" style="font-size: 13px; font-weight: 600; color: #334155;">{{ booking.drop_off_address }}</span>
                         </div>
                     {% endif %}
                 </div>
