@@ -4,15 +4,15 @@
 
 {% block extra_css %}
 <style>
-    /* Enhanced alert banner with animation - Blue informational theme */
+    /* Enhanced alert banner with animation - Yellow/Amber theme */
     .alert-pending-header {
-        background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%);
-        border: 2px solid #7dd3fc;
+        background: linear-gradient(135deg, #fef9e7 0%, #fdedb4 100%);
+        border: 2px solid #e8b44f;
         border-radius: 12px;
         padding: 16px 20px;
         margin-bottom: 24px;
-        box-shadow: 0 2px 8px rgba(125, 211, 252, 0.12);
-        animation: pulse-glow-blue 3s ease-in-out infinite;
+        box-shadow: 0 2px 8px rgba(232, 180, 79, 0.12);
+        animation: pulse-glow-amber 3s ease-in-out infinite;
         position: relative;
         overflow: hidden;
     }
@@ -28,12 +28,12 @@
         animation: shimmer 3s infinite;
     }
 
-    @keyframes pulse-glow-blue {
+    @keyframes pulse-glow-amber {
         0%, 100% {
-            box-shadow: 0 2px 8px rgba(125, 211, 252, 0.12);
+            box-shadow: 0 2px 8px rgba(232, 180, 79, 0.12);
         }
         50% {
-            box-shadow: 0 2px 12px rgba(125, 211, 252, 0.18);
+            box-shadow: 0 2px 12px rgba(232, 180, 79, 0.18);
         }
     }
 
@@ -352,16 +352,16 @@
     {% if total_count > 0 %}
         <div class="alert-pending-header">
             <div style="display: flex; align-items: center; gap: 14px; position: relative; z-index: 1;">
-                <div style="flex-shrink: 0; width: 48px; height: 48px; background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(125, 211, 252, 0.25);">
+                <div style="flex-shrink: 0; width: 48px; height: 48px; background: linear-gradient(135deg, #e8b44f 0%, #d9a543 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(232, 180, 79, 0.25);">
                     <svg style="width: 28px; height: 28px; color: white;" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                     </svg>
                 </div>
                 <div style="flex: 1;">
-                    <h3 style="color: #0c4a6e; font-size: 15px; font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.01em;">
+                    <h3 style="color: #8b6914; font-size: 15px; font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.01em;">
                         Review Required
                     </h3>
-                    <p style="color: #0c4a6e; font-size: 13px; margin: 0; line-height: 1.5;">
+                    <p style="color: #8b6914; font-size: 13px; margin: 0; line-height: 1.5;">
                         <strong style="font-weight: 700;">{{ total_count }}</strong> pending reservation{{ total_count|pluralize }} with past pickup times. 
                         Please review and decide on next action.
                     </p>

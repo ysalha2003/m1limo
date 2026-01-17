@@ -6,12 +6,12 @@
 <style>
     /* Enhanced alert banner with animation */
     .alert-warning-header {
-        background: linear-gradient(135deg, #fef9e7 0%, #fdedb4 100%);
-        border: 2px solid #e8b44f;
+        background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%);
+        border: 2px solid #7dd3fc;
         border-radius: 12px;
         padding: 16px 20px;
         margin-bottom: 24px;
-        box-shadow: 0 2px 8px rgba(232, 180, 79, 0.12);
+        box-shadow: 0 2px 8px rgba(125, 211, 252, 0.12);
         animation: pulse-glow 3s ease-in-out infinite;
         position: relative;
         overflow: hidden;
@@ -30,10 +30,10 @@
 
     @keyframes pulse-glow {
         0%, 100% {
-            box-shadow: 0 2px 8px rgba(232, 180, 79, 0.12);
+            box-shadow: 0 2px 8px rgba(125, 211, 252, 0.12);
         }
         50% {
-            box-shadow: 0 2px 12px rgba(232, 180, 79, 0.18);
+            box-shadow: 0 2px 12px rgba(125, 211, 252, 0.18);
         }
     }
 
@@ -341,16 +341,16 @@
     {% if total_count > 0 %}
         <div class="alert-warning-header">
             <div style="display: flex; align-items: center; gap: 14px; position: relative; z-index: 1;">
-                <div style="flex-shrink: 0; width: 48px; height: 48px; background: linear-gradient(135deg, #e8b44f 0%, #d9a543 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(232, 180, 79, 0.25);">
+                <div style="flex-shrink: 0; width: 48px; height: 48px; background: linear-gradient(135deg, #7dd3fc 0%, #60c3f7 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(125, 211, 252, 0.25);">
                     <svg style="width: 28px; height: 28px; color: white;" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                     </svg>
                 </div>
                 <div style="flex: 1;">
-                    <h3 style="color: #8b6914; font-size: 15px; font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.01em;">
+                    <h3 style="color: #0c4a6e; font-size: 15px; font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.01em;">
                         Action Required
                     </h3>
-                    <p style="color: #8b6914; font-size: 13px; margin: 0; line-height: 1.5;">
+                    <p style="color: #0c4a6e; font-size: 13px; margin: 0; line-height: 1.5;">
                         <strong style="font-weight: 700;">{{ total_count }}</strong> confirmed reservation{{ total_count|pluralize }} with past pickup times. 
                         Please review and update status to maintain accurate records.
                     </p>

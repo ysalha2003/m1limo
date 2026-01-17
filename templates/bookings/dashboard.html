@@ -576,23 +576,23 @@
 
 {% if is_admin and past_confirmed_count > 0 %}
 <!-- Past Confirmed Reservations Alert Banner -->
-<div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);">
-    <div style="display: flex; align-items: start; gap: 16px;">
-        <div style="flex-shrink: 0; width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <svg style="width: 28px; height: 28px; color: #f59e0b;" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+<div style="background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%); border: 2px solid #7dd3fc; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(125, 211, 252, 0.08);">
+    <div style="display: flex; align-items: start; gap: 12px;">
+        <div style="flex-shrink: 0; width: 40px; height: 40px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08);">
+            <svg style="width: 22px; height: 22px; color: #7dd3fc;" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
             </svg>
         </div>
         <div style="flex: 1;">
-            <h3 style="color: #92400e; font-size: 18px; font-weight: 700; margin: 0 0 8px 0;">
-                ⚠️ {{ past_confirmed_count }} Confirmed Reservation{{ past_confirmed_count|pluralize }} Require{{ past_confirmed_count|pluralize:"s," }} Action
+            <h3 style="color: #0c4a6e; font-size: 15px; font-weight: 700; margin: 0 0 6px 0;">
+                {{ past_confirmed_count }} Confirmed Reservation{{ past_confirmed_count|pluralize }} Require{{ past_confirmed_count|pluralize:"s," }} Action
             </h3>
-            <p style="color: #78350f; font-size: 15px; margin: 0 0 16px 0; line-height: 1.5;">
+            <p style="color: #0c4a6e; font-size: 13px; margin: 0 0 12px 0; line-height: 1.5;">
                 These reservations have passed their pickup time and are still marked as "Confirmed". 
                 Please review and update their status to Trip Completed, Customer No-Show, or Cancelled.
             </p>
-            <a href="{% url 'past_confirmed_reservations' %}" class="btn" style="background: #f59e0b; color: white; font-weight: 600; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);">
-                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{% url 'past_confirmed_reservations' %}" class="btn" style="background: #7dd3fc; color: #0c4a6e; font-weight: 600; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(125, 211, 252, 0.2); font-size: 13px;">
+                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
                 Review {{ past_confirmed_count }} Reservation{{ past_confirmed_count|pluralize }}
@@ -604,22 +604,22 @@
 
 {% if is_admin and past_pending_count > 0 %}
 <!-- Past Pending Reservations Alert Banner -->
-<div style="background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%); border: 2px solid #7dd3fc; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(125, 211, 252, 0.08);">
+<div style="background: linear-gradient(135deg, #fef9e7 0%, #fdedb4 100%); border: 2px solid #e8b44f; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(232, 180, 79, 0.08);">
     <div style="display: flex; align-items: start; gap: 12px;">
         <div style="flex-shrink: 0; width: 40px; height: 40px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08);">
-            <svg style="width: 22px; height: 22px; color: #7dd3fc;" fill="currentColor" viewBox="0 0 20 20">
+            <svg style="width: 22px; height: 22px; color: #e8b44f;" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
             </svg>
         </div>
         <div style="flex: 1;">
-            <h3 style="color: #0c4a6e; font-size: 15px; font-weight: 700; margin: 0 0 6px 0;">
+            <h3 style="color: #8b6914; font-size: 15px; font-weight: 700; margin: 0 0 6px 0;">
                 {{ past_pending_count }} Pending Request{{ past_pending_count|pluralize }} Need Review
             </h3>
-            <p style="color: #0c4a6e; font-size: 13px; margin: 0 0 12px 0; line-height: 1.5;">
+            <p style="color: #8b6914; font-size: 13px; margin: 0 0 12px 0; line-height: 1.5;">
                 These requests were never confirmed and have passed their pickup time. 
                 Please review and decide next action.
             </p>
-            <a href="{% url 'past_pending_reservations' %}" class="btn" style="background: #7dd3fc; color: #0c4a6e; font-weight: 600; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(125, 211, 252, 0.2); font-size: 13px;">
+            <a href="{% url 'past_pending_reservations' %}" class="btn" style="background: #e8b44f; color: #8b6914; font-weight: 600; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(232, 180, 79, 0.2); font-size: 13px;">
                 <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
@@ -846,33 +846,33 @@
 <!-- Bookings List -->
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-        <h2 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--dark);">
+        <h2 style="font-size: 15px; font-weight: 700; margin: 0; color: var(--dark);">
             {% if is_admin %}All Reservations{% else %}Your Reservations{% endif %}
         </h2>
-        <a href="{% url 'new_reservation' %}" class="btn btn-primary">+ New Reservation</a>
+        <a href="{% url 'new_reservation' %}" class="btn" style="background: #1e293b; color: white; font-weight: 600; padding: 7px 14px; font-size: 13px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);">+ New Reservation</a>
     </div>
 
     <!-- Search & Filter -->
     <form method="get" class="search-form">
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
             <div class="form-group" style="margin: 0;">
-                <label class="form-label">Search</label>
-                <input type="text" name="search" class="form-input" placeholder="Trip #ID, Name, Phone, or Reference Number" value="{{ request.GET.search }}" style="margin: 0;">
+                <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Search</label>
+                <input type="text" name="search" class="form-input" placeholder="Trip #ID, Name, Phone, or Reference Number" value="{{ request.GET.search }}" style="margin: 0; height: 36px; font-size: 13px; border-color: #cbd5e1; padding: 8px 12px;">
             </div>
 
             <div class="form-group" style="margin: 0;">
-                <label class="form-label">Date From</label>
-                <input type="date" name="date_from" class="form-input" value="{{ request.GET.date_from }}" style="margin: 0;">
+                <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Date From</label>
+                <input type="date" name="date_from" class="form-input" value="{{ request.GET.date_from }}" style="margin: 0; height: 36px; font-size: 13px; border-color: #cbd5e1; padding: 8px 12px;">
             </div>
 
             <div class="form-group" style="margin: 0;">
-                <label class="form-label">Date To</label>
-                <input type="date" name="date_to" class="form-input" value="{{ request.GET.date_to }}" style="margin: 0;">
+                <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Date To</label>
+                <input type="date" name="date_to" class="form-input" value="{{ request.GET.date_to }}" style="margin: 0; height: 36px; font-size: 13px; border-color: #cbd5e1; padding: 8px 12px;">
             </div>
 
             <div class="form-group" style="margin: 0;">
-                <label class="form-label">Status</label>
-                <select name="status" id="statusFilter" class="form-select" style="margin: 0;" onchange="this.form.submit()">
+                <label class="form-label" style="font-size: 11px; margin-bottom: 4px;">Status</label>
+                <select name="status" id="statusFilter" class="form-select" style="margin: 0; height: 36px; font-size: 13px; border-color: #cbd5e1; padding: 8px 12px;" onchange="this.form.submit()">
                     <option value="">All States</option>
                     <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
                     <option value="Confirmed" {% if request.GET.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
@@ -883,8 +883,8 @@
             </div>
 
             <div style="display: flex; gap: 8px;">
-                <button type="submit" class="btn btn-primary" style="margin: 0;">Search</button>
-                <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="margin: 0;">Clear</a>
+                <button type="submit" class="btn" style="background: #1e293b; color: white; font-weight: 600; padding: 7px 14px; font-size: 13px; margin: 0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);">Search</button>
+                <a href="{% url 'dashboard' %}" class="btn" style="background: transparent; color: #64748b; font-weight: 600; padding: 7px 14px; font-size: 13px; margin: 0; border: 1.5px solid #cbd5e1; box-shadow: none;">Clear</a>
             </div>
         </div>
 
