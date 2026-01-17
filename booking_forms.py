@@ -31,6 +31,7 @@ class BookingForm(BaseModelForm):
     booking_for_user = UserChoiceField(
         queryset=User.objects.filter(is_active=True).order_by('first_name', 'last_name', 'username'),
         required=False,
+        initial=lambda: User.objects.filter(username='Admin').first(),
         help_text='Select a user to create this booking on their behalf',
         widget=forms.Select(attrs={'class': 'form-select'})
     )
