@@ -531,11 +531,26 @@
 
     @media (max-width: 1024px) {
         .stat-card {
-            padding: 16px;
+            padding: 14px;
+            height: 90px;
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 30px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+        }
+
+        .stat-icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        .stat-icon svg {
+            width: 13px;
+            height: 13px;
         }
 
         table {
@@ -550,40 +565,93 @@
     @media (max-width: 768px) {
         .stat-card {
             padding: 14px;
+            height: 90px !important;
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }
+
+        .stat-card.pending-card,
+        .stat-card.confirmed-card {
+            flex: 1 1 calc(50% - 9px) !important;
+            min-width: calc(50% - 9px) !important;
         }
 
         .stat-icon {
-            width: 38px;
-            height: 38px;
+            width: 22px;
+            height: 22px;
+        }
+
+        .stat-icon svg {
+            width: 13px;
+            height: 13px;
         }
 
         .stat-value {
-            font-size: 22px;
+            font-size: 28px;
         }
 
         .stat-label {
-            font-size: 12px;
+            font-size: 13px;
+        }
+
+        .welcome-banner {
+            padding: 10px 14px !important;
+            margin-bottom: 16px !important;
+        }
+
+        .welcome-banner h1 {
+            font-size: 14px !important;
+        }
+
+        .welcome-banner p {
+            font-size: 11px !important;
+        }
+
+        /* Alert banners responsive */
+        div[style*="border-radius: 12px"][style*="padding: 14px 16px"] {
+            padding: 12px 14px !important;
+            border-radius: 10px !important;
+        }
+
+        div[style*="border-radius: 12px"] h3 {
+            font-size: 14px !important;
+        }
+
+        div[style*="border-radius: 12px"] p {
+            font-size: 12px !important;
+        }
+
+        /* Icon containers in alerts */
+        div[style*="width: 40px; height: 40px"] {
+            width: 36px !important;
+            height: 36px !important;
+        }
+
+        div[style*="width: 40px; height: 40px"] svg {
+            width: 20px !important;
+            height: 20px !important;
         }
 
         .today-pickups-card {
-            padding: 16px;
+            padding: 12px 14px;
         }
 
         .pickup-item {
             flex-direction: column;
             align-items: flex-start;
             gap: 12px;
-            padding: 14px;
+            padding: 12px;
         }
 
         .pickup-actions {
             display: flex;
             gap: 8px;
             width: 100%;
+            flex-wrap: wrap;
         }
 
         .search-form {
-            padding: 16px;
+            padding: 14px;
         }
 
         table {
@@ -611,41 +679,102 @@
 
     @media (max-width: 480px) {
         .stat-card {
-            padding: 12px;
+            padding: 14px;
+            height: auto !important;
+            min-height: 85px;
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }
+
+        .stat-card.pending-card,
+        .stat-card.confirmed-card {
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
         }
         
         .stat-icon {
-            width: 36px;
-            height: 36px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .stat-icon svg {
+            width: 12px;
+            height: 12px;
         }
         
         .stat-value {
-            font-size: 20px;
+            font-size: 26px;
         }
         
         .stat-label {
-            font-size: 11px;
+            font-size: 12px;
         }
 
-        .pickup-item {
-            padding: 12px;
+        .welcome-banner {
+            padding: 10px 12px !important;
+            margin-bottom: 14px !important;
+            border-left-width: 2px !important;
         }
-        
+
         .welcome-banner h1 {
-            font-size: 22px !important;
+            font-size: 14px !important;
+            margin-bottom: 2px !important;
         }
         
         .welcome-banner p {
+            font-size: 11px !important;
+        }
+
+        /* Alert banners on small screens */
+        div[style*="border-radius: 12px"][style*="padding"] {
+            padding: 10px 12px !important;
+            border-radius: 8px !important;
+            margin-bottom: 14px !important;
+            gap: 10px !important;
+        }
+
+        div[style*="border-radius: 12px"] h3 {
             font-size: 13px !important;
+            margin-bottom: 4px !important;
+        }
+
+        div[style*="border-radius: 12px"] p {
+            font-size: 11px !important;
+            margin-bottom: 10px !important;
+        }
+
+        /* Alert icon containers */
+        div[style*="width: 40px"],
+        div[style*="width: 36px"] {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+        }
+
+        div[style*="width: 40px"] svg,
+        div[style*="width: 36px"] svg {
+            width: 18px !important;
+            height: 18px !important;
+        }
+
+        .pickup-item {
+            padding: 10px;
+            gap: 10px;
         }
         
         .card {
-            padding: 14px !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
         }
         
         .btn {
-            padding: 8px 14px !important;
-            font-size: 13px !important;
+            padding: 7px 12px !important;
+            font-size: 12px !important;
+        }
+
+        /* Stats grid gap */
+        div[style*="display: flex; gap: 18px"] {
+            gap: 12px !important;
         }
     }
 

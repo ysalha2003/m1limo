@@ -334,6 +334,110 @@
         font-weight: 600;
         letter-spacing: 0.01em;
     }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        .alert-warning-header {
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+
+        .alert-warning-header div[style*="width: 48px"] {
+            width: 40px !important;
+            height: 40px !important;
+        }
+
+        .alert-warning-header svg {
+            width: 24px !important;
+            height: 24px !important;
+        }
+
+        .alert-warning-header h3 {
+            font-size: 14px !important;
+        }
+
+        .alert-warning-header p {
+            font-size: 12px !important;
+        }
+
+        .stats-row {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-box {
+            padding: 14px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+        }
+
+        .trip-card {
+            padding: 14px 16px;
+        }
+
+        .trip-header {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .trip-info-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        h1 {
+            font-size: 22px !important;
+        }
+
+        .container {
+            padding: 0 12px;
+        }
+
+        .alert-warning-header {
+            padding: 10px 14px;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+        }
+
+        .trip-card {
+            padding: 12px 14px;
+            border-radius: 10px;
+        }
+
+        .info-label {
+            font-size: 11px;
+        }
+
+        .info-value {
+            font-size: 13px;
+        }
+
+        .btn-action {
+            padding: 7px 12px;
+            font-size: 11px;
+        }
+    }
 </style>
 {% endblock %}
 
