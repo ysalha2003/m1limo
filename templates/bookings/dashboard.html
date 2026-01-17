@@ -1457,28 +1457,59 @@
 {% block extra_js %}
 <script>
 // Live countdown for next reservation (when < 24 hours)
+// IMPORTANT: All times are in America/Chicago timezone
 function updateLiveCountdown() {
     const countdownElement = document.getElementById('live-countdown');
     if (!countdownElement) return;
     
     const pickupDate = countdownElement.dataset.pickupDate;
     const pickupTime = countdownElement.dataset.pickupTime;
-    const pickupDateTime = new Date(pickupDate + 'T' + pickupTime);
+    
+    // Create pickup datetime in Chicago timezone
+    // The backend sends Chicago time, so we interpret it as such
+    const pickupDateTimeString = `${pickupDate}T${pickupTime}`;
     
     function update() {
+        // Get current time in Chicago timezone
         const now = new Date();
-        const diff = pickupDateTime - now;
+        const chicagoTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+        
+        // Parse pickup time as Chicago time
+        // Create Date objects and calculate offset
+        const pickupLocal = new Date(pickupDateTimeString);
+        const pickupChicago = new Date(pickupLocal.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+        
+        // Calculate the difference between Chicago time and what the browser interpreted
+        const offset = pickupLocal - pickupChicago;
+        
+        // Adjust pickup time to be correctly interpreted as Chicago time
+        const pickupCorrected = new Date(pickupLocal.getTime() - offset);
+        
+        // Calculate difference
+        const diff = pickupCorrected - now;
         
         if (diff <= 0) {
             countdownElement.textContent = 'PICKUP TIME';
+            countdownElement.parentElement.style.background = '#fee2e2';
+            countdownElement.parentElement.style.color = '#991b1b';
             return;
         }
         
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        const totalSeconds = Math.floor(diff / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
         
-        countdownElement.textContent = `${hours}h ${minutes}m ${seconds}s remaining`;
+        countdownElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
+        
+        // Update color based on urgency
+        if (hours < 2) {
+            countdownElement.parentElement.style.background = '#fee2e2';
+            countdownElement.parentElement.style.color = '#991b1b';
+        } else if (hours < 6) {
+            countdownElement.parentElement.style.background = '#fef9e7';
+            countdownElement.parentElement.style.color = '#8b6914';
+        }
     }
     
     update();

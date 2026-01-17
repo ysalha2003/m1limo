@@ -294,13 +294,16 @@ def dashboard(request):
         from django.db.models import Q
         now = timezone.now()
         today = now.date()
-        current_time = now.time()
-        # Trip is upcoming if: date > today OR (date == today AND time >= current_time)
-        base_queryset = base_queryset.filter(
-            status='Confirmed'
-        ).filter(
-            Q(pick_up_date__gt=today) | Q(pick_up_date=today, pick_up_time__gte=current_time)
-        )
+        # Get upcoming trips using datetime comparison to avoid time-only comparison issues
+        from datetime import datetime
+        upcoming_ids = []
+        for booking in base_queryset.filter(status='Confirmed'):
+            pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+            if timezone.is_naive(pickup_datetime):
+                pickup_datetime = timezone.make_aware(pickup_datetime)
+            if pickup_datetime > now:
+                upcoming_ids.append(booking.id)
+        base_queryset = base_queryset.filter(id__in=upcoming_ids)
     elif status_filter:
         base_queryset = base_queryset.filter(status=status_filter)
     else:
@@ -436,11 +439,22 @@ def dashboard(request):
     if request.user.is_staff:
         # Calculate stats directly with fresh queries to ensure accurate counts
         from django.db.models import Q
-        current_time = now.time()
-        # Future trips: date > today OR (date == today AND time >= current_time)
-        future_filter = Q(pick_up_date__gt=today) | Q(pick_up_date=today, pick_up_time__gte=current_time)
-        # Past trips: date < today OR (date == today AND time < current_time)
-        past_filter = Q(pick_up_date__lt=today) | Q(pick_up_date=today, pick_up_time__lt=current_time)
+        from datetime import datetime
+        
+        # Get all future bookings by comparing full datetime, not just date/time separately
+        # This prevents issues when current time is late at night (e.g., 11 PM) and
+        # pickup is early morning (e.g., 4 AM) - comparing times alone would incorrectly
+        # classify the early morning pickup as "past"
+        future_bookings = []
+        for booking in Booking.objects.all():
+            pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+            if timezone.is_naive(pickup_datetime):
+                pickup_datetime = timezone.make_aware(pickup_datetime)
+            if pickup_datetime > now:
+                future_bookings.append(booking.id)
+        
+        future_filter = Q(id__in=future_bookings)
+        past_filter = ~Q(id__in=future_bookings)
         
         stats = {
             'pending_count': Booking.objects.filter(
@@ -473,9 +487,18 @@ def dashboard(request):
     else:
         # Calculate upcoming trips for user (Confirmed bookings with future datetime)
         from django.db.models import Q
-        current_time = now.time()
-        # Future trips: date > today OR (date == today AND time >= current_time)
-        future_filter = Q(pick_up_date__gt=today) | Q(pick_up_date=today, pick_up_time__gte=current_time)
+        from datetime import datetime
+        
+        # Get all future bookings by comparing full datetime
+        future_bookings = []
+        for booking in Booking.objects.filter(user=request.user):
+            pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+            if timezone.is_naive(pickup_datetime):
+                pickup_datetime = timezone.make_aware(pickup_datetime)
+            if pickup_datetime > now:
+                future_bookings.append(booking.id)
+        
+        future_filter = Q(id__in=future_bookings)
         
         next_upcoming = Booking.objects.filter(
             user=request.user,
@@ -2254,14 +2277,19 @@ def past_confirmed_trips(request):
     
     now = timezone.now()
     today = now.date()
-    current_time = now.time()
     
-    # Find Confirmed trips where pickup datetime has passed
-    # Past trips: date < today OR (date == today AND time < current_time)
+    # Find Confirmed trips where pickup datetime has passed using datetime comparison
+    from datetime import datetime
+    past_ids = []
+    for booking in Booking.objects.filter(status='Confirmed'):
+        pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+        if timezone.is_naive(pickup_datetime):
+            pickup_datetime = timezone.make_aware(pickup_datetime)
+        if pickup_datetime <= now:
+            past_ids.append(booking.id)
+    
     past_confirmed = Booking.objects.filter(
-        status='Confirmed'
-    ).filter(
-        Q(pick_up_date__lt=today) | Q(pick_up_date=today, pick_up_time__lt=current_time)
+        id__in=past_ids
     ).select_related(
         'user',
         'assigned_driver',
@@ -2363,14 +2391,19 @@ def past_pending_trips(request):
     
     now = timezone.now()
     today = now.date()
-    current_time = now.time()
     
-    # Find Pending trips where pickup datetime has passed
-    # Past trips: date < today OR (date == today AND time < current_time)
+    # Find Pending trips where pickup datetime has passed using datetime comparison
+    from datetime import datetime
+    past_ids = []
+    for booking in Booking.objects.filter(status='Pending'):
+        pickup_datetime = datetime.combine(booking.pick_up_date, booking.pick_up_time)
+        if timezone.is_naive(pickup_datetime):
+            pickup_datetime = timezone.make_aware(pickup_datetime)
+        if pickup_datetime <= now:
+            past_ids.append(booking.id)
+    
     past_pending = Booking.objects.filter(
-        status='Pending'
-    ).filter(
-        Q(pick_up_date__lt=today) | Q(pick_up_date=today, pick_up_time__lt=current_time)
+        id__in=past_ids
     ).select_related(
         'user',
         'assigned_driver',
