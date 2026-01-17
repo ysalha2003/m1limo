@@ -632,7 +632,7 @@
             <div style="display: grid; gap: 8px;">
                 {% if booking.status == 'Pending' %}
                 <a href="{% url 'reservation_actions' booking.id 'confirm' %}" class="btn btn-primary" style="width: 100%; justify-content: center;">✓ Confirm Reservation</a>
-                <a href="{% url 'reservation_actions' booking.id 'assign_driver' %}" class="btn btn-secondary" style="width: 100%; justify-content: center;">🚗 Assign Driver</a>
+                <a href="{% url 'reservation_actions' booking.id 'assign_driver' %}" class="btn btn-secondary" style="width: 100%; justify-content: center;">Assign Driver</a>
                 {% elif booking.status == 'Confirmed' %}
                     {% if booking.hours_until_pickup <= 0 %}
                         <a href="{% url 'reservation_actions' booking.id 'complete' %}" class="btn btn-primary" style="width: 100%; justify-content: center;">✓ Mark as Completed</a>
