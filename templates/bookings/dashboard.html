@@ -368,19 +368,19 @@
     .time-badge.time-safe {
         background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
         color: #2e7d32;
-        border: 1px solid #81c784;
+        border: none;
     }
 
     .time-badge.time-warning {
         background: linear-gradient(135deg, #fef9e7 0%, #fdedb4 100%);
         color: #8b6914;
-        border: 1px solid #e8b44f;
+        border: none;
     }
 
     .time-badge.time-urgent {
         background: linear-gradient(135deg, #fef0ef 0%, #fddbd9 100%);
         color: #8b302b;
-        border: 1px solid #e87f77;
+        border: none;
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
@@ -432,26 +432,39 @@
         text-decoration: none;
         font-weight: 600;
         font-size: 12px;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         white-space: nowrap;
-        padding: 5px 10px;
-        border-radius: 6px;
-        background: var(--primary-light);
-        border: 1px solid transparent;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border: 1px solid rgba(59, 130, 246, 0.2);
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-    }
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
+        gap: 5px;
+        position: relative;
     }
 
     .action-link:hover {
-        background: var(--primary);
+        background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+        color: white !important;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35), 0 2px 6px rgba(15, 23, 42, 0.2);
+        border-color: var(--primary);
+    }
+
+    .action-link:hover svg {
         color: white;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+        transform: scale(1.1);
+    }
+
+    .action-link:active {
+        transform: translateY(0) scale(0.98);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+    }
+
+    .action-link svg {
+        transition: all 0.25s ease;
+        color: inherit;
     }
 
     .action-link.action-approve {
@@ -1424,17 +1437,17 @@
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                     <span style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">Active Filters:</span>
                     {% if request.GET.search %}
-                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Search: "{{ request.GET.search }}"</span>
+                    <span class="badge" style="background: var(--info-light); color: #1e40af; border: none;">Search: "{{ request.GET.search }}"</span>
                     {% endif %}
                     {% if request.GET.date_from and request.GET.date_to %}
-                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Date Range: {{ request.GET.date_from }} to {{ request.GET.date_to }}</span>
+                    <span class="badge" style="background: var(--info-light); color: #1e40af; border: none;">Date Range: {{ request.GET.date_from }} to {{ request.GET.date_to }}</span>
                     {% elif request.GET.date_from %}
-                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Date From: {{ request.GET.date_from }}</span>
+                    <span class="badge" style="background: var(--info-light); color: #1e40af; border: none;">Date From: {{ request.GET.date_from }}</span>
                     {% elif request.GET.date_to %}
-                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Date To: {{ request.GET.date_to }}</span>
+                    <span class="badge" style="background: var(--info-light); color: #1e40af; border: none;">Date To: {{ request.GET.date_to }}</span>
                     {% endif %}
                     {% if request.GET.status %}
-                    <span class="badge" style="background: var(--info-light); color: #1e40af;">Status: {{ request.GET.status }}</span>
+                    <span class="badge" style="background: var(--info-light); color: #1e40af; border: none;">Status: {{ request.GET.status }}</span>
                     {% endif %}
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: linear-gradient(135deg, var(--primary-light) 0%, #e2e8f0 100%); border-radius: 6px; border: 1px solid var(--border);">
@@ -1611,7 +1624,13 @@
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 {% if booking.is_past_trip %}
                                     {# Past trips: Only show View and Rebook #}
-                                    <a href="{% url 'reservation_detail' booking.id %}" class="action-link">View</a>
+                                    <a href="{% url 'reservation_detail' booking.id %}" class="action-link">
+                                        <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        View
+                                    </a>
                                     <a href="{% url 'rebook_reservation' booking.id %}" class="action-link" style="color: var(--primary); font-weight: 600;">
                                         <svg style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -1722,7 +1741,13 @@
                                     <div>
                                         <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">ACTIONS</div>
                                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                            <a href="{% url 'reservation_detail' booking.linked_booking.id %}" class="action-link">View</a>
+                                            <a href="{% url 'reservation_detail' booking.linked_booking.id %}" class="action-link">
+                                                <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                                View
+                                            </a>
                                             {% if is_admin %}
                                                 <a href="{% url 'assign_driver' booking.linked_booking.id %}" class="action-link">Assign Driver</a>
                                             {% endif %}
@@ -1825,7 +1850,13 @@
                 <!-- Card Actions -->
                 <div class="mobile-card-actions">
                     {% if booking.is_past_trip %}
-                        <a href="{% url 'reservation_detail' booking.id %}" class="action-link">View</a>
+                        <a href="{% url 'reservation_detail' booking.id %}" class="action-link">
+                            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View
+                        </a>
                         <a href="{% url 'rebook_reservation' booking.id %}" class="action-link" style="color: var(--primary);">
                             <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -1845,6 +1876,7 @@
                         <a href="{% url 'reservation_detail' booking.id %}" class="action-link">
                             <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             </svg>
                             View
                         </a>

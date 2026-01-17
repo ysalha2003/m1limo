@@ -385,7 +385,13 @@
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <span class="badge badge-{{ booking.status|lower }}" style="font-size: 11px; padding: 4px 10px;">{{ booking.get_status_display }}</span>
-                                        <a href="{% url 'reservation_detail' booking.id %}" class="action-link" style="font-size: 12px; white-space: nowrap;">View</a>
+                                        <a href="{% url 'reservation_detail' booking.id %}" class="action-link" style="font-size: 12px; white-space: nowrap;">
+                                            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                            View
+                                        </a>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -527,13 +533,41 @@
 .action-link {
     color: var(--primary);
     text-decoration: none;
-    font-weight: 500;
-    transition: var(--transition);
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    position: relative;
 }
 
 .action-link:hover {
-    color: var(--primary-hover);
-    text-decoration: underline;
+    background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35), 0 2px 6px rgba(15, 23, 42, 0.2);
+    border-color: var(--primary);
+}
+
+.action-link:hover svg {
+    color: white;
+    transform: scale(1.1);
+}
+
+.action-link:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+}
+
+.action-link svg {
+    transition: all 0.25s ease;
+    color: inherit;
 }
 
 /* Responsive Design */

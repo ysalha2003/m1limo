@@ -1319,12 +1319,12 @@
             border: none !important;
         }
 
-        /* Info/Completed - Modern Blue */
+        /* Info/Completed - Modern Blue (No Border) */
         .badge-completed,
         .badge-trip_completed {
             background: linear-gradient(135deg, var(--color-info-light) 0%, #bfdbfe 100%);
             color: #1e40af;
-            border-color: rgba(59, 130, 246, 0.2);
+            border: none !important;
         }
 
         /* Pending - Amber for Awaiting Action (No Border) */
@@ -1334,20 +1334,21 @@
             border: none !important;
         }
 
-        /* Error/Cancelled - Modern Red */
+        /* Error/Cancelled - Modern Red (No Border) */
         .badge-cancelled,
         .badge-cancelled_full_charge,
         .badge-rejected {
             background: linear-gradient(135deg, var(--color-error-light) 0%, #fecaca 100%);
             color: #991b1b;
-            border-color: rgba(239, 68, 68, 0.2);
+            border: none !important;
         }
 
-        /* No-Show/Neutral - Gray */
+        /* No-Show/Neutral - Gray (No Border) */
         .badge-customer_no_show,
         .badge-trip_not_covered {
             background: linear-gradient(135deg, var(--color-gray-200) 0%, var(--color-gray-300) 100%);
             color: var(--color-gray-700);
+            border: none !important;
             border-color: rgba(100, 116, 139, 0.2);
         }
 
