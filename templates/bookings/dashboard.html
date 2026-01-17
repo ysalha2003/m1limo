@@ -565,7 +565,8 @@
     @media (max-width: 768px) {
         .stat-card {
             padding: 14px;
-            height: 90px !important;
+            height: auto !important;
+            min-height: 90px;
             flex: 1 1 100% !important;
             min-width: 100% !important;
         }
@@ -574,6 +575,54 @@
         .stat-card.confirmed-card {
             flex: 1 1 calc(50% - 9px) !important;
             min-width: calc(50% - 9px) !important;
+        }
+
+        /* Next Reservation card mobile responsive */
+        .next-reservation-card {
+            min-width: 100% !important;
+            height: auto !important;
+            min-height: 100px;
+            padding: 14px !important;
+        }
+
+        .trip-rotation-item {
+            font-size: 11px;
+            gap: 4px !important;
+            padding: 2px 0 !important;
+        }
+
+        .trip-rotation-item > div {
+            gap: 4px !important;
+        }
+
+        .trip-rotation-item span {
+            font-size: 11px !important;
+        }
+
+        .trip-rotation-item svg {
+            width: 10px !important;
+            height: 10px !important;
+        }
+
+        .trip-rotation-item span[style*="font-size: 14px"] {
+            font-size: 12px !important;
+        }
+
+        .trip-rotation-item span[style*="font-size: 13px"] {
+            font-size: 11px !important;
+        }
+
+        .trip-rotation-item span[style*="font-size: 12px"] {
+            font-size: 10px !important;
+        }
+
+        .trip-rotation-item div[style*="font-size: 10px"] {
+            font-size: 9px !important;
+            padding: 2px 5px !important;
+        }
+
+        #next-reservation-container {
+            min-height: 60px;
         }
 
         .stat-icon {
@@ -690,6 +739,33 @@
         .stat-card.confirmed-card {
             flex: 1 1 100% !important;
             min-width: 100% !important;
+        }
+
+        /* Next Reservation extra small screens */
+        .next-reservation-card {
+            padding: 12px !important;
+            min-height: 95px;
+        }
+
+        .trip-rotation-item {
+            font-size: 10px;
+        }
+
+        .trip-rotation-item span[style*="font-size: 14px"] {
+            font-size: 11px !important;
+        }
+
+        .trip-rotation-item span[style*="font-size: 13px"] {
+            font-size: 10px !important;
+        }
+
+        .trip-rotation-item span[style*="font-size: 12px"] {
+            font-size: 9px !important;
+        }
+
+        #trip-counter {
+            font-size: 9px !important;
+            padding: 1px 5px !important;
         }
         
         .stat-icon {
@@ -900,7 +976,7 @@
 
     <!-- Next Reservation Card -->
     <div class="stat-card next-reservation-card {% if next_upcoming_trip.hours_until_pickup <= 2 %}urgent{% endif %}" 
-         style="flex: 1; min-width: 400px; height: 100px; position: relative; {% if not next_upcoming_trip %}cursor: default; pointer-events: none; opacity: 0.6;{% else %}cursor: pointer;{% endif %}"
+         style="flex: 1; min-width: min(400px, 100%); height: auto; min-height: 100px; position: relative; {% if not next_upcoming_trip %}cursor: default; pointer-events: none; opacity: 0.6;{% else %}cursor: pointer;{% endif %}"
          {% if next_upcoming_trip %}onclick="window.location.href='{% url 'reservation_detail' next_upcoming_trip.id %}'"{% endif %}
          aria-label="{% if next_upcoming_trip %}View next reservation details{% else %}No upcoming reservations{% endif %}"
          role="{% if next_upcoming_trip %}button{% else %}presentation{% endif %}">
@@ -924,12 +1000,12 @@
             
             {% if next_upcoming_trip %}
                 <!-- Container for all trips (will rotate if multiple) -->
-                <div id="next-reservation-container" style="position: relative; flex: 1;">
+                <div id="next-reservation-container" style="position: relative; flex: 1; min-height: 45px;">
                     {% for trip in next_upcoming_trips %}
                     <div class="trip-rotation-item" 
                          data-trip-index="{{ forloop.counter0 }}"
                          data-trip-id="{{ trip.id }}"
-                         style="display: {% if forloop.first %}flex{% else %}none{% endif %}; align-items: center; gap: 8px; flex-wrap: wrap; position: absolute; top: 0; left: 0; right: 0; opacity: {% if forloop.first %}1{% else %}0{% endif %}; transition: opacity 0.5s ease-in-out;">
+                         style="display: {% if forloop.first %}flex{% else %}none{% endif %}; align-items: center; gap: 6px; flex-wrap: wrap; position: absolute; top: 0; left: 0; right: 0; opacity: {% if forloop.first %}1{% else %}0{% endif %}; transition: opacity 0.5s ease-in-out; padding: 4px 0;">
                         <!-- Date & Time -->
                         <div style="display: flex; align-items: baseline; gap: 6px;">
                             <span style="color: #0c4a6e; font-size: 14px; font-weight: 700; white-space: nowrap;">
