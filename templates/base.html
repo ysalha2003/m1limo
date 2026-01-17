@@ -248,24 +248,23 @@
            NAVIGATION - Modern Glass Effect
            ================================= */
         nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            background: white;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.5);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            height: 60px;
         }
 
         .nav-container {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 0 1.5rem;
+            padding: 0 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 64px;
+            height: 60px;
         }
 
         .logo {
@@ -325,32 +324,50 @@
 
         .nav-links {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             align-items: center;
         }
 
         .nav-link {
-            padding: 7px 14px;
-            border-radius: var(--radius);
+            padding: 8px 16px;
+            border-radius: 6px;
             text-decoration: none;
-            color: var(--text-secondary);
+            color: #64748b;
             font-weight: 500;
-            font-size: 13px;
-            transition: var(--transition);
+            font-size: 14px;
+            transition: all 0.15s ease;
             white-space: nowrap;
+            position: relative;
         }
 
         .nav-link:hover {
-            background: var(--primary-light);
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .nav-link.active {
             color: var(--primary);
+            background: rgba(4, 8, 20, 0.04);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px 2px 0 0;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding-left: 12px;
-            border-left: 1px solid var(--border);
+            gap: 4px;
+            padding-left: 16px;
+            margin-left: 8px;
+            border-left: 1px solid #e2e8f0;
         }
 
         .user-name {
@@ -369,38 +386,37 @@
 
         .activity-btn {
             position: relative;
-            background: var(--color-gray-100);
-            border: 1px solid var(--color-gray-200);
-            border-radius: var(--radius-sm);
-            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            padding: 8px;
             cursor: pointer;
-            transition: var(--transition-fast);
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--color-gray-700);
+            color: #64748b;
         }
 
         .activity-btn:hover {
-            background: var(--color-gray-200);
-            border-color: var(--color-gray-300);
-            color: var(--color-primary-dark);
+            background: #f8fafc;
+            color: #1e293b;
         }
 
         .activity-badge {
             position: absolute;
-            top: -6px;
-            right: -6px;
-            background: linear-gradient(135deg, var(--color-accent-red) 0%, #dc2626 100%);
+            top: 2px;
+            right: 2px;
+            background: #ef4444;
             color: white;
             border-radius: 999px;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: 700;
-            min-width: 18px;
+            padding: 1px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            min-width: 16px;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+            border: 1.5px solid white;
         }
 
         .activity-dropdown {
@@ -593,7 +609,7 @@
         .mobile-menu {
             display: none;
             position: fixed;
-            top: 64px;
+            top: 60px;
             left: 0;
             right: 0;
             background: white;
@@ -1107,7 +1123,8 @@
            ================================= */
         @media (max-width: 1024px) {
             .nav-container {
-                padding: 0 1.25rem;
+                padding: 0 24px;
+                height: 60px;
             }
 
             main {
@@ -1146,8 +1163,8 @@
                 margin-bottom: 8px !important;
             }
             .nav-container {
-                padding: 0 1rem;
-                min-height: 56px;
+                padding: 0 20px;
+                height: 60px;
             }
 
             .nav-links {
@@ -1158,22 +1175,8 @@
                 display: block;
             }
 
-            .logo-subtitle {
-                display: none;
-            }
-
-            .logo-text {
-                font-size: 17px;
-            }
-
-            .logo-icon {
-                width: 36px;
-                height: 36px;
-            }
-
-            .logo-icon svg {
-                width: 20px;
-                height: 20px;
+            .logo img {
+                height: 32px !important;
             }
 
             main {
@@ -1284,7 +1287,8 @@
            ================================= */
         @media (max-width: 375px) {
             .nav-container {
-                padding: 0 0.75rem;
+                padding: 0 16px;
+                height: 60px;
             }
 
             main {
@@ -1414,7 +1418,7 @@
     <nav>
         <div class="nav-container">
             <a href="{% url 'home' %}" class="logo">
-                <img src="{% static 'images/logo-white.png' %}" alt="M1 Limousine" style="height: 48px; width: auto; object-fit: contain;">
+                <img src="{% static 'images/logo-white.png' %}" alt="M1 Limousine" style="height: 36px; width: auto; object-fit: contain;">
             </a>
 
             <div class="nav-links">
@@ -1432,7 +1436,7 @@
                     {% if not user.is_staff %}
                     <div class="activity-dropdown-container">
                         <button class="activity-btn" onclick="toggleBookingsDropdown()" aria-label="View your bookings">
-                            <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg style="width: 17px; height: 17px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
                             {% if user_bookings_count > 0 %}
@@ -1518,7 +1522,7 @@
                         <!-- Admin Activity Dropdown (System-Wide) -->
                         <div class="activity-dropdown-container">
                             <button class="activity-btn" onclick="toggleActivityDropdown()" aria-label="View recent system activity">
-                                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg style="width: 17px; height: 17px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 <span class="activity-badge">{{ recent_activity_count|default:0 }}</span>
@@ -1805,6 +1809,22 @@
         document.querySelectorAll('.mobile-menu-link').forEach(link => {
             link.addEventListener('click', function() {
                 document.getElementById('mobileMenu').classList.remove('active');
+            });
+        });
+
+        // Set active nav link based on current page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const linkPath = new URL(link.href).pathname;
+                
+                // Match exact paths or check if current path starts with link path
+                if (currentPath === linkPath || 
+                    (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+                    link.classList.add('active');
+                }
             });
         });
 
