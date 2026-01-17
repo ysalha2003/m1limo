@@ -7,11 +7,11 @@
 <style>
     .stat-card {
         background: white;
-        border-radius: var(--radius-lg);
-        padding: 18px;
-        box-shadow: var(--shadow-sm);
-        border: 2px solid var(--border-light);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        padding: 14px 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        border: 1.5px solid #e2e8f0;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
         text-decoration: none;
@@ -26,16 +26,16 @@
         bottom: 0;
         left: 0;
         right: 0;
-        height: 3px;
+        height: 2px;
         background: linear-gradient(90deg, transparent 0%, var(--border) 50%, transparent 100%);
         opacity: 0;
         transition: var(--transition);
     }
 
     .stat-card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-5px) scale(1.01);
-        border-color: var(--border);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
+        border-color: #cbd5e1;
     }
 
     .stat-card:hover::before {
@@ -51,45 +51,45 @@
 
     /* Status card specific borders */
     .stat-card.pending-card {
-        border-color: #f59e0b;
-        border-width: 2px;
+        border-color: #e8b44f;
+        border-width: 1.5px;
     }
 
     .stat-card.pending-card:hover {
-        border-color: #d97706;
-        box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15);
+        border-color: #d9a543;
+        box-shadow: 0 4px 12px rgba(232, 180, 79, 0.12);
     }
 
     .stat-card.confirmed-card {
-        border-color: #10b981;
-        border-width: 2px;
+        border-color: #8fbc8f;
+        border-width: 1.5px;
     }
 
     .stat-card.confirmed-card:hover {
-        border-color: #059669;
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+        border-color: #7aaa7a;
+        box-shadow: 0 4px 12px rgba(143, 188, 143, 0.12);
     }
 
     .stat-card.next-reservation-card {
-        border-color: #3b82f6;
-        border-width: 2.5px;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+        border-color: #7dd3fc;
+        border-width: 2px;
+        box-shadow: 0 2px 8px rgba(125, 211, 252, 0.12);
     }
 
     .stat-card.next-reservation-card:hover {
-        border-color: #2563eb;
-        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        border-color: #38bdf8;
+        box-shadow: 0 4px 16px rgba(125, 211, 252, 0.18);
     }
 
     /* Pulsing animation for urgent reservations */
     @keyframes pulse-border {
         0%, 100% {
-            border-color: #ef4444;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+            border-color: #e87f77;
+            box-shadow: 0 2px 8px rgba(232, 127, 119, 0.15);
         }
         50% {
-            border-color: #dc2626;
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+            border-color: #d66b63;
+            box-shadow: 0 3px 12px rgba(232, 127, 119, 0.25);
         }
     }
 
@@ -138,13 +138,13 @@
     }
 
     .stat-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: var(--radius);
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: var(--shadow-sm);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         position: relative;
     }
 
@@ -158,28 +158,28 @@
     }
 
     .stat-value {
-        font-size: 26px;
+        font-size: 22px;
         font-weight: 700;
         color: var(--dark);
         line-height: 1;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.02em;
     }
 
     .stat-label {
         color: var(--text-secondary);
-        font-size: 12px;
-        margin-bottom: 6px;
+        font-size: 11px;
+        margin-bottom: 5px;
         font-weight: 600;
         letter-spacing: -0.01em;
     }
 
     .today-pickups-card {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.04) 0%, rgba(51, 65, 85, 0.04) 100%);
-        border: 1.5px solid rgba(30, 41, 59, 0.15);
-        border-radius: var(--radius-xl);
-        padding: 18px;
-        margin-bottom: 20px;
-        box-shadow: var(--shadow-sm);
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.03) 0%, rgba(51, 65, 85, 0.03) 100%);
+        border: 1px solid rgba(30, 41, 59, 0.12);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         position: relative;
         overflow: hidden;
     }
@@ -190,57 +190,57 @@
         left: 0;
         top: 0;
         bottom: 0;
-        width: 4px;
+        width: 3px;
         background: linear-gradient(to bottom, var(--pending) 0%, var(--accent) 100%);
     }
 
     .pickup-item {
         background: white;
-        border-radius: var(--radius-lg);
-        padding: 18px;
-        border: 1px solid var(--border-light);
+        border-radius: 10px;
+        padding: 12px 14px;
+        border: 1px solid #e2e8f0;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 14px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: var(--shadow-xs);
+        gap: 12px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
     .pickup-item:hover {
-        box-shadow: var(--shadow-lg);
-        border-color: var(--border);
-        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
     }
 
     /* Time badge with color coding */
     .time-badge {
-        font-weight: 700;
-        font-size: 15px;
-        padding: 6px 12px;
-        border-radius: 8px;
+        font-weight: 600;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 6px;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         letter-spacing: -0.01em;
     }
 
     .time-badge.time-safe {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-        color: #065f46;
-        border: 1.5px solid #10b981;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        color: #2e7d32;
+        border: 1px solid #81c784;
     }
 
     .time-badge.time-warning {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        color: #92400e;
-        border: 1.5px solid #f59e0b;
+        background: linear-gradient(135deg, #fef9e7 0%, #fdedb4 100%);
+        color: #8b6914;
+        border: 1px solid #e8b44f;
     }
 
     .time-badge.time-urgent {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        color: #991b1b;
-        border: 1.5px solid #ef4444;
+        background: linear-gradient(135deg, #fef0ef 0%, #fddbd9 100%);
+        color: #8b302b;
+        border: 1px solid #e87f77;
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
@@ -261,23 +261,23 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     th {
-        padding: 12px 8px;
+        padding: 10px 8px;
         color: var(--text-secondary);
         font-weight: 600;
-        font-size: 12px;
+        font-size: 11px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid var(--border);
+        letter-spacing: 0.04em;
+        border-bottom: 1.5px solid var(--border);
         text-align: left;
         white-space: nowrap;
     }
 
     td {
-        padding: 16px 8px;
+        padding: 12px 8px;
         border-bottom: 1px solid var(--border);
     }
 
@@ -291,13 +291,17 @@
         color: var(--primary);
         text-decoration: none;
         font-weight: 600;
-        font-size: 13px;
+        font-size: 12px;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         white-space: nowrap;
-        padding: 6px 12px;
+        padding: 5px 10px;
         border-radius: 6px;
         background: var(--primary-light);
         border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
         display: inline-flex;
         align-items: center;
         gap: 4px;
@@ -307,26 +311,26 @@
         background: var(--primary);
         color: white;
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(15, 23, 42, 0.15);
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
     }
 
     .action-link.action-approve {
-        background: #d1fae5;
-        color: #065f46;
+        background: #e8f5e9;
+        color: #2e7d32;
     }
 
     .action-link.action-approve:hover {
-        background: #10b981;
+        background: #8fbc8f;
         color: white;
     }
 
     .action-link.action-complete {
-        background: #dbeafe;
-        color: #1e40af;
+        background: #f0f9ff;
+        color: #0c4a6e;
     }
 
     .action-link.action-complete:hover {
-        background: #3b82f6;
+        background: #7dd3fc;
         color: white;
     }
 
@@ -334,19 +338,19 @@
     .badge {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 700;
-        border: 1.5px solid;
-        letter-spacing: 0.02em;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid;
+        letter-spacing: 0.01em;
         transition: all 0.2s ease;
     }
 
     .badge svg {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
     }
 
     /* Hover preview for table rows */
@@ -365,7 +369,7 @@
         left: -2px;
         top: -1px;
         bottom: -1px;
-        width: 4px;
+        width: 3px;
         background: var(--primary);
         border-radius: 2px;
     }
@@ -600,23 +604,23 @@
 
 {% if is_admin and past_pending_count > 0 %}
 <!-- Past Pending Reservations Alert Banner -->
-<div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);">
-    <div style="display: flex; align-items: start; gap: 16px;">
-        <div style="flex-shrink: 0; width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <svg style="width: 28px; height: 28px; color: #3b82f6;" fill="currentColor" viewBox="0 0 20 20">
+<div style="background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%); border: 2px solid #7dd3fc; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(125, 211, 252, 0.08);">
+    <div style="display: flex; align-items: start; gap: 12px;">
+        <div style="flex-shrink: 0; width: 40px; height: 40px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08);">
+            <svg style="width: 22px; height: 22px; color: #7dd3fc;" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
             </svg>
         </div>
         <div style="flex: 1;">
-            <h3 style="color: #1e3a8a; font-size: 18px; font-weight: 700; margin: 0 0 8px 0;">
-                🕒 {{ past_pending_count }} Pending Reservation Request{{ past_pending_count|pluralize }} Need Review
+            <h3 style="color: #0c4a6e; font-size: 15px; font-weight: 700; margin: 0 0 6px 0;">
+                {{ past_pending_count }} Pending Request{{ past_pending_count|pluralize }} Need Review
             </h3>
-            <p style="color: #1e40af; font-size: 15px; margin: 0 0 16px 0; line-height: 1.5;">
-                These reservation requests were never confirmed and have passed their pickup time. 
-                Please review and decide: confirm anyway, cancel, or mark as "Trip Not Covered".
+            <p style="color: #0c4a6e; font-size: 13px; margin: 0 0 12px 0; line-height: 1.5;">
+                These requests were never confirmed and have passed their pickup time. 
+                Please review and decide next action.
             </p>
-            <a href="{% url 'past_pending_reservations' %}" class="btn" style="background: #3b82f6; color: white; font-weight: 600; padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);">
-                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{% url 'past_pending_reservations' %}" class="btn" style="background: #7dd3fc; color: #0c4a6e; font-weight: 600; padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(125, 211, 252, 0.2); font-size: 13px;">
+                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
                 Review {{ past_pending_count }} Request{{ past_pending_count|pluralize }}
@@ -639,9 +643,9 @@
                 <p class="stat-label">Pending</p>
                 <p class="stat-value" style="color: var(--pending);">{{ stats.pending_count|default:0 }}</p>
             </div>
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--pending-light) 0%, #fde68a 100%);">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--pending-light) 0%, #fdedb4 100%);">
                 <!-- Hourglass icon for pending/waiting -->
-                <svg style="width: 26px; height: 26px; color: var(--pending); position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style="width: 20px; height: 20px; color: var(--pending); position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
@@ -654,9 +658,9 @@
                 <p class="stat-label">Confirmed</p>
                 <p class="stat-value" style="color: var(--success);">{{ stats.confirmed_count|default:0 }}</p>
             </div>
-            <div class="stat-icon" style="background: linear-gradient(135deg, var(--success-light) 0%, #a7f3d0 100%);">
+            <div class="stat-icon" style="background: linear-gradient(135deg, var(--success-light) 0%, #c8e6c9 100%);">
                 <!-- Shield check icon for verified/approved -->
-                <svg style="width: 26px; height: 26px; color: var(--success); position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style="width: 20px; height: 20px; color: var(--success); position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                 </svg>
             </div>
@@ -671,8 +675,8 @@
         <div style="display: flex; flex-direction: column; height: 100%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <p class="stat-label" style="margin: 0;">Next Reservation</p>
-                <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); width: 44px; height: 44px;">
-                    <svg style="width: 24px; height: 24px; color: white; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #7dd3fc 0%, #93c5fd 100%); width: 36px; height: 36px;">
+                    <svg style="width: 20px; height: 20px; color: white; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                     </svg>
                 </div>
@@ -680,8 +684,8 @@
             
             {% if next_upcoming_trip %}
                 <!-- Date & Time Section -->
-                <div style="margin-bottom: 12px;">
-                    <p style="color: #1e40af; font-size: 18px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.01em;">
+                <div style="margin-bottom: 10px;">
+                    <p style="color: #0c4a6e; font-size: 15px; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.01em;">
                         {{ next_upcoming_trip.pick_up_date|date:"M d, Y" }} at {{ next_upcoming_trip.pick_up_time|time:"g:i A" }}
                     </p>
                     {% load booking_filters %}
@@ -689,7 +693,7 @@
                         {% if time_remaining %}
                             {% if time_remaining.total_hours < 24 %}
                                 <!-- Live countdown for <24 hours -->
-                                <div style="display: inline-block; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #991b1b; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; border: 2px solid #ef4444; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);">
+                                <div style="display: inline-block; background: linear-gradient(135deg, #fef0ef 0%, #fddbd9 100%); color: #8b302b; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.01em; border: 1.5px solid #e87f77; box-shadow: 0 2px 6px rgba(232, 127, 119, 0.12);">
                                     <span id="live-countdown" 
                                           data-pickup-date="{{ next_upcoming_trip.pick_up_date|date:'Y-m-d' }}" 
                                           data-pickup-time="{{ next_upcoming_trip.pick_up_time|time:'H:i:s' }}">
@@ -697,17 +701,17 @@
                                     </span>
                                 </div>
                                 {% if time_remaining.total_hours <= 2 %}
-                                    <div style="display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; color: #dc2626; font-size: 12px; font-weight: 700;">
-                                        <span style="display: inline-block; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></span>
+                                    <div style="display: inline-flex; align-items: center; gap: 5px; margin-left: 6px; color: #8b302b; font-size: 11px; font-weight: 700;">
+                                        <span style="display: inline-block; width: 6px; height: 6px; background: #e87f77; border-radius: 50%; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></span>
                                         APPROACHING
                                     </div>
                                 {% endif %}
                             {% elif time_remaining.weeks > 0 %}
-                                <div style="display: inline-block; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.02em; border: 1.5px solid #3b82f6;">
+                                <div style="display: inline-block; background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%); color: #0c4a6e; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.01em; border: 1px solid #7dd3fc;">
                                     {{ time_remaining.weeks }} WEEK{{ time_remaining.weeks|pluralize }} {% if time_remaining.days > 0 %}{{ time_remaining.days }} DAY{{ time_remaining.days|pluralize }}{% endif %}
                                 </div>
                             {% elif time_remaining.days > 0 %}
-                                <div style="display: inline-block; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.02em; border: 1.5px solid #f59e0b;">
+                                <div style="display: inline-block; background: linear-gradient(135deg, #fef9e7 0%, #fdedb4 100%); color: #8b6914; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.01em; border: 1px solid #e8b44f;">
                                     {{ time_remaining.days }} DAY{{ time_remaining.days|pluralize }} {{ time_remaining.hours }} HOUR{{ time_remaining.hours|pluralize }}
                                 </div>
                             {% endif %}
@@ -716,15 +720,15 @@
                 </div>
                 
                 <!-- Pickup Location -->
-                <div style="margin-bottom: 10px; background: #f9fafb; padding: 10px; border-radius: 8px; border-left: 3px solid #3b82f6;">
-                    <div style="display: flex; align-items: start; gap: 8px;">
-                        <svg style="width: 16px; height: 16px; color: #3b82f6; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div style="margin-bottom: 8px; background: #f8fafc; padding: 8px; border-radius: 6px; border-left: 2px solid #7dd3fc;">
+                    <div style="display: flex; align-items: start; gap: 6px;">
+                        <svg style="width: 14px; height: 14px; color: #7dd3fc; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                         <div style="flex: 1;">
-                            <p style="color: #6b7280; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 2px 0;">Pickup Location</p>
-                            <p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0; line-height: 1.4;">
+                            <p style="color: #64748b; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 2px 0;">Pickup Location</p>
+                            <p style="color: #334155; font-size: 12px; font-weight: 600; margin: 0; line-height: 1.4;">
                                 {{ next_upcoming_trip.pick_up_address }}
                             </p>
                         </div>
@@ -732,15 +736,15 @@
                 </div>
                 
                 <!-- Passenger Info -->
-                <div style="display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
-                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <span style="color: white; font-weight: 700; font-size: 14px;">{{ next_upcoming_trip.passenger_name.0|upper }}</span>
+                <div style="display: flex; align-items: center; gap: 6px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
+                    <div style="width: 28px; height: 28px; background: linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <span style="color: white; font-weight: 700; font-size: 12px;">{{ next_upcoming_trip.passenger_name.0|upper }}</span>
                     </div>
                     <div style="flex: 1; min-width: 0;">
-                        <p style="color: #111827; font-size: 13px; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <p style="color: #334155; font-size: 12px; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             {{ next_upcoming_trip.passenger_name }}
                         </p>
-                        <p style="color: #6b7280; font-size: 11px; margin: 0;">
+                        <p style="color: #64748b; font-size: 10px; margin: 0;">
                             {{ next_upcoming_trip.vehicle_type }}
                         </p>
                     </div>
@@ -778,28 +782,28 @@
                     <!-- Enhanced time display with color coding -->
                     {% if booking.hours_until_pickup > 2 %}
                         <span class="time-badge time-safe">
-                            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             {{ booking.pick_up_time }}
                         </span>
-                        <span style="font-size: 12px; color: #065f46; font-weight: 600;">{{ booking.time_until_pickup_formatted }} away</span>
+                        <span style="font-size: 11px; color: #2e7d32; font-weight: 600;">{{ booking.time_until_pickup_formatted }} away</span>
                     {% elif booking.hours_until_pickup > 1 %}
                         <span class="time-badge time-warning">
-                            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             {{ booking.pick_up_time }}
                         </span>
-                        <span style="font-size: 12px; color: #92400e; font-weight: 700;">{{ booking.time_until_pickup_formatted }} away</span>
+                        <span style="font-size: 11px; color: #8b6914; font-weight: 700;">{{ booking.time_until_pickup_formatted }} away</span>
                     {% else %}
                         <span class="time-badge time-urgent">
-                            <svg style="width: 14px; height: 14px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg style="width: 12px; height: 12px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
                             {{ booking.pick_up_time }}
                         </span>
-                        <span style="font-size: 12px; color: #991b1b; font-weight: 700; text-transform: uppercase;">{{ booking.time_until_pickup_formatted }} away</span>
+                        <span style="font-size: 11px; color: #8b302b; font-weight: 700; text-transform: uppercase;">{{ booking.time_until_pickup_formatted }} away</span>
                     {% endif %}
                     <span class="badge badge-{{ booking.status|lower }}">{{ booking.get_status_display }}</span>
                     {% if booking.trip_type == 'Round' and booking.linked_booking %}
@@ -811,27 +815,27 @@
                         </span>
                     {% endif %}
                 </div>
-                <div style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">
+                <div style="font-weight: 600; color: var(--dark); margin-bottom: 4px; font-size: 13px;">
                     {{ booking.passenger_name }}
                     {% if booking.trip_label %}
-                        <span style="font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-left: 8px;">({{ booking.trip_label }})</span>
+                        <span style="font-size: 11px; color: var(--text-secondary); font-weight: 500; margin-left: 6px;">({{ booking.trip_label }})</span>
                     {% endif %}
                 </div>
-                <div style="font-size: 14px; color: var(--text-secondary);"> {{ booking.pick_up_address }}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);"> {{ booking.pick_up_address }}</div>
                 {% if booking.drop_off_address %}
-                <div style="font-size: 14px; color: var(--text-secondary);">→ {{ booking.drop_off_address }}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">→ {{ booking.drop_off_address }}</div>
                 {% endif %}
-                <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">{{ booking.vehicle_type }} • {{ booking.phone_number|default:booking.passenger_email }}</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">{{ booking.vehicle_type }} • {{ booking.phone_number|default:booking.passenger_email }}</div>
             </div>
             <div class="pickup-actions">
                 {% if is_admin and booking.status == 'Confirmed' %}
                     {% if booking.hours_until_pickup <= 0 %}
-                        <a href="{% url 'reservation_actions' booking.id 'complete' %}" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">✓ Complete</a>
+                        <a href="{% url 'reservation_actions' booking.id 'complete' %}" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">✓ Complete</a>
                     {% else %}
-                        <span class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px; opacity: 0.5; cursor: not-allowed; pointer-events: none;" title="Cannot complete until after pickup time ({{ booking.time_until_pickup_formatted }} remaining)">✓ Complete</span>
+                        <span class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px; opacity: 0.5; cursor: not-allowed; pointer-events: none;" title="Cannot complete until after pickup time ({{ booking.time_until_pickup_formatted }} remaining)">✓ Complete</span>
                     {% endif %}
                 {% endif %}
-                <a href="{% url 'reservation_detail' booking.id %}" class="btn btn-secondary" style="font-size: 13px; padding: 8px 14px;">View</a>
+                <a href="{% url 'reservation_detail' booking.id %}" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">View</a>
             </div>
         </div>
         {% endfor %}
@@ -842,7 +846,7 @@
 <!-- Bookings List -->
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-        <h2 style="font-size: 18px; font-weight: 700; margin: 0; color: var(--dark);">
+        <h2 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--dark);">
             {% if is_admin %}All Reservations{% else %}Your Reservations{% endif %}
         </h2>
         <a href="{% url 'new_reservation' %}" class="btn btn-primary">+ New Reservation</a>
@@ -967,10 +971,10 @@
                     <tr class="booking-row-{{ booking.id }}" {% if booking.is_past_trip or booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}style="opacity: 0.5; background-color: rgba(0,0,0,0.02); color: var(--text-muted);"{% endif %}>
                         <td>
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">ID #{{ booking.id }}</span>
+                                <span style="font-size: 10px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">ID #{{ booking.id }}</span>
                                 {% if not is_admin and booking.has_unviewed_changes %}
-                                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;" title="Recent activity - status updated">
-                                        <svg style="width: 10px; height: 10px;" fill="currentColor" viewBox="0 0 20 20">
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; color: #8b302b; background: #fef0ef; padding: 2px 6px; border-radius: 4px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;" title="Recent activity - status updated">
+                                        <svg style="width: 9px; height: 9px;" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
                                         </svg>
                                         NEW
@@ -988,48 +992,48 @@
                             <div style="font-weight: 600; color: var(--dark);">
                                 {{ booking.passenger_name }}
                                 {% if booking.is_past_trip %}
-                                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 500; margin-left: 6px;">(Past Trip)</span>
+                                    <span style="font-size: 10px; color: var(--text-muted); font-weight: 500; margin-left: 6px;">(Past Trip)</span>
                                 {% endif %}
                                 {% if booking.trip_label %}
-                                    <span style="font-size: 11px; color: var(--text-secondary); font-weight: 500; margin-left: 6px;">({{ booking.trip_label }})</span>
+                                    <span style="font-size: 10px; color: var(--text-secondary); font-weight: 500; margin-left: 6px;">({{ booking.trip_label }})</span>
                                 {% endif %}
                             </div>
-                            <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.phone_number|default:booking.passenger_email }}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">{{ booking.phone_number|default:booking.passenger_email }}</div>
                             {% if booking.booking_reference %}
-                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">{{ booking.booking_reference }}</div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">{{ booking.booking_reference }}</div>
                             {% endif %}
                         </td>
                         {% if is_admin %}
                         <td class="hide-mobile">
                             <div style="font-weight: 500; color: var(--dark);">{{ booking.user.username }}</div>
                             {% if booking.user.profile.company_name %}
-                            <div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 2px;">
-                                <svg style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div style="font-size: 11px; color: var(--primary); font-weight: 600; margin-top: 2px;">
+                                <svg style="width: 11px; height: 11px; display: inline-block; vertical-align: middle; margin-right: 3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>{{ booking.user.profile.company_name }}
                             </div>
                             {% endif %}
-                            <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.user.email|default:"No email" }}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">{{ booking.user.email|default:"No email" }}</div>
                         </td>
                         {% endif %}
                         <td>
-                            <div style="font-size: 14px; color: var(--dark);">{{ booking.pick_up_address }}</div>
+                            <div style="font-size: 13px; color: var(--dark);">{{ booking.pick_up_address }}</div>
                             {% if booking.drop_off_address %}
-                            <div style="font-size: 13px; color: var(--text-secondary);">→ {{ booking.drop_off_address }}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">→ {{ booking.drop_off_address }}</div>
                             {% endif %}
                         </td>
                         <td>
                             <div style="font-weight: 500;">{{ booking.pick_up_date }}</div>
-                            <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.pick_up_time }}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">{{ booking.pick_up_time }}</div>
                             {% if booking.hours_until_pickup > 0 and booking.hours_until_pickup <= 24 and booking.status in 'Pending,Confirmed' %}
-                            <div style="font-size: 11px; color: var(--warning); font-weight: 600; margin-top: 4px;">
+                            <div style="font-size: 10px; color: var(--warning); font-weight: 600; margin-top: 4px;">
                                 {{ booking.time_until_pickup_formatted }} away
                             </div>
                             {% endif %}
                         </td>
                         <td class="hide-mobile">
                             <div>{{ booking.vehicle_type }}</div>
-                            <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.get_trip_type_display }}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">{{ booking.get_trip_type_display }}</div>
                         </td>
                         <td>
                             <span class="badge badge-{{ booking.status|lower }}">
@@ -1057,17 +1061,17 @@
                         <td class="hide-mobile">
                             {% if booking.assigned_driver %}
                                 <div style="font-weight: 500; color: var(--dark);">{{ booking.assigned_driver.full_name }}</div>
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
                                     {% if booking.driver_response_status == 'accepted' %}
-                                        <span style="color: #059669;">✓ Accepted</span>
+                                        <span style="color: #2e7d32;">✓ Accepted</span>
                                     {% elif booking.driver_response_status == 'rejected' %}
-                                        <span style="color: #dc2626;">✗ Rejected</span>
+                                        <span style="color: #8b302b;">✗ Rejected</span>
                                     {% elif booking.driver_response_status == 'completed' %}
                                         <span style="color: #0c5460;">✓ Completed</span>
                                     {% endif %}
                                 </div>
                             {% else %}
-                                <span style="color: var(--text-muted); font-size: 13px;">Driver Not Assigned</span>
+                                <span style="color: var(--text-muted); font-size: 12px;">Driver Not Assigned</span>
                             {% endif %}
                         </td>
                         {% endif %}
@@ -1077,7 +1081,7 @@
                                     {# Past trips: Only show View and Rebook #}
                                     <a href="{% url 'reservation_detail' booking.id %}" class="action-link">View</a>
                                     <a href="{% url 'rebook_reservation' booking.id %}" class="action-link" style="color: var(--primary); font-weight: 600;">
-                                        <svg style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                         </svg>
                                         Rebook
@@ -1093,7 +1097,7 @@
                                         </button>
                                     {% endif %}
                                     <a href="{% url 'reservation_detail' booking.id %}" class="action-link">
-                                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
@@ -1102,7 +1106,7 @@
                                     {% if is_admin %}
                                         {% if booking.status == 'Pending' %}
                                             <a href="{% url 'reservation_actions' booking.id 'confirm' %}" class="action-link action-approve">
-                                                <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                 </svg>
                                                 Approve
@@ -1110,14 +1114,14 @@
                                         {% elif booking.status == 'Confirmed' %}
                                             {% if booking.hours_until_pickup <= 0 %}
                                                 <a href="{% url 'reservation_actions' booking.id 'complete' %}" class="action-link action-complete">
-                                                    <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                     </svg>
                                                     Complete
                                                 </a>
                                             {% else %}
                                                 <span class="action-link" style="opacity: 0.4; cursor: not-allowed; pointer-events: none; background: #f3f4f6; color: #9ca3af;" title="Cannot complete until after pickup time ({{ booking.time_until_pickup_formatted }} remaining)">
-                                                    <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                                     </svg>
                                                     Complete
@@ -1127,7 +1131,7 @@
                                     {% else %}
                                         {% if booking.status in 'Pending,Confirmed' and booking.hours_until_pickup > 2 %}
                                             <a href="{% url 'update_reservation' booking.id %}" class="action-link">
-                                                <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                 </svg>
                                                 Edit
@@ -1144,47 +1148,47 @@
                         <td colspan="{% if is_admin %}7{% else %}6{% endif %}" style="padding: 16px 24px;">
                             <div class="return-trip-content">
                                 <div style="font-weight: 600; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                                     </svg>
                                     Return Trip
-                                    <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px; margin-left: 4px;">ID #{{ booking.linked_booking.id }}</span>
+                                    <span style="font-size: 10px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px; margin-left: 4px;">ID #{{ booking.linked_booking.id }}</span>
                                 </div>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
                                     <div>
-                                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">PASSENGER</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">PASSENGER</div>
                                         <div style="font-weight: 500; color: var(--dark);">{{ booking.linked_booking.passenger_name }}</div>
-                                        <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.linked_booking.phone_number|default:booking.linked_booking.passenger_email }}</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">{{ booking.linked_booking.phone_number|default:booking.linked_booking.passenger_email }}</div>
                                     </div>
                                     <div>
-                                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">PICKUP</div>
-                                        <div style="font-size: 14px; color: var(--dark);">{{ booking.linked_booking.pick_up_address }}</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">PICKUP</div>
+                                        <div style="font-size: 13px; color: var(--dark);">{{ booking.linked_booking.pick_up_address }}</div>
                                         {% if booking.linked_booking.drop_off_address %}
-                                        <div style="font-size: 13px; color: var(--text-secondary);">→ {{ booking.linked_booking.drop_off_address }}</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">→ {{ booking.linked_booking.drop_off_address }}</div>
                                         {% endif %}
                                     </div>
                                     <div>
-                                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">DATE & TIME</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">DATE & TIME</div>
                                         <div style="font-weight: 500;">{{ booking.linked_booking.pick_up_date }}</div>
-                                        <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.linked_booking.pick_up_time }}</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">{{ booking.linked_booking.pick_up_time }}</div>
                                     </div>
                                     <div>
-                                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">STATUS</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">STATUS</div>
                                         <span class="badge badge-{{ booking.linked_booking.status|lower }}">{{ booking.linked_booking.get_status_display }}</span>
                                     </div>
                                     {% if is_admin %}
                                     <div>
-                                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">DRIVER</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">DRIVER</div>
                                         {% if booking.linked_booking.assigned_driver %}
                                             <div style="font-weight: 500; color: var(--dark);">{{ booking.linked_booking.assigned_driver.full_name }}</div>
-                                            <div style="font-size: 13px; color: var(--text-secondary);">{{ booking.linked_booking.assigned_driver.car_type }}</div>
+                                            <div style="font-size: 12px; color: var(--text-secondary);">{{ booking.linked_booking.assigned_driver.car_type }}</div>
                                         {% else %}
-                                            <span style="color: var(--text-muted); font-size: 13px;">Not assigned</span>
+                                            <span style="color: var(--text-muted); font-size: 12px;">Not assigned</span>
                                         {% endif %}
                                     </div>
                                     {% endif %}
                                     <div>
-                                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">ACTIONS</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">ACTIONS</div>
                                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                             <a href="{% url 'reservation_detail' booking.linked_booking.id %}" class="action-link">View</a>
                                             {% if is_admin %}
@@ -1218,11 +1222,11 @@
     {% else %}
         <div class="empty-state">
             <div class="empty-icon">
-                <svg style="width: 40px; height: 40px; color: var(--border-dark);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style="width: 36px; height: 36px; color: var(--border-dark);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
             </div>
-            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--dark);">No bookings yet</h3>
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--dark);">No bookings yet</h3>
         </div>
     {% endif %}
 </div>
