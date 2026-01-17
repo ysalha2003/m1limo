@@ -63,7 +63,7 @@ class BookingForm(BaseModelForm):
     # Notification preferences
     send_passenger_notifications = forms.BooleanField(
         required=False,
-        initial=True,  # Default to True for NEW bookings only
+        initial=False,  # Default to False - admin opts in to send passenger notifications
         label="Send notifications to passenger",
         widget=forms.CheckboxInput(attrs={
             'class': 'form-checkbox'

@@ -6,10 +6,10 @@
 <style>
     /* Multi-step progress indicator */
     .progress-container {
-        margin-bottom: 40px;
-        padding: 24px;
+        margin-bottom: 28px;
+        padding: 16px 20px;
         background: var(--primary-light);
-        border-radius: var(--radius-lg);
+        border-radius: 10px;
         border: 1px solid var(--border);
     }
 
@@ -24,10 +24,10 @@
 
     .progress-line {
         position: absolute;
-        top: 20px;
+        top: 16px;
         left: 0;
         right: 0;
-        height: 3px;
+        height: 2px;
         background: var(--border);
         z-index: 0;
     }
@@ -52,25 +52,26 @@
     }
 
     .step-circle {
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         background: white;
-        border: 3px solid var(--border);
+        border: 2px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
+        font-weight: 600;
+        font-size: 13px;
         color: var(--text-secondary);
         transition: all 0.3s ease;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     .progress-step.active .step-circle {
         background: var(--primary);
         border-color: var(--primary);
         color: white;
-        box-shadow: 0 4px 8px rgba(4, 8, 20, 0.3);
+        box-shadow: 0 2px 6px rgba(4, 8, 20, 0.25);
     }
 
     .progress-step.completed .step-circle {
@@ -80,7 +81,7 @@
     }
 
     .step-label {
-        font-size: 13px;
+        font-size: 12px;
         color: var(--text-secondary);
         font-weight: 500;
         text-align: center;
@@ -122,73 +123,74 @@
         appearance: none;
         cursor: pointer;
         margin: 8px 0;
+        height: 4px;
     }
 
     .passenger-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
         background: var(--primary);
         cursor: pointer;
         border-radius: 50%;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         transition: all 0.2s ease;
     }
 
     .passenger-slider::-webkit-slider-thumb:hover {
-        transform: scale(1.2);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transform: scale(1.15);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
 
     .passenger-slider::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
         background: var(--primary);
         cursor: pointer;
         border-radius: 50%;
         border: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         transition: all 0.2s ease;
     }
 
     .passenger-slider::-moz-range-thumb:hover {
-        transform: scale(1.2);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transform: scale(1.15);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
 
     .form-section {
-        margin-bottom: 32px;
-        padding: 24px;
+        margin-bottom: 24px;
+        padding: 20px;
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, var(--light) 50%);
-        border-radius: var(--radius-lg);
+        border-radius: 10px;
         border: 1px solid var(--border-light);
     }
 
     .section-header {
-        font-size: 20px;
-        font-weight: 700;
+        font-size: 16px;
+        font-weight: 600;
         color: var(--dark);
-        margin: -24px -24px 24px -24px;
-        padding: 16px 24px;
+        margin: -20px -20px 20px -20px;
+        padding: 14px 20px;
         background: white;
-        border-bottom: 2px solid var(--border);
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        border-bottom: 1.5px solid var(--border);
+        border-radius: 10px 10px 0 0;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
     }
 
     .section-icon {
-        width: 36px;
-        height: 36px;
+        width: 28px;
+        height: 28px;
         background: linear-gradient(135deg, var(--primary-light) 0%, rgba(4, 8, 20, 0.05) 100%);
-        border-radius: 8px;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--primary);
-        box-shadow: 0 2px 4px rgba(4, 8, 20, 0.1);
+        box-shadow: 0 1px 3px rgba(4, 8, 20, 0.08);
     }
 
     .form-grid {
@@ -231,44 +233,44 @@
 
     .quick-select-box {
         background: linear-gradient(135deg, var(--info-light) 0%, rgba(59, 130, 246, 0.05) 100%);
-        border: 1.5px solid var(--border-light);
-        border-left: 4px solid var(--info);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 32px;
-        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.08);
+        border: 1px solid var(--border-light);
+        border-left: 3px solid var(--info);
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(59, 130, 246, 0.06);
         transition: var(--transition);
     }
 
     .quick-select-box:hover {
         border-color: var(--info);
-        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.12);
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
     }
 
     .quick-select-header {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
+        gap: 10px;
+        margin-bottom: 12px;
     }
 
     .quick-select-icon {
-        width: 36px;
-        height: 36px;
+        width: 28px;
+        height: 28px;
         background: white;
-        border-radius: 8px;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
     .form-navigation {
         display: flex;
-        gap: 12px;
-        padding-top: 24px;
-        border-top: 2px solid var(--border);
-        margin-top: 32px;
+        gap: 10px;
+        padding-top: 20px;
+        border-top: 1.5px solid var(--border);
+        margin-top: 24px;
     }
 
     .form-hint {
@@ -280,20 +282,20 @@
 
     .form-error {
         color: var(--error);
-        font-size: 13px;
+        font-size: 12px;
         margin-top: 4px;
     }
 
     .auto-fill-notice {
         background: var(--success-light);
         border: 1px solid var(--border);
-        border-left: 4px solid var(--success);
-        border-radius: var(--radius);
-        padding: 12px;
-        margin-bottom: 16px;
+        border-left: 3px solid var(--success);
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 14px;
         display: flex;
         align-items: start;
-        gap: 10px;
+        gap: 8px;
     }
 
     .auto-fill-notice svg {
@@ -313,45 +315,45 @@
     /* Review step */
     .review-section {
         background: linear-gradient(to bottom, white 0%, var(--light) 100%);
-        border-radius: var(--radius-lg);
-        padding: 24px;
-        margin-bottom: 20px;
-        border: 1.5px solid var(--border-light);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         transition: var(--transition);
     }
 
     .review-section:hover {
         border-color: var(--border);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     }
 
     .review-header {
-        font-weight: 700;
+        font-weight: 600;
         color: var(--dark);
-        margin-bottom: 16px;
-        font-size: 16px;
+        margin-bottom: 12px;
+        font-size: 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-bottom: 12px;
-        border-bottom: 2px solid var(--border);
+        padding-bottom: 10px;
+        border-bottom: 1.5px solid var(--border);
     }
 
     .review-item {
         display: flex;
         justify-content: space-between;
-        padding: 10px 0;
+        padding: 8px 0;
         border-bottom: 1px solid var(--border-light);
         transition: var(--transition);
     }
 
     .review-item:hover {
         background: rgba(4, 8, 20, 0.02);
-        padding-left: 8px;
-        padding-right: 8px;
-        margin-left: -8px;
-        margin-right: -8px;
+        padding-left: 6px;
+        padding-right: 6px;
+        margin-left: -6px;
+        margin-right: -6px;
         border-radius: var(--radius);
     }
 
@@ -362,19 +364,20 @@
     .review-label {
         font-weight: 500;
         color: var(--text-secondary);
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .review-value {
         font-weight: 600;
         color: var(--dark);
         text-align: right;
+        font-size: 13px;
     }
 
     .edit-link {
         color: var(--primary);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 500;
         transition: var(--transition);
     }
@@ -473,13 +476,13 @@
 {% block content %}
 <div class="card booking-form-card" style="max-width: 900px; margin: 0 auto;">
     <div class="card-header" style="text-align: center;">
-        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; box-shadow: 0 4px 12px rgba(4, 8, 20, 0.2);">
-            <svg style="width: 28px; height: 28px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style="width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; box-shadow: 0 2px 8px rgba(4, 8, 20, 0.15);">
+            <svg style="width: 22px; height: 22px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
         </div>
-        <h1 class="card-title">{% if is_rebook %}Rebook Reservation{% else %}New Reservation Request{% endif %}</h1>
-        <p style="color: var(--text-secondary); margin-top: 8px; font-size: 15px;">
+        <h1 class="card-title" style="font-size: 20px; font-weight: 600;">{% if is_rebook %}Rebook Reservation{% else %}New Reservation Request{% endif %}</h1>
+        <p style="color: var(--text-secondary); margin-top: 6px; font-size: 13px;">
             {% if is_rebook %}
                 Creating a new reservation based on your previous trip. Update dates, times, and details as needed.
             {% else %}
@@ -565,13 +568,13 @@
             <div class="quick-select-box">
                 <div class="quick-select-header">
                     <div class="quick-select-icon">
-                        <svg style="width: 18px; height: 18px; color: var(--info);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px; color: var(--info);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
                     </div>
                     <div>
-                        <h3 style="font-size: 16px; font-weight: 600; color: var(--dark); margin: 0;">Quick Select Passenger</h3>
-                        <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">Choose from your saved frequent passengers</p>
+                        <h3 style="font-size: 14px; font-weight: 600; color: var(--dark); margin: 0;">Quick Select Passenger</h3>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">Choose from your saved frequent passengers</p>
                     </div>
                 </div>
 
@@ -596,18 +599,18 @@
             {% endif %}
 
             {% if user.is_staff %}
-            <div class="form-section" style="background: linear-gradient(135deg, #b6b7bc 0%, #06010a 100%); border: none; color: white;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div class="form-section" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #cbd5e1; padding: 16px 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                    
                     <div>
-                        <h3 style="font-size: 16px; font-weight: 600; margin: 0;">Select a Customer to Create Reservation (Optional)</h3>
+                        <h3 style="font-size: 14px; font-weight: 600; margin: 0; color: var(--dark);">Select a Customer to Create Reservation (Optional)</h3>
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 0;">
                     {{ form.booking_for_user }}
                     {% if form.booking_for_user.errors %}
-                        <div class="form-error" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3);">{{ form.booking_for_user.errors.0 }}</div>
+                        <div class="form-error">{{ form.booking_for_user.errors.0 }}</div>
                     {% endif %}
                 </div>
             </div>
@@ -616,7 +619,7 @@
             <div class="form-section">
                 <h3 class="section-header">
                     <div class="section-icon">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
@@ -647,26 +650,26 @@
                         {% endif %}
                         
                         <!-- Notification Preferences -->
-                        <div style="margin-top: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <label class="checkbox-label" style="display: flex; align-items: center; cursor: pointer; margin-bottom: 8px;">
+                        <div style="margin-top: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                            <label class="checkbox-label" style="display: flex; align-items: center; cursor: pointer; margin-bottom: 6px;">
                                 {{ form.send_passenger_notifications }}
-                                <span style="margin-left: 8px; font-size: 14px; font-weight: 500;">Send notifications to passenger</span>
+                                <span style="margin-left: 8px; font-size: 13px; font-weight: 500;">Send notifications to passenger</span>
                             </label>
-                            <div style="font-size: 12px; color: #64748b; margin-left: 28px;">
+                            <div style="font-size: 11px; color: #64748b; opacity: 0.7; margin-left: 28px; line-height: 1.4;">
                                 Passenger will receive booking confirmation, status updates, and pickup reminders
                             </div>
                         </div>
                         
-                        <div style="margin-top: 8px; font-size: 12px; color: #64748b;">
-                            You will always receive notifications based on your <a href="{% url 'edit_profile' %}" style="color: var(--primary); text-decoration: underline;">Email Preferences</a>
+                        <div style="margin-top: 6px; font-size: 11px; color: #64748b; opacity: 0.7;">
+                            You will always receive notifications based on your <a href="{% url 'edit_profile' %}" style="color: var(--primary); text-decoration: none; opacity: 0.8;">Email Preferences</a>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="id_number_of_passengers">Number of Passengers * <span id="passengerCount" style="color: var(--primary); font-weight: 700;">1</span></label>
-                        <input type="range" id="passengerSlider" min="1" max="15" value="1" class="passenger-slider" style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, var(--primary) 0%, var(--primary) 6.67%, var(--border) 6.67%, var(--border) 100%); outline: none; -webkit-appearance: none;">
+                        <label class="form-label" for="id_number_of_passengers">Number of Passengers * <span id="passengerCount" style="color: var(--primary); font-weight: 600;">1</span></label>
+                        <input type="range" id="passengerSlider" min="1" max="15" value="1" class="passenger-slider" style="width: 100%; border-radius: 5px; background: linear-gradient(to right, var(--primary) 0%, var(--primary) 6.67%, var(--border) 6.67%, var(--border) 100%); outline: none; -webkit-appearance: none;">
                         <input type="hidden" id="id_number_of_passengers" name="number_of_passengers" value="1">
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
                             <span>1</span>
                             <span>15</span>
                         </div>
@@ -681,7 +684,7 @@
             <div class="form-section">
                 <h3 class="section-header">
                     <div class="section-icon">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
@@ -746,7 +749,7 @@
             <div class="form-section">
                 <h3 class="section-header">
                     <div class="section-icon">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
@@ -785,7 +788,7 @@
             <div class="form-section">
                 <h3 class="section-header">
                     <div class="section-icon">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
@@ -817,7 +820,7 @@
                 <div class="form-section">
                     <h3 class="section-header">
                         <div class="section-icon">
-                            <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                             </svg>
                         </div>
@@ -842,7 +845,7 @@
             <div class="form-section">
                 <h3 class="section-header">
                     <div class="section-icon">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
                         </svg>
                     </div>
@@ -881,7 +884,7 @@
             <div class="form-section">
                 <h3 class="section-header">
                     <div class="section-icon">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
                     </div>
@@ -919,7 +922,7 @@
             <div class="form-section">
                 <h3 class="section-header">
                     <div class="section-icon">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
