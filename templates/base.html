@@ -741,71 +741,231 @@
         }
 
         /* =================================
-           MESSAGES
+           MESSAGES - Modern Alert System
            ================================= */
         .messages {
             position: fixed;
             top: 80px;
             right: 20px;
             z-index: 999;
-            max-width: 400px;
+            max-width: 420px;
             width: calc(100% - 40px);
+            pointer-events: none;
         }
 
         .message {
             background: white;
-            padding: 16px;
+            padding: 16px 20px;
             margin-bottom: 12px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            border-left: 4px solid var(--success);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
             display: flex;
-            justify-content: space-between;
-            align-items: start;
-            animation: slideIn 0.3s ease-out;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+            user-select: none;
+            touch-action: pan-y;
         }
 
+        .message:active {
+            cursor: grabbing;
+        }
+
+        /* Icon container */
+        .message-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Message content */
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-text {
+            margin: 0;
+            color: var(--dark);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        /* Success variant */
         .message.success {
-            border-left-color: var(--success);
+            border-left: 4px solid #10b981;
         }
 
+        .message.success .message-icon {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #059669;
+        }
+
+        .message.success .message-icon::before {
+            content: "✓";
+        }
+
+        /* Error variant */
         .message.error {
-            border-left-color: var(--error);
+            border-left: 4px solid #ef4444;
         }
 
+        .message.error .message-icon {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc2626;
+        }
+
+        .message.error .message-icon::before {
+            content: "✕";
+        }
+
+        /* Warning variant */
         .message.warning {
-            border-left-color: var(--warning);
+            border-left: 4px solid #f59e0b;
         }
 
+        .message.warning .message-icon {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #d97706;
+        }
+
+        .message.warning .message-icon::before {
+            content: "⚠";
+        }
+
+        /* Info variant */
         .message.info {
-            border-left-color: var(--primary);
+            border-left: 4px solid #3b82f6;
         }
 
+        .message.info .message-icon {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #2563eb;
+        }
+
+        .message.info .message-icon::before {
+            content: "i";
+        }
+
+        /* Close button */
         .message-close {
-            background: none;
+            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.05);
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            padding: 0;
-            margin-left: 12px;
-            font-size: 18px;
+            padding: 6px;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            font-size: 16px;
             line-height: 1;
-            transition: var(--transition);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .message-close:hover {
+            background: rgba(0, 0, 0, 0.1);
             color: var(--dark);
+            transform: scale(1.1);
         }
 
-        @keyframes slideIn {
+        .message-close:active {
+            transform: scale(0.95);
+        }
+
+        /* Progress bar for auto-dismiss */
+        .message-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: currentColor;
+            opacity: 0.3;
+            animation: progressShrink 5s linear forwards;
+        }
+
+        .message.success .message-progress {
+            color: #10b981;
+        }
+
+        .message.error .message-progress {
+            color: #ef4444;
+        }
+
+        .message.warning .message-progress {
+            color: #f59e0b;
+        }
+
+        .message.info .message-progress {
+            color: #3b82f6;
+        }
+
+        /* Animations */
+        @keyframes slideInRight {
             from {
-                transform: translateY(-20px);
+                transform: translateX(calc(100% + 40px));
                 opacity: 0;
             }
             to {
-                transform: translateY(0);
+                transform: translateX(0);
                 opacity: 1;
             }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(calc(100% + 40px));
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideOutLeft {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(calc(-100% - 40px));
+                opacity: 0;
+            }
+        }
+
+        @keyframes progressShrink {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
+        /* Dismissing states */
+        .message.dismissing-right {
+            animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        .message.dismissing-left {
+            animation: slideOutLeft 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
         }
 
         /* =================================
@@ -1380,13 +1540,31 @@
             .messages {
                 top: 70px;
                 right: 12px;
-                max-width: 90%;
+                left: 12px;
+                max-width: calc(100% - 24px);
+                width: auto;
             }
-        }
 
             .message {
-                padding: 10px;
+                padding: 12px 14px;
                 font-size: 13px;
+                gap: 10px;
+            }
+
+            .message-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .message-text {
+                font-size: 13px;
+            }
+
+            .message-close {
+                width: 24px;
+                height: 24px;
+                font-size: 14px;
             }
 
             /* Grid adjustments */
@@ -1898,12 +2076,165 @@
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
-        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-            <p style="margin: 0; color: var(--dark); font-size: 14px; font-weight: 500;">{{ message }}</p>
-            <button class="message-close" onclick="this.parentElement.remove()" aria-label="Close message">✕</button>
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}" data-message-id="{{ forloop.counter }}">
+            <div class="message-icon"></div>
+            <div class="message-content">
+                <p class="message-text">{{ message }}</p>
+            </div>
+            <button class="message-close" onclick="dismissMessage(this)" aria-label="Close message">✕</button>
+            <div class="message-progress"></div>
         </div>
         {% endfor %}
     </div>
+
+    <script>
+    // Modern alert system with swipe-to-dismiss functionality
+    (function() {
+        const messages = document.querySelectorAll('.message');
+        
+        messages.forEach((message, index) => {
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+            let autoDismissTimer = null;
+
+            // Auto-dismiss after 5 seconds
+            autoDismissTimer = setTimeout(() => {
+                dismissMessage(message.querySelector('.message-close'));
+            }, 5000);
+
+            // Mouse/Touch event handlers
+            const handleStart = (e) => {
+                isDragging = true;
+                startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                message.style.transition = 'none';
+                
+                // Pause auto-dismiss on interaction
+                if (autoDismissTimer) {
+                    clearTimeout(autoDismissTimer);
+                    const progressBar = message.querySelector('.message-progress');
+                    if (progressBar) {
+                        progressBar.style.animationPlayState = 'paused';
+                    }
+                }
+            };
+
+            const handleMove = (e) => {
+                if (!isDragging) return;
+                
+                e.preventDefault();
+                currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                const deltaX = currentX - startX;
+                
+                // Only allow horizontal swipe
+                if (Math.abs(deltaX) > 5) {
+                    message.style.transform = `translateX(${deltaX}px)`;
+                    message.style.opacity = Math.max(0.3, 1 - Math.abs(deltaX) / 200);
+                }
+            };
+
+            const handleEnd = (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                const deltaX = currentX - startX;
+                const threshold = 100;
+                
+                message.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                
+                // Dismiss if swiped beyond threshold
+                if (Math.abs(deltaX) > threshold) {
+                    if (deltaX > 0) {
+                        message.classList.add('dismissing-right');
+                    } else {
+                        message.classList.add('dismissing-left');
+                    }
+                    
+                    setTimeout(() => {
+                        message.remove();
+                        checkIfAllMessagesRemoved();
+                    }, 300);
+                } else {
+                    // Snap back to original position
+                    message.style.transform = 'translateX(0)';
+                    message.style.opacity = '1';
+                    
+                    // Resume auto-dismiss
+                    autoDismissTimer = setTimeout(() => {
+                        dismissMessage(message.querySelector('.message-close'));
+                    }, 3000);
+                    
+                    const progressBar = message.querySelector('.message-progress');
+                    if (progressBar) {
+                        progressBar.style.animationPlayState = 'running';
+                    }
+                }
+                
+                startX = 0;
+                currentX = 0;
+            };
+
+            // Add event listeners
+            message.addEventListener('mousedown', handleStart);
+            message.addEventListener('mousemove', handleMove);
+            message.addEventListener('mouseup', handleEnd);
+            message.addEventListener('mouseleave', handleEnd);
+            
+            message.addEventListener('touchstart', handleStart, { passive: false });
+            message.addEventListener('touchmove', handleMove, { passive: false });
+            message.addEventListener('touchend', handleEnd);
+            message.addEventListener('touchcancel', handleEnd);
+
+            // Hover to pause auto-dismiss
+            message.addEventListener('mouseenter', () => {
+                if (autoDismissTimer) {
+                    clearTimeout(autoDismissTimer);
+                    const progressBar = message.querySelector('.message-progress');
+                    if (progressBar) {
+                        progressBar.style.animationPlayState = 'paused';
+                    }
+                }
+            });
+
+            message.addEventListener('mouseleave', () => {
+                if (!isDragging) {
+                    autoDismissTimer = setTimeout(() => {
+                        dismissMessage(message.querySelector('.message-close'));
+                    }, 2000);
+                    
+                    const progressBar = message.querySelector('.message-progress');
+                    if (progressBar) {
+                        progressBar.style.animationPlayState = 'running';
+                    }
+                }
+            });
+        });
+
+        function checkIfAllMessagesRemoved() {
+            const container = document.querySelector('.messages');
+            if (container && container.querySelectorAll('.message').length === 0) {
+                container.remove();
+            }
+        }
+    })();
+
+    function dismissMessage(button) {
+        const message = button.closest('.message');
+        if (!message) return;
+        
+        message.classList.add('dismissing-right');
+        
+        setTimeout(() => {
+            message.remove();
+            
+            // Remove container if no messages left
+            const container = document.querySelector('.messages');
+            if (container && container.querySelectorAll('.message').length === 0) {
+                container.remove();
+            }
+        }, 300);
+    }
+    </script>
     {% endif %}
 
     <main id="main-content">
