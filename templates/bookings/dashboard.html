@@ -220,37 +220,84 @@
     }
 
     .filter-hint {
-        color: #94a3b8;
-        font-size: 11px;
+        color: #64748b;
+        font-size: 10px;
         margin: 0;
-        font-weight: 500;
+        font-weight: 600;
         opacity: 0;
-        transition: opacity 200ms ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: absolute;
-        bottom: 12px;
-        left: 16px;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%) translateY(5px);
+        background: linear-gradient(135deg, rgba(100, 116, 139, 0.08) 0%, rgba(71, 85, 105, 0.06) 100%);
+        padding: 6px 14px;
+        border-radius: 20px;
+        letter-spacing: 0.02em;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border: 1px solid rgba(100, 116, 139, 0.12);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        white-space: nowrap;
+    }
+
+    .filter-hint::before {
+        content: '↗';
+        margin-right: 4px;
+        font-size: 11px;
+        opacity: 0.7;
     }
 
     .stat-card:hover .filter-hint {
-        opacity: 0.7;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
     }
 
     .active-indicator {
         display: none;
         align-items: center;
-        gap: 4px;
-        color: var(--primary);
-        font-size: 10px;
+        gap: 6px;
+        color: #0f172a;
+        font-size: 9px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
         position: absolute;
-        bottom: 12px;
-        left: 16px;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.08) 100%);
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    .active-indicator::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+        pointer-events: none;
     }
 
     .stat-card.active .active-indicator {
         display: flex;
+        animation: slideInUp 0.3s ease-out;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
     }
 
     .stat-card.active .filter-hint {
@@ -947,7 +994,7 @@
         <p class="stat-value" style="color: #a0790b;">{{ stats.pending_count|default:0 }}</p>
         <p class="filter-hint">Click to filter</p>
         <div class="active-indicator">
-            <span style="width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></span>
+            <span style="width: 6px; height: 6px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 50%; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);"></span>
             Filtering
         </div>
     </a>
@@ -969,7 +1016,7 @@
         <p class="stat-value" style="color: #2d6a3c;">{{ stats.confirmed_count|default:0 }}</p>
         <p class="filter-hint">Click to filter</p>
         <div class="active-indicator">
-            <span style="width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></span>
+            <span style="width: 6px; height: 6px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 50%; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);"></span>
             Filtering
         </div>
     </a>
