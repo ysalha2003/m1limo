@@ -1424,6 +1424,29 @@
             nav {
                 height: 56px;
             }
+        }
+
+        /* =================================
+           RESPONSIVE - TINY MOBILE (<320px)
+           ================================= */
+        @media (max-width: 320px) {
+            /* Footer optimization for very small devices */
+            footer > div > div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+                gap: 24px !important;
+            }
+            
+            .nav-container {
+                padding: 0 10px;
+            }
+            
+            .logo-text {
+                font-size: 14px !important;
+            }
+            
+            main {
+                padding: 10px;
+            }
 
             .mobile-menu-backdrop {
                 top: 56px;
