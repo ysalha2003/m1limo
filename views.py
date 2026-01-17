@@ -471,7 +471,20 @@ def dashboard(request):
             status='Confirmed',
             is_return_trip=False
         ).filter(future_filter).order_by('pick_up_date', 'pick_up_time').first()
+        
+        # Get ALL trips at the same time as next_upcoming (for rotation display)
+        next_upcoming_trips = []
+        if next_upcoming:
+            same_time_trips = Booking.objects.filter(
+                status='Confirmed',
+                is_return_trip=False,
+                pick_up_date=next_upcoming.pick_up_date,
+                pick_up_time=next_upcoming.pick_up_time
+            ).filter(future_filter).order_by('passenger_name')
+            next_upcoming_trips = list(same_time_trips)
+        
         context['next_upcoming_trip'] = next_upcoming
+        context['next_upcoming_trips'] = next_upcoming_trips  # Multiple trips at same time
         context['stats'] = stats
         
         # Count past confirmed trips that need review
@@ -505,7 +518,21 @@ def dashboard(request):
             status='Confirmed',
             is_return_trip=False
         ).filter(future_filter).order_by('pick_up_date', 'pick_up_time').first()
+        
+        # Get ALL trips at the same time as next_upcoming (for rotation display)
+        next_upcoming_trips = []
+        if next_upcoming:
+            same_time_trips = Booking.objects.filter(
+                user=request.user,
+                status='Confirmed',
+                is_return_trip=False,
+                pick_up_date=next_upcoming.pick_up_date,
+                pick_up_time=next_upcoming.pick_up_time
+            ).filter(future_filter).order_by('passenger_name')
+            next_upcoming_trips = list(same_time_trips)
+        
         context['next_upcoming_trip'] = next_upcoming
+        context['next_upcoming_trips'] = next_upcoming_trips  # Multiple trips at same time
         
         context['stats'] = {
             'total_bookings': Booking.objects.filter(user=request.user).count(),

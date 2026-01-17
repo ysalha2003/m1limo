@@ -899,22 +899,22 @@
     </a>
 
     <!-- Next Reservation Card -->
-    {% if next_upcoming_trip %}
-    <a href="{% url 'reservation_detail' next_upcoming_trip.id %}" 
-       class="stat-card next-reservation-card {% if next_upcoming_trip.hours_until_pickup <= 2 %}urgent{% endif %}" 
-       style="flex: 1; min-width: 400px; height: 100px;"
-       aria-label="View next reservation details"
-       role="button">
-    {% else %}
-    <a href="#" 
-       class="stat-card next-reservation-card" 
-       style="flex: 1; min-width: 400px; height: 100px; cursor: default; pointer-events: none; opacity: 0.6;"
-       aria-label="No upcoming reservations"
-       role="presentation">
-    {% endif %}
+    <div class="stat-card next-reservation-card {% if next_upcoming_trip.hours_until_pickup <= 2 %}urgent{% endif %}" 
+         style="flex: 1; min-width: 400px; height: 100px; position: relative; {% if not next_upcoming_trip %}cursor: default; pointer-events: none; opacity: 0.6;{% else %}cursor: pointer;{% endif %}"
+         {% if next_upcoming_trip %}onclick="window.location.href='{% url 'reservation_detail' next_upcoming_trip.id %}'"{% endif %}
+         aria-label="{% if next_upcoming_trip %}View next reservation details{% else %}No upcoming reservations{% endif %}"
+         role="{% if next_upcoming_trip %}button{% else %}presentation{% endif %}">
+        
         <div style="display: flex; flex-direction: column; height: 100%; position: relative;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <p class="stat-label" style="font-size: 13px; font-weight: 600; color: #0c4a6e; margin: 0;">Next Reservation</p>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <p class="stat-label" style="font-size: 13px; font-weight: 600; color: #0c4a6e; margin: 0;">Next Reservation</p>
+                    {% if next_upcoming_trips and next_upcoming_trips|length > 1 %}
+                        <span id="trip-counter" style="font-size: 10px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">
+                            1/{{ next_upcoming_trips|length }}
+                        </span>
+                    {% endif %}
+                </div>
                 <div class="stat-icon" style="background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%); width: 20px; height: 20px;">
                     <svg style="width: 12px; height: 12px; color: white; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
@@ -923,56 +923,64 @@
             </div>
             
             {% if next_upcoming_trip %}
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <!-- Date & Time -->
-                    <div style="display: flex; align-items: baseline; gap: 6px;">
-                        <span style="color: #0c4a6e; font-size: 14px; font-weight: 700; white-space: nowrap;">
-                            {{ next_upcoming_trip.pick_up_date|date:"M d, Y" }}
-                        </span>
-                        <span style="color: #0369a1; font-size: 13px; font-weight: 600; white-space: nowrap;">
-                            {{ next_upcoming_trip.pick_up_time|time:"g:i A" }}
-                        </span>
-                    </div>
-                    
-                    <!-- Countdown Badge -->
-                    {% load booking_filters %}
-                    {% with time_remaining=next_upcoming_trip|format_time_until_pickup %}
-                        {% if time_remaining %}
-                            {% if time_remaining.total_hours < 24 %}
-                                <div style="display: inline-flex; align-items: center; background: #fee2e2; color: #991b1b; padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap;">
-                                    <span id="live-countdown" 
-                                          data-pickup-date="{{ next_upcoming_trip.pick_up_date|date:'Y-m-d' }}" 
-                                          data-pickup-time="{{ next_upcoming_trip.pick_up_time|time:'H:i:s' }}">
-                                        Calculating...
-                                    </span>
-                                </div>
-                            {% elif time_remaining.days > 0 %}
-                                <div style="display: inline-flex; align-items: center; background: #fef9e7; color: #8b6914; padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap;">
-                                    {{ time_remaining.days }}d {{ time_remaining.hours }}h
-                                </div>
+                <!-- Container for all trips (will rotate if multiple) -->
+                <div id="next-reservation-container" style="position: relative; flex: 1;">
+                    {% for trip in next_upcoming_trips %}
+                    <div class="trip-rotation-item" 
+                         data-trip-index="{{ forloop.counter0 }}"
+                         data-trip-id="{{ trip.id }}"
+                         style="display: {% if forloop.first %}flex{% else %}none{% endif %}; align-items: center; gap: 8px; flex-wrap: wrap; position: absolute; top: 0; left: 0; right: 0; opacity: {% if forloop.first %}1{% else %}0{% endif %}; transition: opacity 0.5s ease-in-out;">
+                        <!-- Date & Time -->
+                        <div style="display: flex; align-items: baseline; gap: 6px;">
+                            <span style="color: #0c4a6e; font-size: 14px; font-weight: 700; white-space: nowrap;">
+                                {{ trip.pick_up_date|date:"M d, Y" }}
+                            </span>
+                            <span style="color: #0369a1; font-size: 13px; font-weight: 600; white-space: nowrap;">
+                                {{ trip.pick_up_time|time:"g:i A" }}
+                            </span>
+                        </div>
+                        
+                        <!-- Countdown Badge -->
+                        {% load booking_filters %}
+                        {% with time_remaining=trip|format_time_until_pickup %}
+                            {% if time_remaining %}
+                                {% if time_remaining.total_hours < 24 %}
+                                    <div style="display: inline-flex; align-items: center; background: #fee2e2; color: #991b1b; padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap;">
+                                        <span class="live-countdown" 
+                                              data-pickup-date="{{ trip.pick_up_date|date:'Y-m-d' }}" 
+                                              data-pickup-time="{{ trip.pick_up_time|time:'H:i:s' }}">
+                                            Calculating...
+                                        </span>
+                                    </div>
+                                {% elif time_remaining.days > 0 %}
+                                    <div style="display: inline-flex; align-items: center; background: #fef9e7; color: #8b6914; padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap;">
+                                        {{ time_remaining.days }}d {{ time_remaining.hours }}h
+                                    </div>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    {% endwith %}
-                    
-                    <span style="color: #cbd5e1; font-weight: 300; font-size: 14px;">│</span>
-                    
-                    <!-- Location -->
-                    <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
-                        <svg style="width: 12px; height: 12px; color: #7dd3fc; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        </svg>
-                        <span style="color: #334155; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ next_upcoming_trip.pick_up_address|truncatewords:3 }}</span>
+                        {% endwith %}
+                        
+                        <span style="color: #cbd5e1; font-weight: 300; font-size: 14px;">│</span>
+                        
+                        <!-- Location -->
+                        <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
+                            <svg style="width: 12px; height: 12px; color: #7dd3fc; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            </svg>
+                            <span style="color: #334155; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ trip.pick_up_address|truncatewords:3 }}</span>
+                        </div>
+                        
+                        <span style="color: #e2e8f0; font-size: 12px;">•</span>
+                        
+                        <!-- Passenger -->
+                        <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
+                            <svg style="width: 12px; height: 12px; color: #a78bfa; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            <span style="color: #334155; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ trip.passenger_name|truncatewords:2 }}</span>
+                        </div>
                     </div>
-                    
-                    <span style="color: #e2e8f0; font-size: 12px;">•</span>
-                    
-                    <!-- Passenger -->
-                    <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
-                        <svg style="width: 12px; height: 12px; color: #a78bfa; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        <span style="color: #334155; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ next_upcoming_trip.passenger_name|truncatewords:2 }}</span>
-                    </div>
+                    {% endfor %}
                 </div>
             {% else %}
                 <div style="display: flex; align-items: center; justify-content: center; flex: 1; color: #94a3b8; font-size: 13px;">
@@ -980,7 +988,7 @@
                 </div>
             {% endif %}
         </div>
-    </a>
+    </div>
 </div>
 
 <!-- Today's Pickups -->
@@ -1456,26 +1464,86 @@
 
 {% block extra_js %}
 <script>
+// Rotate between multiple trips at the same time (if any)
+let currentTripIndex = 0;
+let tripRotationInterval = null;
+
+function rotateNextReservationTrips() {
+    const tripItems = document.querySelectorAll('.trip-rotation-item');
+    if (tripItems.length <= 1) return; // No rotation needed for single trip
+    
+    const counter = document.getElementById('trip-counter');
+    const container = document.querySelector('.stat-card.next-reservation-card');
+    
+    function showTrip(index) {
+        // Fade out current trip
+        tripItems.forEach((item, i) => {
+            if (i === currentTripIndex) {
+                item.style.opacity = '0';
+                setTimeout(() => {
+                    item.style.display = 'none';
+                }, 500);
+            }
+        });
+        
+        // Update index
+        currentTripIndex = index;
+        
+        // Fade in next trip
+        setTimeout(() => {
+            const nextItem = tripItems[currentTripIndex];
+            nextItem.style.display = 'flex';
+            setTimeout(() => {
+                nextItem.style.opacity = '1';
+            }, 50);
+            
+            // Update counter
+            if (counter) {
+                counter.textContent = `${currentTripIndex + 1}/${tripItems.length}`;
+            }
+            
+            // Update click handler to go to correct trip
+            const tripId = nextItem.dataset.tripId;
+            if (container && tripId) {
+                container.onclick = function() {
+                    window.location.href = `/bookings/${tripId}/`;
+                };
+            }
+            
+            // Update countdowns for this trip
+            updateAllCountdowns();
+        }, 500);
+    }
+    
+    function rotateToNext() {
+        const nextIndex = (currentTripIndex + 1) % tripItems.length;
+        showTrip(nextIndex);
+    }
+    
+    // Start rotation every 3 seconds
+    tripRotationInterval = setInterval(rotateToNext, 3000);
+}
+
 // Live countdown for next reservation (when < 24 hours)
+// Updated to handle multiple countdowns (for rotation)
 // IMPORTANT: All times are in America/Chicago timezone
-function updateLiveCountdown() {
-    const countdownElement = document.getElementById('live-countdown');
-    if (!countdownElement) return;
+function updateAllCountdowns() {
+    const countdownElements = document.querySelectorAll('.live-countdown');
     
-    const pickupDate = countdownElement.dataset.pickupDate;
-    const pickupTime = countdownElement.dataset.pickupTime;
-    
-    // Create pickup datetime in Chicago timezone
-    // The backend sends Chicago time, so we interpret it as such
-    const pickupDateTimeString = `${pickupDate}T${pickupTime}`;
-    
-    function update() {
+    countdownElements.forEach(countdownElement => {
+        const pickupDate = countdownElement.dataset.pickupDate;
+        const pickupTime = countdownElement.dataset.pickupTime;
+        
+        if (!pickupDate || !pickupTime) return;
+        
+        // Create pickup datetime in Chicago timezone
+        const pickupDateTimeString = `${pickupDate}T${pickupTime}`;
+        
         // Get current time in Chicago timezone
         const now = new Date();
         const chicagoTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
         
         // Parse pickup time as Chicago time
-        // Create Date objects and calculate offset
         const pickupLocal = new Date(pickupDateTimeString);
         const pickupChicago = new Date(pickupLocal.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
         
@@ -1510,17 +1578,27 @@ function updateLiveCountdown() {
             countdownElement.parentElement.style.background = '#fef9e7';
             countdownElement.parentElement.style.color = '#8b6914';
         }
-    }
-    
-    update();
-    setInterval(update, 1000);
+    });
 }
 
-// Initialize countdown on page load
+// Legacy function for backward compatibility (single countdown)
+function updateLiveCountdown() {
+    updateAllCountdowns();
+}
+
+// Initialize rotation and countdowns on page load
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateLiveCountdown);
+    document.addEventListener('DOMContentLoaded', function() {
+        rotateNextReservationTrips();
+        updateAllCountdowns();
+        // Update countdowns every second
+        setInterval(updateAllCountdowns, 1000);
+    });
 } else {
-    updateLiveCountdown();
+    rotateNextReservationTrips();
+    updateAllCountdowns();
+    // Update countdowns every second
+    setInterval(updateAllCountdowns, 1000);
 }
 
 function toggleReturn(bookingId) {
