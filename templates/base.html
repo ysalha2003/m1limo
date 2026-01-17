@@ -626,16 +626,43 @@
         /* Mobile Menu */
         .mobile-menu-button {
             display: none;
-            background: none;
+            background: transparent;
             border: none;
             cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius);
-            transition: var(--transition);
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            align-items: center;
+            justify-content: center;
         }
 
         .mobile-menu-button:hover {
-            background: var(--light-gray);
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+        }
+
+        .mobile-menu-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile menu backdrop overlay */
+        .mobile-menu-backdrop {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-menu-backdrop.active {
+            display: block;
+            opacity: 1;
         }
 
         .mobile-menu {
@@ -645,36 +672,48 @@
             left: 0;
             right: 0;
             background: white;
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
+            border-bottom: 1px solid rgba(203, 213, 225, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
             z-index: 999;
-            animation: slideDown 0.2s ease-out;
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+            transform: translateY(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .mobile-menu.active {
             display: block;
+            transform: translateY(0);
         }
 
         .mobile-menu-links {
-            padding: 12px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
         .mobile-menu-link {
-            padding: 10px 14px;
-            border-radius: var(--radius);
+            padding: 14px 16px;
+            border-radius: 8px;
             text-decoration: none;
-            color: var(--text-secondary);
+            color: #475569;
             font-weight: 500;
-            font-size: 14px;
-            transition: var(--transition);
+            font-size: 15px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .mobile-menu-link:hover {
-            background: var(--primary-light);
-            color: var(--primary);
+            background: linear-gradient(to bottom, #f0f9ff, #e0f2fe);
+            color: #0f172a;
+            transform: translateX(4px);
+        }
+
+        .mobile-menu-link:active {
+            transform: translateX(4px) scale(0.98);
         }
 
         @keyframes slideDown {
@@ -1155,8 +1194,19 @@
            ================================= */
         @media (max-width: 1024px) {
             .nav-container {
-                padding: 0 24px;
+                padding: 0 20px;
                 height: 60px;
+            }
+
+            /* Reduce nav link padding on tablets */
+            .nav-link {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+
+            /* Adjust activity dropdown width */
+            .activity-dropdown {
+                width: 360px;
             }
 
             main {
@@ -1165,6 +1215,22 @@
 
             .card {
                 padding: 20px;
+            }
+        }
+
+        /* =================================
+           RESPONSIVE - MEDIUM SCREENS (Switch to Mobile Menu)
+           ================================= */
+        @media (max-width: 992px) {
+            /* Hide desktop nav links, show mobile menu */
+            .nav-links {
+                display: none !important;
+            }
+
+            .mobile-menu-button {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
             }
         }
 
@@ -1180,6 +1246,27 @@
             .nav-container {
                 padding: 0 16px;
                 height: 60px;
+            }
+
+            /* Hide desktop nav links on mobile */
+            .nav-links {
+                display: none !important;
+            }
+
+            /* Show mobile menu button */
+            .mobile-menu-button {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Logo adjustments */
+            .logo {
+                gap: 8px;
+            }
+
+            .logo img {
+                height: 32px !important;
             }
 
             .logo-icon {
@@ -1198,62 +1285,6 @@
 
             .logo-subtitle {
                 font-size: 8px;
-            }
-
-            .nav-links {
-                gap: 0;
-                max-width: calc(100vw - 250px);
-            }
-
-            .nav-link {
-                padding: 7px 12px;
-                font-size: 13px;
-            }
-
-            .user-info {
-                padding-left: 10px;
-                margin-left: 10px;
-            }
-
-            .user-name {
-                font-size: 12px;
-                max-width: 100px;
-            }
-
-            .activity-dropdown {
-                width: calc(100vw - 32px);
-                right: -16px;
-            }
-
-            footer {
-                padding: 32px 16px 16px !important;
-                margin-top: 48px !important;
-            }
-
-            footer > div > div {
-                gap: 20px !important;
-                margin-bottom: 20px !important;
-                grid-template-columns: 1fr !important;
-            }
-
-            footer h3, footer h4 {
-                margin-bottom: 12px !important;
-            }
-
-            footer ul {
-                margin-bottom: 0 !important;
-            }
-
-            footer li {
-                margin-bottom: 8px !important;
-            }
-
-            .mobile-menu-button {
-                display: block;
-            }
-
-            .logo img {
-                height: 32px !important;
             }
 
             main {
@@ -1384,8 +1415,56 @@
            ================================= */
         @media (max-width: 375px) {
             .nav-container {
-                padding: 0 16px;
-                height: 60px;
+                padding: 0 12px;
+                height: 56px;
+            }
+
+            nav {
+                height: 56px;
+            }
+
+            .mobile-menu-backdrop {
+                top: 56px;
+            }
+
+            .mobile-menu {
+                top: 56px;
+                max-height: calc(100vh - 56px);
+            }
+
+            .logo {
+                gap: 6px;
+            }
+
+            .logo img {
+                height: 28px !important;
+            }
+
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .logo-icon svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .logo-text {
+                font-size: 15px;
+            }
+
+            .logo-subtitle {
+                font-size: 7px;
+            }
+
+            .mobile-menu-button {
+                padding: 8px;
+            }
+
+            .mobile-menu-button svg {
+                width: 22px !important;
+                height: 22px !important;
             }
 
             main {
@@ -1701,30 +1780,92 @@
         </div>
     </nav>
 
+    <!-- Mobile Menu Backdrop -->
+    <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" onclick="toggleMobileMenu()"></div>
+
     <div class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-links">
             {% if user.is_authenticated %}
-                <a href="{% url 'dashboard' %}" class="mobile-menu-link">Dashboard</a>
-                <a href="{% url 'new_reservation' %}" class="mobile-menu-link">New Reservation</a>
+                <!-- User Info Header in Mobile Menu -->
+                <div style="padding: 16px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 10px; margin-bottom: 12px; border: 1px solid #bae6fd;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);">
+                            <svg style="width: 24px; height: 24px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 2px;">{{ user.username }}</div>
+                            <div style="font-size: 12px; color: #64748b;">{{ user.email }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{% url 'dashboard' %}" class="mobile-menu-link">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="{% url 'new_reservation' %}" class="mobile-menu-link">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    New Reservation
+                </a>
                 {% if user.is_staff %}
-                    <a href="{% url 'reservation_activity' %}" class="mobile-menu-link">Activity Log</a>
+                    <a href="{% url 'reservation_activity' %}" class="mobile-menu-link">
+                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Activity Log
+                    </a>
                 {% endif %}
                 {% if not user.is_staff %}
-                <a href="{% url 'frequent_passengers' %}" class="mobile-menu-link">Frequent Passengers</a>
+                <a href="{% url 'frequent_passengers' %}" class="mobile-menu-link">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    Frequent Passengers
+                </a>
                 {% endif %}
-                <a href="{% url 'edit_profile' %}" class="mobile-menu-link">My Profile</a>
+                <a href="{% url 'edit_profile' %}" class="mobile-menu-link">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    My Profile
+                </a>
                 {% if user.is_staff %}
-                    <a href="{% url 'admin:index' %}" class="mobile-menu-link">Admin Panel</a>
+                    <a href="{% url 'admin:index' %}" class="mobile-menu-link">
+                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        Admin Panel
+                    </a>
                 {% endif %}
-                <div style="border-top: 1px solid var(--border); margin: 8px 0; padding-top: 8px;">
-                    <div style="padding: 12px 16px; color: var(--text-secondary); font-size: 14px; font-weight: 600;">
-                        {{ user.username }}
-                    </div>
-                    <a href="{% url 'logout' %}" class="mobile-menu-link">Logout</a>
-                </div>
+
+                <div style="border-top: 1px solid #e2e8f0; margin: 12px 0;"></div>
+                
+                <a href="{% url 'logout' %}" class="mobile-menu-link" style="color: #dc2626;">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Logout
+                </a>
             {% else %}
-                <a href="{% url 'signup' %}" class="mobile-menu-link">Sign Up</a>
-                <a href="{% url 'login' %}" class="mobile-menu-link">Login</a>
+                <a href="{% url 'signup' %}" class="mobile-menu-link">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    Sign Up
+                </a>
+                <a href="{% url 'login' %}" class="mobile-menu-link">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    Login
+                </a>
             {% endif %}
         </div>
     </div>
@@ -1892,20 +2033,41 @@
 
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
+            const backdrop = document.getElementById('mobileMenuBackdrop');
             menu.classList.toggle('active');
+            backdrop.classList.toggle('active');
+            
+            // Prevent body scroll when menu is open
+            if (menu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
         }
 
         document.addEventListener('click', function(event) {
             const menu = document.getElementById('mobileMenu');
+            const backdrop = document.getElementById('mobileMenuBackdrop');
             const button = document.querySelector('.mobile-menu-button');
-            if (menu && button && !menu.contains(event.target) && !button.contains(event.target)) {
+            
+            // Close menu when clicking outside (but not on the button)
+            if (menu && button && backdrop && 
+                !menu.contains(event.target) && 
+                !button.contains(event.target) && 
+                menu.classList.contains('active')) {
                 menu.classList.remove('active');
+                backdrop.classList.remove('active');
+                document.body.style.overflow = '';
             }
         });
 
         document.querySelectorAll('.mobile-menu-link').forEach(link => {
             link.addEventListener('click', function() {
-                document.getElementById('mobileMenu').classList.remove('active');
+                const menu = document.getElementById('mobileMenu');
+                const backdrop = document.getElementById('mobileMenuBackdrop');
+                menu.classList.remove('active');
+                backdrop.classList.remove('active');
+                document.body.style.overflow = '';
             });
         });
 
