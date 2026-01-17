@@ -31,7 +31,6 @@ class BookingForm(BaseModelForm):
     booking_for_user = UserChoiceField(
         queryset=User.objects.filter(is_active=True).order_by('first_name', 'last_name', 'username'),
         required=False,
-        initial=lambda: User.objects.filter(username='Admin').first(),
         help_text='Select a user to create this booking on their behalf',
         widget=forms.Select(attrs={'class': 'form-select'})
     )
@@ -94,7 +93,14 @@ class BookingForm(BaseModelForm):
     def __init__(self, *args, **kwargs):
         """Initialize form"""
         super().__init__(*args, **kwargs)
-        # phone_number and passenger_email are now direct model fields, no special handling needed
+        # Set Admin as default for booking_for_user field if no instance
+        if not self.instance.pk and 'booking_for_user' in self.fields:
+            try:
+                admin_user = User.objects.filter(username='Admin').first()
+                if admin_user:
+                    self.fields['booking_for_user'].initial = admin_user.pk
+            except User.DoesNotExist:
+                pass
 
     class Meta:
         model = Booking
