@@ -2042,25 +2042,38 @@ function updateAllCountdowns() {
         
         if (!pickupDate || !pickupTime) return;
         
-        // Create pickup datetime in Chicago timezone
-        const pickupDateTimeString = `${pickupDate}T${pickupTime}`;
+        // Create pickup datetime string (YYYY-MM-DD HH:MM:SS format)
+        const pickupDateTimeString = `${pickupDate} ${pickupTime}`;
         
-        // Get current time in Chicago timezone
-        const now = new Date();
-        const chicagoTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+        // Get current time in Chicago timezone using Intl API
+        const nowChicago = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
         
-        // Parse pickup time as Chicago time
-        const pickupLocal = new Date(pickupDateTimeString);
-        const pickupChicago = new Date(pickupLocal.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+        // Parse the pickup time as if it's already in Chicago timezone
+        // We construct a date string that the browser will interpret correctly
+        const pickupParts = pickupDateTimeString.split(/[- :]/);
+        const pickupChicago = new Date(
+            parseInt(pickupParts[0]),  // year
+            parseInt(pickupParts[1]) - 1,  // month (0-indexed)
+            parseInt(pickupParts[2]),  // day
+            parseInt(pickupParts[3]),  // hour
+            parseInt(pickupParts[4]),  // minute
+            parseInt(pickupParts[5] || 0)  // second
+        );
         
-        // Calculate the difference between Chicago time and what the browser interpreted
-        const offset = pickupLocal - pickupChicago;
+        // Get the Chicago time equivalent in the browser's timezone
+        const chicagoOffset = new Date().toLocaleString('en-US', { 
+            timeZone: 'America/Chicago',
+            hour: '2-digit',
+            minute: '2-digit', 
+            second: '2-digit',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour12: false
+        });
         
-        // Adjust pickup time to be correctly interpreted as Chicago time
-        const pickupCorrected = new Date(pickupLocal.getTime() - offset);
-        
-        // Calculate difference
-        const diff = pickupCorrected - now;
+        // Calculate difference using Chicago time
+        const diff = pickupChicago - nowChicago;
         
         if (diff <= 0) {
             countdownElement.textContent = 'PICKUP TIME';
