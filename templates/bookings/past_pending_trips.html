@@ -280,6 +280,19 @@
         box-shadow: 0 3px 10px rgba(100, 116, 139, 0.25);
     }
 
+    .btn-disabled {
+        background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .btn-disabled:hover {
+        transform: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
     .empty-state {
         text-align: center;
         padding: 60px 20px;
@@ -569,26 +582,53 @@
             </div>
 
             <div class="action-buttons">
-                <a href="{% url 'confirm_pending_action' booking.id 'confirm' %}?next=past_pending_trips" class="btn-action btn-confirm-now" onclick="this.classList.add('loading');">
+                {% if booking.can_confirm %}
+                <a href="{% url 'confirm_pending_action' booking.id 'confirm' %}?next=past_pending_reservations" class="btn-action btn-confirm-now" onclick="this.classList.add('loading');">
                     <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span style="position: relative; z-index: 1;">Confirm Anyway</span>
                 </a>
+                {% else %}
+                <button class="btn-action btn-disabled" disabled title="{{ booking.confirm_disabled_reason|default:'Action not available' }}">
+                    <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span style="position: relative; z-index: 1;">Confirm Anyway</span>
+                </button>
+                {% endif %}
                 
-                <a href="{% url 'confirm_pending_action' booking.id 'cancel' %}?next=past_pending_trips" class="btn-action btn-cancel" onclick="this.classList.add('loading');">
+                {% if booking.can_cancel %}
+                <a href="{% url 'confirm_pending_action' booking.id 'cancel' %}?next=past_pending_reservations" class="btn-action btn-cancel" onclick="this.classList.add('loading');">
                     <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span style="position: relative; z-index: 1;">Cancel</span>
                 </a>
-
-                <a href="{% url 'confirm_pending_action' booking.id 'not_covered' %}?next=past_pending_trips" class="btn-action btn-not-covered" onclick="this.classList.add('loading');">
+                {% else %}
+                <button class="btn-action btn-disabled" disabled>
                     <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span style="position: relative; z-index: 1;">Cancel</span>
+                </button>
+                {% endif %}
+
+                {% if booking.can_mark_not_covered %}
+                <a href="{% url 'confirm_pending_action' booking.id 'not_covered' %}?next=past_pending_reservations" class="btn-action btn-not-covered" onclick="this.classList.add('loading');">
+                    <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 515.636 5.636m12.728 12.728L5.636 5.636"/>
                     </svg>
                     <span style="position: relative; z-index: 1;">Not Covered</span>
                 </a>
+                {% else %}
+                <button class="btn-action btn-disabled" disabled>
+                    <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 515.636 5.636m12.728 12.728L5.636 5.636"/>
+                    </svg>
+                    <span style="position: relative; z-index: 1;">Not Covered</span>
+                </button>
+                {% endif %}
 
                 <a href="{% url 'reservation_detail' booking.id %}" class="btn-action btn-view">
                     <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1406,10 +1406,10 @@ def booking_actions(request, booking_id, action):
         logger.error(f"Error performing action {action}: {e}")
         messages.error(request, str(e))
 
-    # Return to referring page if from past_confirmed_trips
+    # Return to referring page if from past_confirmed_reservations
     next_url = request.GET.get('next')
-    if next_url == 'past_confirmed_trips':
-        return redirect('past_confirmed_trips')
+    if next_url == 'past_confirmed_reservations':
+        return redirect('past_confirmed_reservations')
     return redirect('dashboard')
 
 
@@ -2330,6 +2330,11 @@ def past_confirmed_trips(request):
         if timezone.is_naive(pickup_datetime):
             pickup_datetime = timezone.make_aware(pickup_datetime)
         booking.hours_overdue = int((now - pickup_datetime).total_seconds() / 3600)
+        
+        # Determine which actions are allowed
+        # All actions are allowed for past confirmed trips
+        booking.can_complete = True
+        booking.can_mark_no_show = True
     
     context = {
         'past_confirmed_trips': past_confirmed,
@@ -2379,7 +2384,7 @@ def confirm_trip_action(request, booking_id, action):
     
     if action not in action_details:
         messages.error(request, "Invalid action.")
-        return redirect('past_confirmed_trips' if next_url == 'past_confirmed_trips' else 'dashboard')
+        return redirect('past_confirmed_reservations' if next_url == 'past_confirmed_reservations' else 'dashboard')
     
     details = action_details[action]
     
@@ -2393,8 +2398,8 @@ def confirm_trip_action(request, booking_id, action):
             messages.error(request, f"Error: {str(e)}")
         
         # Redirect back to referring page
-        if next_url == 'past_confirmed_trips':
-            return redirect('past_confirmed_trips')
+        if next_url == 'past_confirmed_reservations':
+            return redirect('past_confirmed_reservations')
         return redirect('dashboard')
     
     # GET request - show confirmation page
@@ -2444,6 +2449,17 @@ def past_pending_trips(request):
         if timezone.is_naive(pickup_datetime):
             pickup_datetime = timezone.make_aware(pickup_datetime)
         booking.hours_overdue = int((now - pickup_datetime).total_seconds() / 3600)
+        
+        # Determine which actions are allowed
+        # Confirm is NOT allowed if pickup time was more than 24 hours ago (validation will fail)
+        # This prevents the validation error the user is experiencing
+        booking.can_confirm = booking.hours_overdue < 24
+        booking.can_cancel = True  # Cancel is always allowed
+        booking.can_mark_not_covered = True  # Trip_Not_Covered is always allowed
+        
+        # Add reason why confirm is disabled
+        if not booking.can_confirm:
+            booking.confirm_disabled_reason = f"Pickup was {booking.hours_overdue} hours ago (max 24h for confirmation)"
     
     context = {
         'past_pending_trips': past_pending,
@@ -2493,7 +2509,7 @@ def confirm_pending_action(request, booking_id, action):
     
     if action not in action_details:
         messages.error(request, "Invalid action.")
-        return redirect('past_pending_trips' if next_url == 'past_pending_trips' else 'dashboard')
+        return redirect('past_pending_reservations' if next_url == 'past_pending_reservations' else 'dashboard')
     
     details = action_details[action]
     
@@ -2507,8 +2523,8 @@ def confirm_pending_action(request, booking_id, action):
             messages.error(request, f"Error: {str(e)}")
         
         # Redirect back to referring page
-        if next_url == 'past_pending_trips':
-            return redirect('past_pending_trips')
+        if next_url == 'past_pending_reservations':
+            return redirect('past_pending_reservations')
         return redirect('dashboard')
     
     # GET request - show confirmation page

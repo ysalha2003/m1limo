@@ -219,7 +219,7 @@ class Booking(models.Model):
     ]
 
     VALID_TRANSITIONS = {
-        'Pending': ['Confirmed', 'Cancelled'],
+        'Pending': ['Confirmed', 'Cancelled', 'Trip_Not_Covered'],
         'Confirmed': ['Cancelled', 'Cancelled_Full_Charge', 'Customer_No_Show',
                      'Trip_Not_Covered', 'Trip_Completed', 'Pending'],
         'Cancelled': [],
@@ -538,8 +538,10 @@ class Booking(models.Model):
         skip_past_date_validation = False
 
         if not is_new:
-            # Allow past dates when marking as completed or cancelled
-            if self.status in ['Trip_Completed', 'Cancelled', 'Cancelled_Full_Charge']:
+            # Allow past dates when marking as completed, cancelled, confirmed, or other final statuses
+            # This allows admins to update status on past bookings
+            if self.status in ['Trip_Completed', 'Cancelled', 'Cancelled_Full_Charge', 
+                               'Customer_No_Show', 'Trip_Not_Covered', 'Confirmed']:
                 skip_past_date_validation = True
 
         if self.pick_up_date and not skip_past_date_validation:
@@ -553,8 +555,8 @@ class Booking(models.Model):
                     'pick_up_date': f'Pickup date cannot be in the past. Please select {today} or later.'
                 })
 
-            # If pickup is today, validate time hasn't passed
-            if self.pick_up_date == today and self.pick_up_time:
+            # If pickup is today, validate time hasn't passed (also skip if handling past bookings)
+            if self.pick_up_date == today and self.pick_up_time and not skip_past_date_validation:
                 now = timezone.now()
                 pickup_datetime = timezone.make_aware(
                     datetime.combine(self.pick_up_date, self.pick_up_time)
