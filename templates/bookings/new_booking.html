@@ -398,17 +398,58 @@
     }
 
     @media (max-width: 768px) {
+        /* Hide visual progress circles on mobile */
         .progress-steps {
-            flex-wrap: wrap;
-            gap: 20px;
+            display: none;
         }
-
-        .progress-step {
-            flex: 1 1 45%;
-        }
-
+        
         .progress-line {
             display: none;
+        }
+        
+        /* Show simplified text indicator */
+        .progress-container {
+            position: relative;
+            text-align: center;
+            padding: 12px 16px;
+        }
+        
+        .progress-container::before {
+            content: "Step " attr(data-current-step) " of 4";
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.02em;
+        }
+        
+        /* Mobile progress bar */
+        .progress-container::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 4px;
+            background: var(--border-light);
+            border-radius: 2px;
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        /* Dynamic progress fill based on current step */
+        .progress-container[data-current-step="1"]::after {
+            background: linear-gradient(to right, var(--primary) 0%, var(--primary) 25%, var(--border-light) 25%);
+        }
+        
+        .progress-container[data-current-step="2"]::after {
+            background: linear-gradient(to right, var(--primary) 0%, var(--primary) 50%, var(--border-light) 50%);
+        }
+        
+        .progress-container[data-current-step="3"]::after {
+            background: linear-gradient(to right, var(--primary) 0%, var(--primary) 75%, var(--border-light) 75%);
+        }
+        
+        .progress-container[data-current-step="4"]::after {
+            background: var(--primary);
         }
 
         .form-grid {
@@ -508,7 +549,7 @@
     </div>
 
     <!-- Progress Indicator -->
-    <div class="progress-container">
+    <div class="progress-container" data-current-step="1" id="progressContainer">
         <div class="progress-steps">
             <div class="progress-line">
                 <div class="progress-line-fill" id="progressFill"></div>
@@ -1597,6 +1638,12 @@
     function updateProgress() {
         const progressSteps = document.querySelectorAll('.progress-step');
         const progressFill = document.getElementById('progressFill');
+        const progressContainer = document.getElementById('progressContainer');
+
+        // Update data attribute for mobile indicator
+        if (progressContainer) {
+            progressContainer.setAttribute('data-current-step', currentStep);
+        }
 
         progressSteps.forEach(step => {
             const stepNum = parseInt(step.dataset.step);

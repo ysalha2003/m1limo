@@ -910,6 +910,133 @@
             opacity: 0.7;
         }
     }
+
+    /* ===== MOBILE CARD VIEW (replaces table on mobile) ===== */
+    .mobile-card-list {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .desktop-table {
+            display: none !important;
+        }
+        
+        .mobile-card-list {
+            display: block;
+        }
+    }
+
+    .mobile-booking-card {
+        background: white;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+    }
+
+    .mobile-booking-card:hover {
+        border-color: var(--border);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile-booking-card.past-trip {
+        opacity: 0.5;
+        background-color: rgba(0,0,0,0.02);
+    }
+
+    .mobile-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .mobile-card-id {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .mobile-card-body {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .mobile-card-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 12px;
+    }
+
+    .mobile-card-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        flex-shrink: 0;
+    }
+
+    .mobile-card-value {
+        color: var(--dark);
+        font-weight: 600;
+        font-size: 13px;
+        text-align: right;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mobile-card-actions {
+        display: flex;
+        gap: 8px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border-light);
+        flex-wrap: wrap;
+    }
+
+    .mobile-card-actions .action-link,
+    .mobile-card-actions .expand-btn {
+        flex: 1;
+        min-width: fit-content;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .mobile-card-return {
+        margin-top: 12px;
+        padding: 12px;
+        background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+        border-radius: 8px;
+        border-left: 3px solid var(--primary);
+        display: none;
+    }
+
+    .mobile-card-return.active {
+        display: block;
+    }
+
+    .mobile-card-return-header {
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+    }
+
+    .mobile-card-return-grid {
+        display: grid;
+        gap: 8px;
+    }
 </style>
 {% endblock %}
 
@@ -1294,7 +1421,9 @@
             </div>
         </div>
         {% endif %}
-        <div class="table-wrapper">
+        
+        <!-- Desktop Table View -->
+        <div class="table-wrapper desktop-table">
             <table>
                 <thead>
                     <tr>
@@ -1570,6 +1699,187 @@
             </table>
         </div>
 
+        <!-- Mobile Card View -->
+        <div class="mobile-card-list">
+            {% for booking in bookings %}
+            <div class="mobile-booking-card {% if booking.is_past_trip or booking.status == 'Cancelled' or booking.status == 'Cancelled_Full_Charge' %}past-trip{% endif %}">
+                <!-- Card Header -->
+                <div class="mobile-card-header">
+                    <div class="mobile-card-id">
+                        <span style="font-size: 10px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">ID #{{ booking.id }}</span>
+                        {% if not is_admin and booking.has_unviewed_changes %}
+                            <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; color: #8b302b; background: #fef0ef; padding: 2px 6px; border-radius: 4px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;" title="Recent activity">
+                                <svg style="width: 9px; height: 9px;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                                </svg>
+                                NEW
+                            </span>
+                        {% endif %}
+                        {% if booking.trip_type == 'Round' and booking.linked_booking %}
+                            <span class="round-trip-badge">
+                                <svg style="width: 10px; height: 10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                                ROUND
+                            </span>
+                        {% endif %}
+                    </div>
+                    <span class="badge badge-{{ booking.status|lower }}">{{ booking.get_status_display }}</span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="mobile-card-body">
+                    <div class="mobile-card-row">
+                        <span class="mobile-card-label">Passenger</span>
+                        <span class="mobile-card-value">{{ booking.passenger_name }}</span>
+                    </div>
+                    
+                    <div class="mobile-card-row">
+                        <span class="mobile-card-label">Contact</span>
+                        <span class="mobile-card-value">{{ booking.phone_number|default:booking.passenger_email }}</span>
+                    </div>
+                    
+                    <div class="mobile-card-row">
+                        <span class="mobile-card-label">Pickup</span>
+                        <span class="mobile-card-value">{{ booking.pick_up_address }}</span>
+                    </div>
+                    
+                    {% if booking.drop_off_address %}
+                    <div class="mobile-card-row">
+                        <span class="mobile-card-label">Dropoff</span>
+                        <span class="mobile-card-value">{{ booking.drop_off_address }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mobile-card-row">
+                        <span class="mobile-card-label">Date & Time</span>
+                        <span class="mobile-card-value">{{ booking.pick_up_date }} {{ booking.pick_up_time }}</span>
+                    </div>
+                    
+                    <div class="mobile-card-row">
+                        <span class="mobile-card-label">Vehicle</span>
+                        <span class="mobile-card-value">{{ booking.vehicle_type }}</span>
+                    </div>
+                    
+                    <div class="mobile-card-row">
+                        <span class="mobile-card-label">Trip Type</span>
+                        <span class="mobile-card-value">{{ booking.get_trip_type_display }}</span>
+                    </div>
+                    
+                    {% if is_admin and booking.assigned_driver %}
+                    <div class="mobile-card-row">
+                        <span class="mobile-card-label">Driver</span>
+                        <span class="mobile-card-value">
+                            {{ booking.assigned_driver.full_name }}
+                            {% if booking.driver_response_status == 'accepted' %}
+                                <span style="color: #2e7d32; font-size: 11px;">✓ Accepted</span>
+                            {% elif booking.driver_response_status == 'rejected' %}
+                                <span style="color: #8b302b; font-size: 11px;">✗ Rejected</span>
+                            {% elif booking.driver_response_status == 'completed' %}
+                                <span style="color: #0c5460; font-size: 11px;">✓ Completed</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Card Actions -->
+                <div class="mobile-card-actions">
+                    {% if booking.is_past_trip %}
+                        <a href="{% url 'reservation_detail' booking.id %}" class="action-link">View</a>
+                        <a href="{% url 'rebook_reservation' booking.id %}" class="action-link" style="color: var(--primary);">
+                            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Rebook
+                        </a>
+                    {% else %}
+                        {% if booking.trip_type == 'Round' and booking.linked_booking %}
+                            <button onclick="toggleMobileReturn({{ booking.id }})" class="expand-btn" id="mobile-expand-btn-{{ booking.id }}">
+                                <svg class="expand-icon" style="width: 14px; height: 14px; transition: transform 0.2s;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                                Show Return
+                            </button>
+                        {% endif %}
+                        
+                        <a href="{% url 'reservation_detail' booking.id %}" class="action-link">
+                            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            View
+                        </a>
+                        
+                        {% if is_admin %}
+                            {% if booking.status == 'Pending' %}
+                                <a href="{% url 'reservation_actions' booking.id 'confirm' %}" class="action-link action-approve">
+                                    <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Approve
+                                </a>
+                            {% elif booking.status == 'Confirmed' %}
+                                {% if booking.hours_until_pickup <= 0 %}
+                                    <a href="{% url 'reservation_actions' booking.id 'complete' %}" class="action-link action-complete">
+                                        <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        Complete
+                                    </a>
+                                {% else %}
+                                    <span class="action-link" style="opacity: 0.4; cursor: not-allowed; pointer-events: none;" title="Cannot complete until after pickup time">Complete</span>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            {% if booking.status in 'Pending,Confirmed' and booking.hours_until_pickup > 2 %}
+                                <a href="{% url 'update_reservation' booking.id %}" class="action-link">
+                                    <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    Edit
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Return Trip Details (Mobile) -->
+                {% if booking.trip_type == 'Round' and booking.linked_booking %}
+                <div class="mobile-card-return" id="mobile-return-{{ booking.id }}">
+                    <div class="mobile-card-return-header">
+                        <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                        </svg>
+                        Return Trip
+                        <span style="font-size: 10px; font-weight: 700; background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">ID #{{ booking.linked_booking.id }}</span>
+                    </div>
+                    <div class="mobile-card-return-grid">
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Passenger</span>
+                            <span class="mobile-card-value">{{ booking.linked_booking.passenger_name }}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Pickup</span>
+                            <span class="mobile-card-value">{{ booking.linked_booking.pick_up_address }}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Date & Time</span>
+                            <span class="mobile-card-value">{{ booking.linked_booking.pick_up_date }} {{ booking.linked_booking.pick_up_time }}</span>
+                        </div>
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">Status</span>
+                            <span class="mobile-card-value"><span class="badge badge-{{ booking.linked_booking.status|lower }}">{{ booking.linked_booking.get_status_display }}</span></span>
+                        </div>
+                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light);">
+                            <a href="{% url 'reservation_detail' booking.linked_booking.id %}" class="action-link" style="width: 100%; justify-content: center;">View Return Trip Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
         {% if page_obj.has_other_pages %}
         <div style="margin-top: 24px; display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap;">
             {% if page_obj.has_previous %}
@@ -1747,6 +2057,23 @@ function toggleReturn(bookingId) {
         expandBtn.innerHTML = expandBtn.innerHTML.replace('Hide Return', 'Show Return');
     } else {
         returnRow.style.display = 'table-row';
+        expandIcon.style.transform = 'rotate(180deg)';
+        expandBtn.innerHTML = expandBtn.innerHTML.replace('Show Return', 'Hide Return');
+    }
+}
+
+// Mobile card return toggle
+function toggleMobileReturn(bookingId) {
+    const returnCard = document.getElementById('mobile-return-' + bookingId);
+    const expandBtn = document.getElementById('mobile-expand-btn-' + bookingId);
+    const expandIcon = expandBtn.querySelector('.expand-icon');
+    
+    if (returnCard.classList.contains('active')) {
+        returnCard.classList.remove('active');
+        expandIcon.style.transform = 'rotate(0deg)';
+        expandBtn.innerHTML = expandBtn.innerHTML.replace('Hide Return', 'Show Return');
+    } else {
+        returnCard.classList.add('active');
         expandIcon.style.transform = 'rotate(180deg)';
         expandBtn.innerHTML = expandBtn.innerHTML.replace('Show Return', 'Hide Return');
     }
