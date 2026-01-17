@@ -331,13 +331,15 @@ def dashboard(request):
     if request.user.is_staff:
         today_pickups = Booking.objects.filter(
             pick_up_date=today,
-            status='Confirmed'
+            status='Confirmed',
+            is_return_trip=False  # Only show outbound trips to avoid duplicates
         ).order_by('pick_up_time')
     else:
         today_pickups = Booking.objects.filter(
             user=request.user,
             pick_up_date=today,
-            status='Confirmed'
+            status='Confirmed',
+            is_return_trip=False  # Only show outbound trips to avoid duplicates
         ).order_by('pick_up_time')
 
     from datetime import datetime, timedelta
@@ -450,9 +452,10 @@ def dashboard(request):
             ).filter(future_filter).count(),
         }
         
-        # Get the next upcoming trip
+        # Get the next upcoming trip (exclude return trips to avoid duplicates)
         next_upcoming = Booking.objects.filter(
-            status='Confirmed'
+            status='Confirmed',
+            is_return_trip=False
         ).filter(future_filter).order_by('pick_up_date', 'pick_up_time').first()
         context['next_upcoming_trip'] = next_upcoming
         context['stats'] = stats
@@ -476,7 +479,8 @@ def dashboard(request):
         
         next_upcoming = Booking.objects.filter(
             user=request.user,
-            status='Confirmed'
+            status='Confirmed',
+            is_return_trip=False
         ).filter(future_filter).order_by('pick_up_date', 'pick_up_time').first()
         context['next_upcoming_trip'] = next_upcoming
         
