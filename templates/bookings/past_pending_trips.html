@@ -466,28 +466,28 @@
 
             <div class="action-buttons">
                 <a href="{% url 'confirm_pending_action' booking.id 'confirm' %}?next=past_pending_trips" class="btn-action btn-confirm-now" onclick="this.classList.add('loading');">
-                    <svg style="width: 18px; height: 18px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span style="position: relative; z-index: 1;">Confirm Anyway</span>
                 </a>
                 
                 <a href="{% url 'confirm_pending_action' booking.id 'cancel' %}?next=past_pending_trips" class="btn-action btn-cancel" onclick="this.classList.add('loading');">
-                    <svg style="width: 18px; height: 18px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span style="position: relative; z-index: 1;">Cancel</span>
                 </a>
 
                 <a href="{% url 'confirm_pending_action' booking.id 'not_covered' %}?next=past_pending_trips" class="btn-action btn-not-covered" onclick="this.classList.add('loading');">
-                    <svg style="width: 18px; height: 18px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                     </svg>
                     <span style="position: relative; z-index: 1;">Not Covered</span>
                 </a>
 
                 <a href="{% url 'reservation_detail' booking.id %}" class="btn-action btn-view">
-                    <svg style="width: 18px; height: 18px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width: 14px; height: 14px; position: relative; z-index: 1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span style="position: relative; z-index: 1;">View Details</span>
@@ -496,16 +496,16 @@
         </div>
         {% endfor %}
 
-        <div style="margin-top: 32px; padding: 20px 24px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 16px; border-left: 6px solid #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(4px)';" onmouseout="this.style.transform='translateX(0)';">
-            <div style="display: flex; align-items: start; gap: 16px;">
-                <div style="flex-shrink: 0; width: 48px; height: 48px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);">
-                    <svg style="width: 28px; height: 28px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style="margin-top: 24px; padding: 14px 16px; background: #f0f9ff; border-radius: 10px; border-left: 3px solid #7dd3fc; box-shadow: 0 1px 3px rgba(125, 211, 252, 0.08); transition: all 0.2s ease;" onmouseover="this.style.transform='translateX(2px)';" onmouseout="this.style.transform='translateX(0)';">
+            <div style="display: flex; align-items: start; gap: 12px;">
+                <div style="flex-shrink: 0; width: 32px; height: 32px; background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(125, 211, 252, 0.2);">
+                    <svg style="width: 18px; height: 18px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                     </svg>
                 </div>
                 <div style="flex: 1;">
-                    <p style="color: #1e40af; font-size: 15px; margin: 0; line-height: 1.6; font-weight: 600;">
-                        <strong style="font-weight: 800; font-size: 16px;">💡 Pro Tip:</strong> Pending reservations that pass their pickup time without confirmation are automatically filtered from the "Pending" count. 
+                    <p style="color: #0c4a6e; font-size: 13px; margin: 0; line-height: 1.5; font-weight: 500;">
+                        <strong style="font-weight: 700;">Tip:</strong> Pending reservations that pass their pickup time without confirmation are automatically filtered from the "Pending" count. 
                         Use this page to clean up old requests and maintain accurate records.
                     </p>
                 </div>
