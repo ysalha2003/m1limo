@@ -2245,7 +2245,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    {% if not user.is_staff %}
+    {% if not user.is_authenticated %}
     <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 60px 24px 24px; margin-top: 80px;">
         <div style="max-width: 1200px; margin: 0 auto;">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; margin-bottom: 32px;">
